@@ -1,0 +1,23 @@
+{
+ "name": "My New Vocabulary",
+ "short_name": "MyNewVocabulary",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#F5F9FA",
+ "theme_color": "#1C9F95",
+ "lang": "az",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
