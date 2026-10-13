@@ -11,7 +11,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="MyNewVocabulary">
-<meta name="description" content="My New Vocabulary · Samir Balakişiyev">
+<meta name="description" content="4600+ söz, testlər, PDF lüğət, paraqraflar · Samir Balakişiyev">
+<meta property="og:type" content="website">
+<meta property="og:title" content="My New Vocabulary">
+<meta property="og:description" content="4600+ söz · testlər · PDF lüğət · paraqraflar — Samir Balakişiyev, 055 795 86 25">
+<meta property="og:url" content="https://samirbalakishiyev.github.io/my-new-vocabulary/">
+<meta property="og:image" content="https://samirbalakishiyev.github.io/my-new-vocabulary/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://samirbalakishiyev.github.io/my-new-vocabulary/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -7249,7 +7258,7 @@ function profHTML(){
   if(hasPR()&&!PEDITING){return `<section class="prof"><h3>${WAI}Nəticələr müəllimə göndəriləcək</h3><div class="psum"><span>Şagird: <b>${esc(PR.n)}</b></span><span>Sinif: <b>${esc(PR.k)}</b></span><span>Müəllimin nömrəsi: <b>${fmtTel(PR.t)}</b></span></div>${PCONF?'<p class="perr" style="margin:0 0 8px">Ad, sinif və nömrə silinsin? Bundan sonra nəticə göndərilməyəcək.</p><div class="pbtns"><button class="pbtn dl" onclick="pdelYes()">Bəli, sil</button><button class="pbtn gh" onclick="pdelNo()">Xeyr</button></div>':'<div class="pbtns"><button class="pbtn gh" onclick="pedit()">Dəyiş</button><button class="pbtn dl" onclick="pdel()">Sil</button></div>'}</section>`;}
   if(!hasPR()&&!PFORM)return `<div style="margin:0 0 18px"><button class="btn send" style="margin:0" onclick="PFORM=true;PERR='';home()">${WAI}Nəticəni müəllimə göndər</button></div>`;
   const t=PR.t?PR.t:'';
-  return `<section class="prof"><h3>${WAI}Nəticəni müəllimə göndər</h3><p class="info">Nəticənizi müəllimə göndərmək istəyirsinizsə, aşağıdakı xanaları doldurun. İstəmirsinizsə, boş saxlayın və testlərə davam edin.</p><div class="pf"><label>Şagirdin adı və soyadı<input id="pn" autocomplete="name" placeholder="Məs: Əli Məmmədov" value="${esc(PR.n)}"></label><label>Sinif<input id="pk" placeholder="Məs: 8-D" value="${esc(PR.k)}"></label><label>Müəllimin WhatsApp nömrəsi<div class="tel" id="ptw"><span>+994</span><input id="pt" type="tel" inputmode="numeric" autocomplete="off" placeholder="55 123 45 67" value="${esc(t)}" oninput="ptype(this)"></div></label><p class="perr" id="perr">${esc(PERR)}</p><div class="pbtns"><button class="pbtn" onclick="psubmit()">Yadda saxla</button><button class="pbtn gh" onclick="pcancel()">${hasPR()?'Ləğv et':'Bağla'}</button></div></div></section>`;
+  return `<section class="prof"><h3>${WAI}Nəticəni müəllimə göndər</h3><p class="info">Nəticənizi müəllimə göndərmək istəyirsinizsə, aşağıdakı xanaları doldurun. İstəmirsinizsə, boş saxlayın və testlərə davam edin.</p><div class="pf"><label>Şagirdin adı və soyadı<input id="pn" autocomplete="name" placeholder="Məs: Əli Məmmədov" value="${esc(PR.n)}"></label><label>Sinif<input id="pk" placeholder="Məs: 8-D" value="${esc(PR.k)}"></label><label><span style="color:#B3261E;font-weight:900;font-size:15px">⚠️ Öz müəlliminin WhatsApp nömrəsi</span><div class="tel" id="ptw"><span>+994</span><input id="pt" type="tel" inputmode="numeric" autocomplete="off" placeholder="55 123 45 67" value="${esc(t)}" oninput="ptype(this)"></div></label><p class="perr" id="perr">${esc(PERR)}</p><div class="pbtns"><button class="pbtn" onclick="psubmit()">Yadda saxla</button><button class="pbtn gh" onclick="pcancel()">${hasPR()?'Ləğv et':'Bağla'}</button></div></div></section>`;
 }
 function ptype(el){let d=el.value.replace(/\D/g,'');if(d.length>9&&d.startsWith('994'))d=d.slice(3);if(d.length>9&&d.startsWith('0'))d=d.slice(1);if(d.length>9)d=d.slice(0,9);el.value=d;document.getElementById('ptw').classList.remove('bad');document.getElementById('perr').textContent=''}
 function psubmit(){
@@ -7754,7 +7763,7 @@ const PDFCATS=[['noun','Nouns','İsimlər'],['verb','Verbs','Fellər'],['adj','A
 const LVS={A:'A1–A2',B:'B1–B2',C:'C1–C2'},LVN={A:'Başlanğıc',B:'Orta',C:'Yüksək'},LVO={A:0,B:1,C:2},LVC={A:[74,159,90],B:[59,125,216],C:[138,92,199]};
 const sortKey=w=>String(w).toLowerCase().replace(/^(to |the |a |an )/,'').replace(/[^a-z0-9 ]/g,'');
 function pdfWords(c){const out=[];for(const [l] of LV)pool('words',l,c).forEach(e=>{const id=ID('words',l,c,e);if(!DEL.has(id))out.push({w:e[0],ipa:e[4]||'',az:e[1],ru:e[2],l})});out.sort((a,b)=>LVO[a.l]-LVO[b.l]||sortKey(a.w).localeCompare(sortKey(b.w))||a.w.localeCompare(b.w));return out}
-function pdfPairs(s){const out=[];for(const [l] of LV)pool(s,l,'').forEach(e=>{const id=ID(s,l,'',e);if(!DEL.has(id))out.push({a:e[0],b:e[1],l})});out.sort((x,y)=>LVO[x.l]-LVO[y.l]||sortKey(x.a).localeCompare(sortKey(y.a)));return out}
+function pdfPairs(s){const tr=pdfTr(),out=[];for(const [l] of LV)pool(s,l,'').forEach(e=>{const id=ID(s,l,'',e);if(!DEL.has(id)){const t=tr[String(e[0]).toLowerCase()]||tr[String(e[1]).toLowerCase()]||['',''];out.push({a:e[0],b:e[1],l,az:t[0],ru:t[1]})}});out.sort((x,y)=>LVO[x.l]-LVO[y.l]||sortKey(x.a).localeCompare(sortKey(y.a)));return out}
 async function makeDictPDF(which){
   const P=new MiniPDF(),M=36,TW=P.W-2*M,NAVY=[31,34,64],TQ=[28,159,149],MUT=[107,124,133],LINE=[220,228,232],ZEB=[243,248,249];
   let y=0,pageNo=0,secTitle='',colHead=null;
@@ -7782,7 +7791,7 @@ async function makeDictPDF(which){
     secTitle='';colHead=null;newPage();
     P.rect(M,y,TW,40,TQ);P.text(M+12,y+26,`${nm[0]} · ${nm[1]}`,'B',18,[255,255,255]);const cnt=`${data[s].length} ${pair?'cüt':'söz'}`;P.text(M+TW-12-P.width(cnt,'B',11),y+25,cnt,'B',11,[255,255,255]);y+=52;
     const secBase=`${nm[0]} · ${nm[1]}`;secTitle=secBase;
-    const cols=pair?[['Söz',.38],[s==='syn'?'Sinonimi':'Antonimi',.44],['Səviyyə',.18]]:[['Word',.27],['Transkripsiya',.2],['Azərbaycanca',.27],['Русский',.26]];
+    const cols=pair?[['Söz',.22],[s==='syn'?'Sinonimi':'Antonimi',.22],['Azərbaycanca',.3],['Русский',.26]]:[['Word',.27],['Transkripsiya',.2],['Azərbaycanca',.27],['Русский',.26]];
     const xs=[];let acc=M;cols.forEach(c=>{xs.push(acc);acc+=c[1]*TW});
     colHead=()=>{P.rect(M,y,TW,16,NAVY);cols.forEach((c,i)=>P.text(xs[i]+5,y+11.5,c[0],'B',8,[255,255,255]));y+=19};
     colHead();
@@ -7791,7 +7800,7 @@ async function makeDictPDF(which){
       if(r.l!==curL){curL=r.l;letter='';const n=data[s].filter(x=>x.l===curL).length;secTitle=`${secBase} · ${LVS[curL]}`;need(70);if(y>M+60)y+=6;const C=LVC[curL];P.rect(M,y,TW,24,C);P.text(M+10,y+16.5,`${LVS[curL]} · ${LVN[curL]}`,'B',12,[255,255,255]);const ct=`${n} ${pair?'cüt':'söz'}`;P.text(M+TW-10-P.width(ct,'B',10),y+16,ct,'B',10,[255,255,255]);y+=30;secTitle=`${secBase} · ${LVS[curL]}`}
       const L=(sortKey(pair?r.a:r.w)[0]||'#').toUpperCase();
       if(L!==letter){letter=L;need(40);P.rect(M,y+2,22,16,TQ);P.text(M+11-P.width(L,'B',11)/2,y+14,L,'B',11,[255,255,255]);P.line(M+26,y+10,M+TW,y+10,LINE,.6);y+=22;zi=0}
-      const cells=pair?[[r.a,'B'],[r.b,'R'],[LVS[r.l],'R']]:[[r.w,'B'],[r.ipa?'/'+r.ipa+'/':'','R'],[r.az,'R'],[r.ru,'R']];
+      const cells=pair?[[r.a,'B'],[r.b,'B'],[r.az||'','R'],[r.ru||'','R']]:[[r.w,'B'],[r.ipa?'/'+r.ipa+'/':'','R'],[r.az,'R'],[r.ru,'R']];
       const lines=cells.map((c,i)=>P.wrap(c[0],c[1],FS,cols[i][1]*TW-10));
       const extra=pair?0:LH;const h=Math.max(...lines.map(l=>l.length))*LH+(pair?5:5);
       const lvTag=false;
@@ -7810,7 +7819,7 @@ let PDFBUSY=false,PDFMSG='',PDFNO=false,PDFCHK=false;
 const PDFWA='https://wa.me/994557958625?text='+encodeURIComponent('Salam, müəllim! My Vocabulary PDF lüğətini göndərə bilərsiniz?');
 function pdfNoBox(){return `<div class="prof" style="border-color:var(--or)"><h3 style="color:var(--or)">PDF bu linkdə yüklənmir</h3><p class="info" style="margin:0 0 10px">Səhifə ümumi link ilə açıldığı üçün PDF yükləmə bağlıdır. PDF lüğəti müəllimdən WhatsApp ilə istəyin – hazır faylı sizə göndərəcək.</p><a class="btn send" href="${PDFWA}" target="_blank" rel="noopener" style="margin-top:0">WhatsApp: 055 795 86 25</a></div>`}
 async function pdfGet(which){
-  if(PDFBUSY)return;PDFBUSY=true;PDFMSG='PDF hazırlanır… bir neçə saniyə gözləyin.';pdfHome();
+  if(PDFBUSY)return;PDFBUSY=true;PDFMSG='PDF hazırlanır… bir neçə saniyə gözləyin.';if(V&&V.pdfv)pdfView(V.pdfv,true);else pdfHome();
   try{
     await new Promise(r=>setTimeout(r,30));
     const blob=await makeDictPDF(which),fn=pdfName(which);
@@ -7819,15 +7828,15 @@ async function pdfGet(which){
     else if(inViewer){PDFNO=true;PDFMSG=''}
     else{const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),60000);PDFMSG='✓ PDF yükləndi.'}
   }catch(e){PDFMSG='PDF hazırlamaq alınmadı.'}
-  PDFBUSY=false;pdfHome(true);
+  PDFBUSY=false;if(V&&V.pdfv)pdfView(V.pdfv,true);else pdfHome(true);
 }
 function pdfHome(keep){
   if(!keep&&!PDFBUSY)PDFMSG='';V={pdf:1};
   let h=hdr('PDF Lüğət','Yüklə · nitq hissələrinə görə, sadədən mürəkkəbə','home()','or')+`<p class="tnote">PDF hər dəfə saytdakı ən son sözlərdən hazırlanır – yeni söz əlavə olunanda PDF də avtomatik yenilənir. Sözlər sadədən mürəkkəbə düzülüb (A1–A2 → B1–B2 → C1–C2), hər səviyyədə A–Z; hər sözün transkripsiyası, Azərbaycanca və rusca tərcüməsi var.</p>${PDFMSG?`<p class="tmsg" style="color:var(--or)">${esc(PDFMSG)}</p>`:''}<div class="list" style="${colorVars('or')}">`;
   const tot=PDFCATS.reduce((u,[c])=>u+LV.reduce((v,[l])=>v+liveCount('words',l,c),0),0),dis=PDFBUSY?'disabled':'';
-  h+=`<button class="row" ${dis} onclick="pdfGet('all')"><div><div class="t">📕 Bütün lüğət</div><div class="s">Bütün nitq hissələri + sinonimlər və antonimlər, bir PDF-də</div></div><span class="badge">${tot} söz</span></button>`;
-  for(const [c,n,az] of PDFCATS){const k=LV.reduce((v,[l])=>v+liveCount('words',l,c),0);h+=`<button class="row" ${dis} onclick="pdfGet('${c}')"><div><div class="t">${n}</div><div class="s">${az} · A1 → C2</div></div><span class="badge">${k} söz</span></button>`}
-  h+=`<button class="row" ${dis} onclick="pdfGet('synant')"><div><div class="t">Synonyms & Antonyms</div><div class="s">Sinonimlər və antonimlər · A1 → C2</div></div><span class="badge">${count('syn')+count('ant')} cüt</span></button>`;
+  h+=`<button class="row" ${dis} onclick="pdfView('all')"><div><div class="t">📕 Bütün lüğət</div><div class="s">Bütün nitq hissələri + sinonimlər və antonimlər, bir PDF-də</div></div><span class="badge">${tot} söz</span></button>`;
+  for(const [c,n,az] of PDFCATS){const k=LV.reduce((v,[l])=>v+liveCount('words',l,c),0);h+=`<button class="row" ${dis} onclick="pdfView('${c}')"><div><div class="t">${n}</div><div class="s">${az} · A1 → C2</div></div><span class="badge">${k} söz</span></button>`}
+  h+=`<button class="row" ${dis} onclick="pdfView('synant')"><div><div class="t">Synonyms & Antonyms</div><div class="s">Sinonimlər və antonimlər · A1 → C2</div></div><span class="badge">${count('syn')+count('ant')} cüt</span></button>`;
   h+=`<button class="row" ${dis} onclick="paraPdfGet()"><div><div class="t">Paragraphs</div><div class="s">Nümunə paraqraflar · hər səhifədə bir paraqraf</div></div><span class="badge">${PARA.length} mövzu</span></button>`;
   app.innerHTML=h+'</div>';if(!keep)window.scrollTo(0,0);
 }
@@ -7973,7 +7982,6 @@ function regScreen(){
   h+=f('rg_ad','Ad','Məs: Ruslan')+f('rg_soyad','Soyad','Məs: Əlizadə');
   h+=`<label>Siz kimsiniz?</label><div class="pbtns" style="margin-top:-4px">${rb('Tələbə','🎓 Tələbə')}${rb('Müəllim','👩‍🏫 Müəllim')}</div>`;
   h+=`<label>Telefon nömrəsi<div class="tel"><span>+994</span><input id="rg_tel" inputmode="numeric" maxlength="12" placeholder="55 123 45 67" value="${esc(r.rg_tel||'')}" oninput="regTel(this)"></div></label>`;
-  h+=`<p class="tnote" style="margin:-4px 0 0">Nümunə: <b>+994 55 123 45 67</b> və ya <b>+994 50 123 45 67</b>. +994-dən sonra operator kodunu (50, 51, 55, 70, 77, 99, 10, 60) və 7 rəqəmi yazın – əvvəlində 0 yazmayın.</p>`;
   h+=`<p class="perr">${esc(r.err||'')}</p><button class="btn" style="background:var(--tq);margin-top:0" onclick="regSubmit()">Qeydiyyatdan keç və başla →</button></div></section>`;
   app.innerHTML=h;
 }
@@ -8066,6 +8074,27 @@ function boot(){
   if(!REG){regScreen();cfgPull();return}
   lsSet('mnv-visits',lsGet('mnv-visits',0)+1);
   home();syncPing();cfgPull();
+}
+
+/* ---------- PDF preview list (look first, then download) ---------- */
+function pdfTr(){if(window._TR)return window._TR;const m={};for(const [l] of LV)for(const [c] of CATS)pool('words',l,c).forEach(e=>{const k=String(e[0]).toLowerCase();if(!m[k]&&!DEL.has(ID('words',l,c,e)))m[k]=[e[1],e[2]]});return window._TR=m}
+function pdfView(w,keep){
+  if(!keep&&!PDFBUSY)PDFMSG='';V={pdfv:w};
+  const secs=w==='all'?[...PDFCATS.map(c=>c[0]),'syn','ant']:w==='synant'?['syn','ant']:[w];
+  const nm=s=>s==='syn'?['Synonyms','Sinonimlər']:s==='ant'?['Antonyms','Antonimlər']:PDFCATS.find(c=>c[0]===s).slice(1);
+  const title=w==='all'?'Bütün lüğət':w==='synant'?'Synonyms & Antonyms':nm(w)[0];
+  let h=hdr(title,'Siyahıya bax · bəyənsən, PDF yüklə','pdfHome()','or')+`<div style="${colorVars('or')}"><button class="btn" style="margin:0 0 6px" ${PDFBUSY?'disabled':''} onclick="pdfGet('${w}')">⬇ PDF yüklə</button>${PDFMSG?`<p class="tmsg" style="color:var(--or);text-align:center">${esc(PDFMSG)}</p>`:''}`;
+  const LC={A:'var(--gr)',B:'var(--bl)',C:'var(--pu)'};
+  for(const s of secs){
+    const pair=s==='syn'||s==='ant',data=pair?pdfPairs(s):pdfWords(s),n=nm(s);
+    h+=`<h3 style="margin:22px 0 8px;font-size:20px;font-weight:900;color:var(--or)">${n[0]} · ${n[1]} <small style="color:var(--muted);font-size:14px">${data.length} ${pair?'cüt':'söz'}</small></h3>`;
+    for(const [l] of LV){const rows=data.filter(r=>r.l===l);if(!rows.length)continue;
+      h+=`<div style="background:${LC[l]};color:#fff;border-radius:12px;padding:8px 12px;margin:12px 0 6px;font-weight:900;display:flex;justify-content:space-between"><span>${LVS[l]} · ${LVN[l]}</span><span>${rows.length}</span></div><div style="background:var(--card);border:1.5px solid var(--line);border-radius:14px;overflow:hidden">`;
+      h+=rows.map((r,i)=>`<div style="display:grid;grid-template-columns:${pair?'1fr 1fr':'1fr'};gap:2px 10px;padding:8px 12px;${i%2?'background:var(--bg)':''};font-size:15px;line-height:1.35">${pair?`<b>${esc(r.a)}</b><b style="color:var(--or)">${s==='syn'?'=':'≠'} ${esc(r.b)}</b>`:`<span><b>${esc(r.w)}</b> <small style="color:var(--muted)">${r.ipa?'/'+esc(r.ipa)+'/':''}</small></span>`}<small style="grid-column:1/-1;color:var(--muted);font-weight:700">${esc(r.az||'')}${r.ru?' · '+esc(r.ru):''}</small></div>`).join('')+`</div>`;
+    }
+  }
+  h+=`<button class="btn" style="margin-top:16px" ${PDFBUSY?'disabled':''} onclick="pdfGet('${w}')">⬇ PDF yüklə</button></div>`;
+  app.innerHTML=h;if(!keep)window.scrollTo(0,0);
 }
 
 /* ---------- teacher panel ---------- */
