@@ -8340,6 +8340,11 @@ async function qFlush(){
   }catch(e){}FLUSHING=false;
 }
 function syncPing(){if(!REG)return;qPush({a:'ping',...regFields()});qFlush()}
+/* re-check block status when the app comes back to the screen, and every 2 minutes while open */
+let LASTPING=0;function pingSoon(){if(!REG||Date.now()-LASTPING<60000)return;LASTPING=Date.now();syncPing()}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pingSoon()});
+window.addEventListener('focus',pingSoon);window.addEventListener('pageshow',e=>{if(e.persisted)pingSoon()});
+setInterval(()=>{if(document.visibilityState==='visible')pingSoon()},120000);
 function syncRes(e){}
 
 /* ---------- blocked accounts ---------- */
@@ -8467,7 +8472,7 @@ function boot(){
   if(!REG){regScreen();cfgPull();return}
   if(lsGet('mnv-blok',0)){blockScreen();syncPing();return}
   lsSet('mnv-visits',lsGet('mnv-visits',0)+1);
-  home();syncPing();cfgPull();
+  home();LASTPING=Date.now();syncPing();cfgPull();
 }
 
 /* ---------- PDF preview list (look first, then download) ---------- */
