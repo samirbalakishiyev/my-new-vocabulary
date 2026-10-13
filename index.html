@@ -7936,7 +7936,7 @@ const SHEET_URL='https://script.google.com/macros/s/AKfycbzs0Gv9Mc2lPX8k009EG7gn
 const SAMIR_TEL='557958625';
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-let REG=lsGet('mnv-reg',null);
+let REG=lsGet('mnv-reg2',null);
 const isStandalone=()=>{try{return window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
 const devName=()=>{const u=navigator.userAgent||'';return /iPhone|iPad|iPod/.test(u)?'iPhone/iPad':/Android/.test(u)?'Android':'Kompüter'};
 
@@ -7948,7 +7948,7 @@ function stats(){
   const top=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||'';
   return {known:k,mist:m,tasks:d,avg,top,visits:lsGet('mnv-visits',0),dev:devName()+(isStandalone()?' · ana ekran':'')};
 }
-function regFields(){const r=REG||{};return {uid:r.uid,ad:r.ad,soyad:r.soyad,tel:r.tel,qeyd:r.at}}
+function regFields(){const r=REG||{};return {ad:r.ad,soyad:r.soyad,tel:r.tel,rol:r.rol,qeyd:r.at}}
 function qPush(o){const q=lsGet('mnv-q',[]);q.push(o);lsSet('mnv-q',q.slice(-200))}
 let FLUSHING=false;
 async function qFlush(){
@@ -7959,33 +7959,38 @@ async function qFlush(){
       if(!r.ok)break;q=lsGet('mnv-q',[]);q.shift();lsSet('mnv-q',q)}
   }catch(e){}FLUSHING=false;
 }
-function syncPing(){if(!REG)return;qPush({a:'ping',...regFields(),...stats(),t:Date.now()});qFlush()}
-function syncRes(e){if(!REG||!e)return;qPush({a:'res',...regFields(),sec:e.sec,p:e.p,r:e.r,n:e.n,at:e.at,...stats()});qFlush()}
+function syncPing(){if(!REG)return;qPush({a:'ping',...regFields()});qFlush()}
+function syncRes(e){}
 
 /* ---------- registration (once) ---------- */
-let RG={err:''};
+let RG={err:'',rol:''};
 function regScreen(){
   V={};const r=RG;
   const t='My New Vocabulary'.split('').map((ch,i)=>ch===' '?' ':`<span class="c${i%5}">${ch}</span>`).join('');
   const f=(id,lab,ph)=>`<label>${lab}<input id="${id}" placeholder="${ph}" autocomplete="off" value="${esc(r[id]||'')}"></label>`;
-  let h=`<header class="brand"><h1 class="logo">${t}</h1></header><section class="prof" style="${colorVars('tq')}"><h3 style="color:var(--tq)">Xoş gəlmisiniz! 👋</h3><p class="info">Başlamaq üçün bir dəfə qeydiyyatdan keçin. Bu məlumatlar bir daha soruşulmayacaq.</p><div class="pf">`;
+  const rb=(v,lab)=>`<button type="button" class="pbtn${r.rol===v?'':' gh'}" style="flex:1;font-size:16px;padding:12px;${r.rol===v?'background:var(--tq)':''}" onclick="regRead();RG.rol='${v}';RG.err='';regScreen()">${lab}</button>`;
+  let h=`<header class="brand"><h1 class="logo">${t}</h1></header><section class="prof" style="${colorVars('tq')}"><h3 style="color:var(--tq)">Qeydiyyat 👋</h3><p class="info">Başlamaq üçün bir dəfə qeydiyyatdan keçin. Bu məlumatlar bir daha soruşulmayacaq.</p><div class="pf">`;
   h+=f('rg_ad','Ad','Məs: Ruslan')+f('rg_soyad','Soyad','Məs: Əlizadə');
-  h+=`<label>Telefon nömrəsi<div class="tel"><span>+994</span><input id="rg_tel" inputmode="numeric" placeholder="55 123 45 67" value="${esc(r.rg_tel||'')}"></div></label>`;
-  h+=`<p class="perr">${esc(r.err||'')}</p><button class="btn" style="background:var(--tq);margin-top:0" onclick="regSubmit()">Qeydiyyatdan keç və başla →</button><p class="tnote" style="margin:10px 0 0">Məlumatların yalnız müəllim Samir Balakişiyevə görünür.</p></div></section>`;
+  h+=`<label>Siz kimsiniz?</label><div class="pbtns" style="margin-top:-4px">${rb('Tələbə','🎓 Tələbə')}${rb('Müəllim','👩‍🏫 Müəllim')}</div>`;
+  h+=`<label>Telefon nömrəsi<div class="tel"><span>+994</span><input id="rg_tel" inputmode="numeric" maxlength="12" placeholder="55 123 45 67" value="${esc(r.rg_tel||'')}" oninput="regTel(this)"></div></label>`;
+  h+=`<p class="tnote" style="margin:-4px 0 0">Nümunə: <b>+994 55 123 45 67</b> və ya <b>+994 50 123 45 67</b>. +994-dən sonra operator kodunu (50, 51, 55, 70, 77, 99, 10, 60) və 7 rəqəmi yazın – əvvəlində 0 yazmayın.</p>`;
+  h+=`<p class="perr">${esc(r.err||'')}</p><button class="btn" style="background:var(--tq);margin-top:0" onclick="regSubmit()">Qeydiyyatdan keç və başla →</button></div></section>`;
   app.innerHTML=h;
 }
+function regTel(el){let d=el.value.replace(/\D/g,'');if(d.startsWith('994'))d=d.slice(3);if(d.startsWith('0'))d=d.slice(1);d=d.slice(0,9);el.value=[d.slice(0,2),d.slice(2,5),d.slice(5,7),d.slice(7,9)].filter(Boolean).join(' ')}
 function regRead(){['rg_ad','rg_soyad','rg_tel'].forEach(k=>{const e=document.getElementById(k);if(e)RG[k]=e.value})}
 function regSubmit(){
   regRead();const cl=v=>String(v||'').trim().replace(/\s+/g,' ');
   const ad=cl(RG.rg_ad),soyad=cl(RG.rg_soyad),tel=normTel(RG.rg_tel||'');
   let err='';
   if(!ad)err='Adınızı yazın.';else if(!soyad)err='Soyadınızı yazın.';
-  else if(!telOK(tel))err='Telefon nömrəsi düzgün deyil: +994-dən sonra 9 rəqəm (məs: 55 123 45 67).';
+  else if(!RG.rol)err='Tələbə və ya Müəllim düyməsini seçin.';
+  else if(!telOK(tel))err='Telefon nömrəsi düzgün deyil. Nümunə: 55 123 45 67';
   if(err){RG.err=err;regScreen();return}
-  REG={uid:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,8),ad,soyad,tel,at:Date.now()};
-  lsSet('mnv-reg',REG);
+  REG={ad,soyad,tel,rol:RG.rol,at:Date.now()};
+  lsSet('mnv-reg2',REG);
   if(!PR.n){PR.n=ad+' '+soyad;psave()}
-  lsSet('mnv-visits',1);syncPing();home();
+  syncPing();home();
 }
 
 /* ---------- add-to-home-screen tip on the home page ---------- */
@@ -8034,14 +8039,15 @@ const dOnly=t=>{if(!t)return '';const d=new Date(+t||t);return isNaN(d)?String(t
 async function tUsers(reload){
   if(!TU.list||reload){app.innerHTML=hdr('İstifadəçilər','Yüklənir…','tHome()','bl');await tFetch('users')}
   const L=TU.list||[],now=Date.now(),day=864e5,q=TU.q.toLowerCase();
-    const td=L.filter(u=>now-(+u.son||0)<day).length,wk=L.filter(u=>now-(+u.son||0)<7*day).length;
+  const tl=L.filter(u=>u.rol==='Tələbə').length,mu=L.filter(u=>u.rol==='Müəllim').length;
+  const td=L.filter(u=>now-(+u.son||0)<day).length,wk=L.filter(u=>now-(+u.son||0)<7*day).length;
   let h=hdr('İstifadəçilər',L.length+' nəfər','tHome()','bl')+`<div style="${colorVars('bl')}">`;
   if(TU.err)h+=`<p class="tmsg" style="color:var(--rd)">${esc(TU.err)}</p>`;
-  h+=`<div class="tasks" style="margin-bottom:12px">${[['Cəmi',L.length],['Bu gün',td],['Bu həftə',wk]].map(([a,b])=>`<div class="task"><div class="s">${a}</div><div class="t">${b}</div></div>`).join('')}</div>`;
-  h+=`<div class="pbtns" style="margin-bottom:10px"><button class="pbtn" style="background:var(--bl)" onclick="tUsers(true)">↻ Yenilə</button></div>`;
+  h+=`<div class="tasks" style="margin-bottom:12px">${[['Cəmi',L.length],['Tələbə',tl],['Müəllim',mu],['Bu gün',td],['Bu həftə',wk]].map(([a,b])=>`<div class="task"><div class="s">${a}</div><div class="t">${b}</div></div>`).join('')}</div>`;
+  h+=`<div class="pbtns" style="margin-bottom:10px"><button class="pbtn" style="background:var(--bl)" onclick="tUsers(true)">↻ Yenilə</button>${['','Tələbə','Müəllim'].map(f=>`<button class="pbtn${TU.f===f?'':' gh'}" style="${TU.f===f?'background:var(--bl)':''}" onclick="TU.f='${f}';tUsers()">${f||'Hamısı'}</button>`).join('')}</div>`;
   h+=`<input class="tsearch" placeholder="Axtar: ad, soyad, telefon…" value="${esc(TU.q)}" oninput="TU.q=this.value;clearTimeout(window._tq);window._tq=setTimeout(()=>{tUsers();const i=document.querySelector('.tsearch');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},250)" style="width:100%;font:inherit;font-size:16px;font-weight:700;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin-bottom:10px">`;
-  const rows=L.filter(u=>(!q||[u.ad,u.soyad,u.sinif,u.mekteb,u.seher,u.fenn,u.tel].join(' ').toLowerCase().includes(q))).sort((a,b)=>(+b.son||0)-(+a.son||0));
-  h+=`<div class="tlist">`+rows.map(u=>`<div class="titem" style="flex-wrap:wrap"><span><b>${esc(u.ad)} ${esc(u.soyad)}</b><br><small style="color:var(--muted);font-weight:700">+994 ${esc(u.tel)} · ${esc(u.dev||'')}</small><br><small style="color:var(--muted)">Son giriş: ${dOnly(u.son)} · Giriş: ${u.giris||0} · Task: ${u.tasks||0}${u.avg!==''&&u.avg!=null?' · Orta: '+u.avg+'%':''} · Bilir: ${u.known||0} · Səhv: ${u.mist||0}</small></span><a class="tbtn ed" style="text-decoration:none" href="tel:+994${esc(u.tel)}">📞</a><a class="tbtn undo" href="https://wa.me/994${esc(u.tel)}" target="_blank" rel="noopener">💬</a></div>`).join('')+(rows.length?'':'<div class="empty">Hələ heç kim yoxdur.</div>')+`</div></div>`;
+  const rows=L.filter(u=>(!TU.f||u.rol===TU.f)&&(!q||[u.ad,u.soyad,u.tel].join(' ').toLowerCase().includes(q))).sort((a,b)=>(+b.son||0)-(+a.son||0));
+  h+=`<div class="tlist">`+rows.map(u=>`<div class="titem"><span><b>${esc(u.ad)} ${esc(u.soyad)}</b> <em class="tedit" style="color:var(--bl);background:var(--bl-s)">${esc(u.rol||'')}</em><br><small style="color:var(--muted);font-weight:700">+994 ${esc(u.tel)}</small><br><small style="color:var(--muted)">Qeydiyyat: ${dOnly(u.qeyd)} · Son giriş: ${dOnly(u.son)}</small></span><a class="tbtn ed" style="text-decoration:none" href="tel:+994${esc(u.tel)}">📞</a><a class="tbtn undo" href="https://wa.me/994${esc(u.tel)}" target="_blank" rel="noopener">💬</a></div>`).join('')+(rows.length?'':'<div class="empty">Hələ heç kim yoxdur.</div>')+`</div></div>`;
   app.innerHTML=h;
 }
 async function tResults(reload){
@@ -8076,7 +8082,7 @@ function tLogin(){const v=(document.getElementById('tcode')||{}).value;if(v===TC
 const pendN=()=>{let n=0;for(const x of PEND)if(!DEL.has(x))n++;for(const x of DEL)if(!PEND.has(x))n++;const ks=new Set([...Object.keys(PEDIT),...Object.keys(TS.edit)]);for(const k of ks)if(JSON.stringify(PEDIT[k]||null)!==JSON.stringify(TS.edit[k]||null))n++;return n};
 function tBar(){const n=pendN();return `<div class="tbar" style="${colorVars('bl')}"><span>${n?`Saxlanmamış dəyişiklik: <b>${n}</b>`:'Dəyişiklik yoxdur'}</span><button class="btn sm" ${n?'':'disabled'} onclick="tSave()">Yadda saxla</button></div>${TMSG?`<p class="tmsg">${esc(TMSG)}</p>`:''}`}
 function tHome(){
-  let h=hdr('Müəllim paneli','Bölməni seçin','home()','bl')+tBar()+`<div class="list" style="${colorVars('bl')};margin-bottom:14px"><button class="row" onclick="TU.q='';tUsers()"><div><div class="t">👥 İstifadəçilər</div><div class="s">Qeydiyyatdan keçənlər · zəng və WhatsApp</div></div></button><button class="row" onclick="TU.q='';tResults()"><div><div class="t">📊 Nəticələr</div><div class="s">Kim hansı testi neçə faizlə işləyib</div></div></button><button class="row" onclick="tKey()"><div><div class="t">🔑 Cədvəl açarı</div><div class="s">${lsGet('mnv-tkey','')?'Daxil edilib ✓':'Daxil edilməyib'}</div></div></button></div><p class="tnote">Sildiyiniz sual bütün şagirdlərdən gizlədilir. Növbəti dəfə söz əlavə olunanda həmin task yenidən tam doldurulur və əvvəl onu bitirmiş şagirdlərdə qırmızı görünür.</p><div class="list" style="${colorVars('bl')}">`;
+  let h=hdr('Müəllim paneli','Bölməni seçin','home()','bl')+tBar()+`<div class="list" style="${colorVars('bl')};margin-bottom:14px"><button class="row" onclick="TU.q='';tUsers()"><div><div class="t">👥 İstifadəçilər</div><div class="s">Qeydiyyatdan keçənlər · zəng və WhatsApp</div></div></button><button class="row" onclick="tKey()"><div><div class="t">🔑 Cədvəl açarı</div><div class="s">${lsGet('mnv-tkey','')?'Daxil edilib ✓':'Daxil edilməyib'}</div></div></button></div><p class="tnote">Sildiyiniz sual bütün şagirdlərdən gizlədilir. Növbəti dəfə söz əlavə olunanda həmin task yenidən tam doldurulur və əvvəl onu bitirmiş şagirdlərdə qırmızı görünür.</p><div class="list" style="${colorVars('bl')}">`;
   for(const s in SECS){if(s==='rq'||s==='tv')continue;const o=SECS[s];let d=0;for(const x of PEND)if(IDX[x]&&IDX[x].s===s)d++;h+=`<button class="row" onclick="tLevels('${s}')"><div><div class="t" style="color:var(--${o.c})">${o.n}</div><div class="s">${esc(o.az)}</div></div><span class="badge">${d} silinib</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
