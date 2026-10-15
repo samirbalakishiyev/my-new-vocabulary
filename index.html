@@ -292,6 +292,7 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .pnav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
 .pnav .btn{width:auto;flex:1;margin-top:0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.wexp{margin:12px 0 0;padding:14px 16px;border-radius:16px;background:var(--card);border:2px solid var(--rd,#E5484D);display:grid;gap:10px}.wexr{display:grid;gap:3px}.wexr>b{font-size:13px;color:var(--muted);text-transform:none}.wexr>span{font-size:17px}.wnext{width:100%;margin-top:4px}
 </style>
 </head>
 <body>
@@ -7819,7 +7820,7 @@ function quiz(){
   const wHTML=`<div class="wrow"><div class="w">${esc(q.dir==='az'?q.ans.a:q.prompt)}</div><button class="say" aria-label="Sözü dinlə" onclick="sayQ('w')">${SPK}</button></div>${q.ipa?`<p class="ipa">/${esc(q.ipa)}/</p>`:''}${q.ex?`<div class="exrow"><p class="ex">${exHTML(q.ex)}</p><button class="say sm" aria-label="Cümləni dinlə" onclick="sayQ('ex')">${SPK}</button></div>`:''}`;
   if(isW(q.s)&&q.dir==='az')card=`<div class="w" style="font-size:clamp(24px,7vw,36px)">${esc(q.prompt)}</div><p class="qsub">${esc(q.sub)}</p>${pick!=null?`<div class="revw">${wHTML}</div>`:''}`;
   else if(q.s==='tv')card=wHTML;
-  else if(q.s==='words')card=`<div class="wrow"><div class="w">${esc(q.prompt)}</div><button class="say" aria-label="Sözü dinlə" onclick="sayQ('w')">${SPK}</button></div>${q.ipa?`<p class="ipa">/${esc(q.ipa)}/</p>`:''}${q.ex?`<div class="exrow"><p class="ex">${exHTML(q.ex)}</p><button class="say sm" aria-label="Cümləni dinlə" onclick="sayQ('ex')">${SPK}</button></div>`:''}`;
+  else if(q.s==='words')card=`<div class="wrow"><div class="w">${esc(q.prompt)}</div><button class="say" aria-label="Sözü dinlə" onclick="sayQ('w')">${SPK}</button></div>${q.ipa?`<p class="ipa">/${esc(q.ipa)}/</p>`:''}`;
   else if(q.s==='gap')card=`<div class="exrow"><p class="gq">${gapHTML(q.prompt,pick!=null?q.ans.a:'')}</p>${pick!=null?`<button class="say sm" aria-label="Cümləni dinlə" onclick="sayQ('ex')">${SPK}</button>`:''}</div>`;
   else card=`<div class="w${q.s==='def'||q.s==='rq'?' def':''}">${esc(q.prompt)}</div>`;
   if(q.s==='rq'&&RQP[q.id]){const Pp=READ[q.l][RQP[q.id].pi];h+=`<details class="rpass"><summary>Mətnə bax: ${esc(Pp.t)}</summary><p>${rText(Pp.text,false)}</p></details>`}
@@ -7829,16 +7830,21 @@ function quiz(){
     h+=`<button class="opt ${cls}" ${pick!=null?'disabled':''} onclick="answer(${j})"><span class="L">${LET[j]}</span><span><span class="a">${esc(op.a)}</span>${op.b?`<span class="b">${esc(op.b)}</span>`:''}</span></button>`;
   });
   h+='</div>';
-  if(pick!=null){const ok=pick===q.correct;h+=`<p class="fb ${ok?'ok':'no'}">${ok?'Düzdür!':'Səhv. Düzgün cavab: '+esc(q.ans.a)+' — Səhvlərim bölməsinə əlavə olundu'}</p>`}
+  if(pick!=null){const ok=pick===q.correct;
+    if(!ok&&q.s==='words'){const co=q.opts[q.correct]||{};const en=q.dir==='az'?q.ans.a:q.prompt;const tr=q.dir==='az'?q.prompt:[co.a,co.b].filter(Boolean).join(' · ');
+      h+=`<div class="wexp"><p class="fb no" style="margin:0 0 8px">Səhv cavab — Səhvlərim bölməsinə əlavə olundu</p><div class="wexr"><b>✅ Düzgün tərcümə</b><span><b>${esc(en)}</b> — ${esc(tr)}</span></div>${q.ex?`<div class="wexr"><b>📝 Nümunə cümlə</b><span class="exrow" style="justify-content:flex-start;margin:0"><span class="ex" style="margin:0">${exHTML(q.ex)}</span><button class="say sm" aria-label="Cümləni dinlə" onclick="sayQ('ex')">${SPK}</button></span></div>`:''}<button class="btn wnext" onclick="next()">Növbəti →</button></div>`}
+    else h+=`<p class="fb ${ok?'ok':'no'}">${ok?'Düzdür!':'Səhv. Düzgün cavab: '+esc(q.ans.a)+' — Səhvlərim bölməsinə əlavə olundu'}</p>`}
   app.innerHTML=h+'</div>';
   try{if(document.activeElement&&document.activeElement!==document.body)document.activeElement.blur()}catch(e){}
   if(pick==null&&isW(q.s)&&q.dir!=='az'&&V.spoke!==qi){V.spoke=qi;setTimeout(()=>sayQ('w'),250)}
+  {const we=document.querySelector('.wexp');if(we)setTimeout(()=>we.scrollIntoView({behavior:'smooth',block:'nearest'}),80)}
 }
 function answer(j){
   const q=V.qs[V.qi];if(V.pick!=null)return;V.pick=j;
   if(j===q.correct){V.right++;V.ok.push(q.id);ST.known[q.id]=1;if(V.ctx.mode!=='task')delete ST.mist[q.id]}
   else{V.wrong.push(q.id);ST.mist[q.id]={at:Date.now(),dir:q.dir||''};delete ST.known[q.id]}
   save();quiz();if(q.dir==='az')setTimeout(()=>say(q.ans.a,.8),150);
+  if(q.s==='words'&&j!==q.correct&&!q.mk)return;
   const tok=V.tok=(V.tok||0)+1;setTimeout(()=>{if(V.tok===tok&&V.pick!=null)next()},q.mk?(j===q.correct?1800:4200):(j===q.correct?900:2200));
 }
 function next(){V.qi++;V.pick=null;V.built=[];V.hint=false;if(V.qi<V.qs.length)quiz();else result();}
