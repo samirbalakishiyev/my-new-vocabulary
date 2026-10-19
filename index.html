@@ -8441,11 +8441,11 @@ async function tFetch(kind){
 const dOnly=t=>{if(!t)return '';const d=new Date(+t||t);return isNaN(d)?String(t):fmtD(+d)};
 /* premium in the other site's sheet (same phone = same student); works when both scripts use the same KEY */
 async function tPremX(){
-  const key=lsGet('mnv-tkey','');TU.px=new Set();TU.pxOk=false;if(!key)return;
+  const key=lsGet('mnv-tkey','');TU.px=new Set();TU.pxOk=false;return; /* premium hər saytda ayrıca: o biri sayta baxılmır */
   try{const r=await fetch(OTHER_URL+'?a=plist&key='+encodeURIComponent(key)+'&_='+Date.now());const o=await r.json();
     if(o&&Array.isArray(o.tels)){TU.px=new Set(o.tels.map(String));TU.pxOk=true}}catch(e){}
 }
-const isPrem=u=>!!u.prem||TU.px.has(String(u.tel));
+const isPrem=u=>!!u.prem; /* premium hər saytda ayrıca */
 function tToast(m){let t=document.getElementById('ttoast');if(!t){t=document.createElement('div');t.id='ttoast';t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;background:#1F2547;color:#fff;padding:12px 18px;border-radius:14px;font-weight:800;font-size:15px;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);max-width:calc(100% - 32px);text-align:center;transition:opacity .3s';document.body.appendChild(t)}
   t.textContent=m;t.style.opacity='1';clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.opacity='0'},2600)}
 /* 💳 Ödəniş: "elaqe" sütunu indi ödəniş tarixini saxlayır; bu tarixdən əvvəlki köhnə "Əlaqə saxlanılıb" işarələri sayılmır */
@@ -8481,8 +8481,7 @@ async function tSet(a,tel,v){
   const post=(url)=>fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,key,tel,v})}).then(r=>r.json());
   try{const o=await post(SHEET_URL);if(!o.ok)throw new Error(o.error||'x');
     if(a==='elaqe'&&v&&o.t)u.elaqe=o.t;
-    if(a==='premium'&&TU.pxOk){post(OTHER_URL).then(o2=>{if(o2&&o2.ok){v?TU.px.add(String(tel)):TU.px.delete(String(tel))}}).catch(()=>{})}
-    tToast(a==='block'?(v?'🚫 Bloklandı':'✅ Blok açıldı'):a==='premium'?(v?'👑 Premium açıldı — hər iki saytda':'Premium götürüldü'):(v?'💳 Ödəniş edənlərə əlavə olundu':'Ödəniş işarəsi götürüldü'));
+    tToast(a==='block'?(v?'🚫 Bloklandı':'✅ Blok açıldı'):a==='premium'?(v?'👑 Premium açıldı':'Premium götürüldü'):(v?'💳 Ödəniş edənlərə əlavə olundu':'Ödəniş işarəsi götürüldü'));
   }catch(e){u[F]=old;if(oldX)TU.px.add(String(tel));tUsers();const m=String(e&&e.message);
     tToast(m==='key'?'Cədvəl açarı səhvdir.':'Alınmadı. Google Cədvəlin skriptini yeniləmisiniz?')}
 }

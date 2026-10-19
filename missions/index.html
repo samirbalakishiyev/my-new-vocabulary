@@ -477,13 +477,13 @@ const ICON_GO=svg('<path d="M9 6l6 6-6 6"/>').replace('stroke-width="2.2"','stro
 const top_=document.getElementById('top'),app=document.getElementById('app');
 /* müəllim baxışı: müəllim panelinə daxil olmuş cihazda bütün tasklar açıqdır */
 function unlocked(){return sbTeacher()}
-/* ---------- 👑 Premium: Task 1 pulsuz, Task 2+ premium (My New Vocabulary və English 5–11 cədvəlləri, eyni telefon nömrəsi) ---------- */
-const SB_URLS=['https://script.google.com/macros/s/AKfycby-l8bfI4EZElFAOMaEOvYCJgJXMUX85Y2oI73CaSkS0oPZFpKkkKOHV_pNtYdk818/exec','https://script.google.com/macros/s/AKfycbyOSIc5rhprMJ2g8fIPloN6q0WM4uSox99XAZlxqVP_R0HDT5Sr6CNqFu4DkjwiOHg/exec'];
+/* ---------- 👑 Premium: Task 1 pulsuz, Task 2+ premium (yalnız bu saytın cədvəli; o biri saytın premiumu sayılmır) ---------- */
+const SB_URLS=['https://script.google.com/macros/s/AKfycby-l8bfI4EZElFAOMaEOvYCJgJXMUX85Y2oI73CaSkS0oPZFpKkkKOHV_pNtYdk818/exec']; /* premium hər saytda AYRICA verilir */
 const SB_WA='https://wa.me/994557958625?text='+encodeURIComponent("Salam, Samir müəllim! Mr. Samir's Missions premium tasklarını açmaq istəyirəm.");
 function sbJ(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
-function sbReg(){return sbJ('mnv-reg2')||sbJ('e511-reg')||null}
-function sbTeacher(){return !!(sbJ('mnv-tkey')||sbJ('e511-tkey'))}
-let SB_PREM=sbTeacher()||ls('sb-prem')==='1';
+function sbReg(){return sbJ('mnv-reg2')||null}
+function sbTeacher(){return !!sbJ('mnv-tkey')}
+let SB_PREM=sbTeacher()||ls('sb-prem-mnv')==='1';
 function sbPrem(){return SB_PREM}
 function sbLk(id){return id>1&&!SB_PREM}
 async function sbCheck(){
@@ -491,7 +491,7 @@ async function sbCheck(){
  const r=sbReg();if(!r||!r.tel)return;
  const res=await Promise.all(SB_URLS.map(u=>fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'pq',tel:r.tel})}).then(x=>x.json()).catch(()=>null)));
  const ok=res.filter(x=>x&&x.ok);if(!ok.length)return;
- const p=ok.some(x=>x.prem);ls('sb-prem',p?'1':'0');
+ const p=ok.some(x=>x.prem);ls('sb-prem-mnv',p?'1':'0');
  if(p!==SB_PREM){SB_PREM=p;if(document.getElementById('mqlv'))msHub()}
 }
 function sbModal(){
