@@ -1,0 +1,1370 @@
+<!doctype html>
+<html lang="az"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mr. Samir's Missions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,500;6..12,700;6..12,800;6..12,900&display=swap">
+<style>
+/* Layout: one-screen home — word-of-the-day slot (swappable for an ad), ENGLISH wordmark, big 9 with books, then a 3×3 grid of pastel illustrated cards. Inner screens use a slim top bar. Light-only by request. */
+:root{
+  color-scheme:light;
+  --paper:#F6F7FB; --card:#FFFFFF;
+  --teal:#2F6FD6; --teal-l:#DCE8FB; --teal-d:#1E3A6E;
+  --gold:#FFCF3F; --gold-l:#FFF1C7; --gold-d:#C99A10;
+  --coral:#F0646C; --coral-l:#FDE2E4;
+  --mint:#DDF3E4; --lav:#ECE6FB; --sky:#DDEBFB; --pink:#FCE3E6; --butter:#FFF2CF;
+  --ink:#1E3A6E; --muted:#5E6E8A; --line:#E1E5EF;
+  --ok:#22A06B; --ok-bg:#DCF5E8; --bad:#E5484D; --bad-bg:#FDE4E2;
+  --display:"Fredoka","Baloo 2","Trebuchet MS",sans-serif;
+  --body:"Nunito Sans","Segoe UI",Roboto,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{background:var(--paper)}
+body{color:var(--ink);font:500 16px/1.45 var(--body);overflow-x:hidden}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--coral);outline-offset:2px}
+.wrap{max-width:980px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* ---------- cover (home) ---------- */
+.cover{position:relative;background:var(--paper)}
+.cover-in{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);grid-template-areas:"l m r";gap:16px;align-items:center;padding-block:14px 6px}
+.mark{grid-area:m;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0}
+.mk{display:grid;justify-items:center;gap:6px;text-align:center;min-width:0}
+.mark .eng{margin:0;white-space:nowrap;font-family:var(--display);font-weight:700;font-size:clamp(44px,5vw,64px);line-height:.9;color:var(--teal-d);text-shadow:0 4px 0 #CFDDF5}
+.mark .eng span{color:var(--teal)}
+.mark .hlt{display:inline-block;font-family:var(--display);font-weight:600;font-size:clamp(15px,2vw,20px);color:var(--ink);padding:4px 14px;background:var(--gold);border-radius:8px;transform:rotate(-2deg);box-shadow:0 3px 0 var(--gold-d);white-space:nowrap}
+.mark .by{font-size:13px;font-weight:800;color:var(--muted)}.mark .by b{color:var(--teal-d)}
+.ray{flex:none;width:clamp(26px,3vw,40px);height:auto;align-self:flex-start;margin-top:2px}
+.ray.l{stroke:var(--teal)}.ray.r{stroke:var(--gold)}
+.ray.l path:nth-child(2),.ray.r path:nth-child(2){stroke:var(--gold)}
+.ray.r path:nth-child(2){stroke:var(--teal)}
+.slot{grid-area:l;position:relative;overflow:hidden;aspect-ratio:320/260;max-width:100%;border-radius:22px;background:var(--card);box-shadow:0 8px 22px rgba(30,58,110,.10);display:flex;flex-direction:column;justify-content:center;gap:4px;padding:14px 16px}
+.slot.r{grid-area:r}
+.slot.art{padding:0;background:transparent}
+.cv-svg{display:block;width:100%;height:100%}
+.slot .k{font-size:11.5px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--coral)}
+.slot .sun{position:absolute;right:-26px;bottom:-26px;width:90px;height:90px;border-radius:50%;background:var(--butter)}
+.slot>*{position:relative}
+.slot.ad h3{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(20px,3vw,28px);line-height:1.05}
+.slot.ad p{margin:0;font-weight:700;color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.slot.img{padding:0}
+.slot.img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.slot.img .cap{position:absolute;left:0;right:0;bottom:0;padding:22px 14px 10px;background:linear-gradient(transparent,rgba(30,58,110,.85));color:#fff}
+.slot.img .cap h3{margin:0;color:#fff;font-family:var(--display);font-size:20px}.slot.img .cap p{margin:0;color:#E8EEFA;font-size:13px;font-weight:700}
+@media (max-width:760px){
+  .cover-in{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"m m" "l r";gap:10px;padding-block:10px 4px}
+  .mark .eng{font-size:clamp(46px,14vw,66px)}
+  .ray{width:clamp(28px,8vw,44px)}
+  .slot{border-radius:18px}
+  .slot.ad{padding:10px 12px}.slot.ad p{font-size:12.5px}
+}
+/* ---------- slim bar (inner pages) ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--teal);color:#fff;overflow:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--teal)}
+.bar::after{content:"";position:absolute;left:52%;top:-34px;width:56px;height:56px;border-radius:50%;background:var(--gold);opacity:.9}
+.bar-in{position:relative;z-index:1;display:flex;align-items:center;gap:10px;padding-block:8px}
+.bar .logo{font-family:var(--display);font-weight:900;font-size:24px;letter-spacing:.02em;margin-right:auto}
+.bar .logo b{display:inline-grid;place-items:center;min-width:30px;height:30px;margin-left:6px;border-radius:8px;background:var(--gold);color:var(--ink);font-size:22px}
+.hbtn{display:inline-flex;align-items:center;gap:6px;border:2px solid rgba(255,255,255,.7);background:rgba(255,255,255,.15);color:#fff;border-radius:99px;padding:5px 12px;font-weight:900;font-size:14px}
+.hbtn svg{width:16px;height:16px}
+
+main{padding-block:14px 26px}
+
+/* ---------- menu 3×3 illustrated cards ---------- */
+.menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mt{position:relative;border:0;border-radius:20px;background:var(--st);padding:12px 12px 14px;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px;text-align:center;box-shadow:0 2px 0 rgba(30,58,110,.06),0 8px 18px rgba(30,58,110,.06);transition:transform .15s,box-shadow .15s}
+.mt:hover{transform:translateY(-3px);box-shadow:0 2px 0 rgba(30,58,110,.06),0 14px 26px rgba(30,58,110,.12)}
+.mt .art{display:grid;place-items:center;flex:1;width:100%}
+.mt .art svg{width:clamp(56px,9vw,84px);height:auto}
+.mt .nm{font-family:var(--display);font-weight:600;font-size:clamp(15px,2.2vw,21px);line-height:1.1;color:var(--ink);padding-inline:26px}
+.mt .go{position:absolute;right:10px;bottom:10px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--ac);color:#fff}
+.mt .go svg{width:15px;height:15px}
+.mt .soon{position:absolute;left:10px;top:10px;font-size:10px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.8);color:var(--muted);border-radius:99px;padding:2px 7px}
+.mt .cnt9{position:absolute;left:10px;top:10px;font-size:11px;font-weight:900;background:var(--coral);color:#fff;border-radius:99px;padding:2px 8px}
+@media (max-width:560px){
+  .menu{gap:8px}
+  .mt{min-height:112px;border-radius:16px;padding:8px 6px 10px}
+  .mt .art svg{width:50px}
+  .mt .nm{font-size:13.5px;padding-inline:4px}
+  .mt .go{display:none}
+  .mt .soon{font-size:8.5px;left:6px;top:6px;padding:1px 5px}
+}
+.chip{display:inline-block;font-size:10.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:2px 8px}
+.chip.soon{background:var(--gold-l);color:#7A5A00}
+.chip.live{background:var(--ok-bg);color:var(--ok)}
+.tlink{display:flex;justify-content:center;margin-top:12px}
+.tbtn{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--muted);border-radius:99px;padding:6px 12px;font-weight:800;font-size:13px}
+.tbtn:hover{color:var(--ink);background:var(--card)}
+.tbtn svg{width:16px;height:16px}
+
+/* ---------- headings / misc ---------- */
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+h2{font-family:var(--display);font-weight:900;font-size:clamp(28px,5.5vw,38px);line-height:1;margin:0;text-wrap:balance}
+h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--teal-d);margin-bottom:5px}
+.lead{color:var(--muted);font-weight:700;margin:0;max-width:60ch}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+@media (max-width:640px){.cats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.cat{border:2.5px solid var(--line);background:var(--card);border-radius:16px;padding:10px 12px;text-align:left;display:grid;gap:2px}
+.cat .cn{font-family:var(--display);font-weight:900;font-size:23px;line-height:1}
+.cat .ca{font-size:12.5px;font-weight:800;color:var(--muted)}
+.cat .pb{height:5px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:6px}
+.cat .pb i{display:block;height:100%;background:var(--gold)}
+.cat[aria-pressed="true"]{border-color:var(--teal);background:#E7F7F5;box-shadow:inset 0 -4px 0 var(--teal)}
+.th{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:4px 0 10px}
+.th h3{margin:0;font-family:var(--display);font-weight:800;font-size:23px}
+.listbtn{border:2px dashed var(--teal);background:transparent;color:var(--teal-d);border-radius:99px;padding:5px 14px;font-weight:900;font-size:14px}
+.tgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+@media (max-width:520px){.tgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.task{border:0;border-radius:13px;background:var(--card);box-shadow:0 2px 0 var(--line);padding:8px 6px;display:grid;gap:1px;justify-items:center;transition:transform .12s}
+.task:hover{transform:translateY(-2px)}
+.task .tn{font-family:var(--display);font-weight:900;font-size:26px;line-height:1}
+.task .tk{font-size:10.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.task .tb{font-size:11px;font-weight:900;border-radius:99px;padding:1px 7px;background:var(--line);color:var(--muted);font-variant-numeric:tabular-nums}
+.task.rev{background:#FFF7E3}
+.task.done .tb{background:var(--ok-bg);color:var(--ok)}
+.task.mid .tb{background:var(--gold-l);color:#835500}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 0;font-size:12.5px;font-weight:800;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:13px;height:13px;border-radius:4px;background:var(--card);box-shadow:0 0 0 2px var(--line)}
+.legend i.r{background:#FFF7E3}
+
+/* ---------- quiz ---------- */
+.qtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.qtag{font-family:var(--display);font-weight:900;font-size:19px;background:var(--gold);padding:2px 14px 2px 10px;clip-path:polygon(0 0,100% 0,92% 100%,0 100%)}
+.prog{flex:1;min-width:110px;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));transition:width .3s}
+.cnt{font-weight:900;font-variant-numeric:tabular-nums}
+.qcard{position:relative;overflow:hidden;background:var(--card);border-radius:22px;padding:18px 16px 16px;text-align:center;box-shadow:0 2px 0 var(--line),0 12px 26px rgba(34,56,74,.07);margin-bottom:12px}
+.qcard::before{content:"";position:absolute;left:-36px;top:-20px;width:50px;height:160%;background:var(--teal-l);transform:rotate(30deg)}
+.qcard::after{content:"";position:absolute;right:-24px;bottom:-40px;width:22px;height:160%;background:var(--gold-l);transform:rotate(30deg)}
+.qcard>*{position:relative;z-index:1}
+.qhint{font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-d)}
+.qword{font-family:var(--display);font-weight:900;font-size:clamp(36px,8vw,54px);line-height:1;margin:8px 0 4px;overflow-wrap:anywhere}
+.qword.az{font-family:var(--body);font-size:clamp(24px,5.5vw,34px);line-height:1.15}
+.qru{font-weight:800;color:var(--muted);font-size:17px}
+.qipa{color:var(--muted);font-weight:700;min-height:1.4em}
+.spk{width:42px;height:42px;border-radius:50%;border:0;background:var(--coral);color:#fff;display:inline-grid;place-items:center;box-shadow:0 4px 0 #C9474E;vertical-align:middle}
+.spk:active{transform:translateY(3px);box-shadow:0 1px 0 #C9474E}
+.spk svg{width:20px;height:20px}
+.ex{margin:12px auto 0;max-width:560px;text-align:left;background:var(--paper);border-radius:14px;padding:10px 12px;border-left:4px solid var(--teal);animation:rise .3s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}}
+.ex .en{font-weight:800;font-size:16px}
+.ex .en mark{background:var(--gold-l);color:var(--ink);border-radius:5px;padding:0 3px;font-weight:900;box-shadow:inset 0 -3px 0 var(--gold)}
+.ex .az{font-weight:700;color:var(--muted);font-size:14.5px;margin-top:2px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+@media (max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{display:flex;align-items:center;gap:11px;text-align:left;border:2.5px solid var(--line);background:var(--card);border-radius:15px;padding:10px 12px;font-weight:800;font-size:16.5px;min-width:0;transition:border-color .12s,background .12s}
+.opt>span:last-child{min-width:0;overflow-wrap:anywhere}
+.opt .ru{display:block;font-size:13.5px;font-weight:700;color:var(--muted)}
+.opt:hover:not(:disabled){border-color:var(--teal)}
+.opt .L{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--teal-l);color:var(--teal-d);font-family:var(--display);font-weight:900;font-size:17px}
+.opt:disabled{cursor:default}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}.opt.ok .L{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg);animation:shake .35s}.opt.bad .L{background:var(--bad);color:#fff}
+@keyframes shake{25%,75%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+.nextbar{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:12px;min-height:50px;font-weight:900;color:var(--ok)}
+.auto{width:150px;height:6px;border-radius:99px;background:var(--ok-bg);overflow:hidden}
+.auto i{display:block;height:100%;background:var(--ok);animation:fill 1.8s linear forwards}
+@keyframes fill{from{width:0}to{width:100%}}
+.btn{border:0;border-radius:99px;padding:11px 24px;font-weight:900;font-size:16px}
+.btn.p{background:var(--teal);color:#fff;box-shadow:0 4px 0 var(--teal-d)}
+.btn.g{background:var(--gold);color:var(--ink);box-shadow:0 4px 0 var(--gold-d)}
+.btn.s{background:var(--card);border:2px solid var(--line)}
+.res{position:relative;overflow:hidden;background:var(--card);border-radius:24px;padding:24px 16px;text-align:center;box-shadow:0 12px 26px rgba(34,56,74,.07)}
+.res::before{content:"";position:absolute;right:-50px;top:-40px;width:100px;height:180%;background:var(--teal-l);transform:rotate(30deg)}
+.res>*{position:relative}
+.pct{font-family:var(--display);font-weight:900;font-size:clamp(70px,17vw,112px);line-height:.9;color:var(--teal)}
+.res h3{font-family:var(--display);font-weight:900;font-size:28px;margin:8px 0 2px}
+.res p{margin:0;color:var(--muted);font-weight:800}
+.btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+.review{margin-top:16px;display:grid;gap:8px}
+.review h4{margin:4px 0 0;font-family:var(--display);font-weight:800;font-size:22px}
+.rv{display:grid;gap:2px;background:var(--card);border-left:5px solid var(--bad);border-radius:12px;padding:10px 14px}
+.rv b{font-size:17px}.rv .t{font-weight:800;color:var(--teal-d)}.rv .y{font-size:13px;color:var(--bad);font-weight:800}
+
+/* ---------- word list ---------- */
+.wsearch{width:100%;border:2px solid var(--line);border-radius:14px;padding:10px 14px;font-weight:700;font-size:16px;background:var(--card);margin-bottom:10px}
+.wl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:640px){.wl{grid-template-columns:1fr}}
+.wi{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:0 10px;align-items:start;background:var(--card);border-radius:12px;padding:9px 10px;box-shadow:0 1px 0 var(--line)}
+.wi .n{font-family:var(--display);font-weight:800;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;padding-top:2px}
+.wi .w{font-weight:900;font-size:16.5px}
+.wi .w i{font-style:normal;font-weight:700;font-size:13px;color:var(--muted);margin-left:6px}
+.wi .a{font-size:14px;font-weight:800;color:var(--teal-d)}
+.wi .a span{color:var(--muted);font-weight:700}
+.wi .e{font-size:13.5px;font-weight:700;color:var(--ink);margin-top:3px}
+.wi .e mark{background:var(--gold-l);color:var(--ink);border-radius:4px;padding:0 2px}
+.wi .e small{display:block;color:var(--muted);font-size:13px}
+.wi .spk{width:36px;height:36px;box-shadow:0 3px 0 #C9474E}
+.wi .spk svg{width:17px;height:17px}
+
+/* ---------- soon ---------- */
+.soon-box{position:relative;overflow:hidden;background:var(--card);border-radius:22px;padding:20px;box-shadow:0 2px 0 var(--line)}
+.soon-box ul{margin:10px 0 0;padding-left:20px;font-weight:700;color:var(--muted)}
+
+/* ---------- teacher ---------- */
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{border:2px solid var(--line);background:var(--card);border-radius:99px;padding:6px 16px;font-weight:900}
+.tab[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tstatus{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--ink);color:#fff;border-radius:14px;padding:9px 14px;margin-bottom:12px;font-weight:800;font-size:14px}
+.tstatus .st{display:inline-flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--teal)}
+.dot.wait{background:var(--gold);animation:blink 1s infinite}
+.dot.err{background:var(--bad)}
+@keyframes blink{50%{opacity:.3}}
+.tw{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:0 10px;align-items:center;background:var(--card);border-radius:12px;padding:7px 8px 7px 10px;box-shadow:0 1px 0 var(--line);transition:opacity .18s,transform .18s}
+.tw.gone{opacity:0;transform:translateX(30px)}
+.tw .n{font-family:var(--display);font-weight:800;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.tw .w{font-weight:900;min-width:0;overflow-wrap:anywhere}
+.tw .a{grid-column:2;font-size:13.5px;font-weight:700;color:var(--teal-d);min-width:0}
+.del{grid-row:span 2;width:40px;height:40px;border-radius:12px;border:0;background:var(--bad-bg);color:var(--bad);display:grid;place-items:center}
+.del:hover{background:var(--bad);color:#fff}
+.del svg{width:20px;height:20px}
+.removed{margin-top:18px}
+.removed h3{font-family:var(--display);font-weight:800;font-size:21px;margin:0 0 8px}
+.rchips{display:flex;flex-wrap:wrap;gap:8px}
+.rchip{display:inline-flex;align-items:center;gap:6px;border:2px dashed var(--line);background:var(--card);border-radius:99px;padding:3px 5px 3px 12px;font-weight:800;font-size:14px;color:var(--muted)}
+.rchip s{text-decoration-thickness:2px}
+.rchip button{border:0;background:var(--teal-l);color:var(--teal-d);border-radius:99px;padding:2px 10px;font-weight:900;font-size:12px}
+.form{display:grid;gap:12px;background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 0 var(--line)}
+.form label{display:grid;gap:5px;font-weight:900;font-size:14px}
+.form input[type=text],.form textarea{border:2px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:700;background:var(--paper);width:100%}
+.form textarea{min-height:76px;resize:vertical}
+.frow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.file{display:inline-flex;align-items:center;gap:8px;border:2px dashed var(--teal);border-radius:12px;padding:8px 14px;font-weight:900;color:var(--teal-d);cursor:pointer}
+.file input{position:absolute;width:1px;height:1px;opacity:0}
+.hint{font-size:13px;font-weight:700;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-weight:800;font-size:12.5px;padding-block:4px 20px}
+footer b{color:var(--teal-d)}
+/* teacher extras */
+.gate{max-width:380px;margin:20px auto;background:var(--card);border-radius:20px;padding:22px;box-shadow:0 2px 0 var(--line),0 12px 26px rgba(34,56,74,.07);display:grid;gap:12px;text-align:center}
+.gate input{border:2px solid var(--line);border-radius:14px;padding:12px;font-size:24px;font-weight:900;letter-spacing:.4em;text-align:center;background:var(--paper);width:100%}
+.gate .err{color:var(--bad);font-weight:800;min-height:1.4em;margin:0}
+.letters{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.letters button{min-width:32px;height:32px;border-radius:9px;border:2px solid var(--line);background:var(--card);font-weight:900;font-size:13px;padding:0 6px}
+.letters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.filt{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.filt button{border:2px solid var(--line);background:var(--card);border-radius:99px;padding:4px 12px;font-weight:800;font-size:13px}
+.filt button[aria-pressed="true"]{border-color:var(--teal);background:#E7F7F5;color:var(--teal-d)}
+.az{display:grid;gap:6px}
+.azr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:center;background:var(--card);border-radius:12px;padding:7px 8px 7px 12px;box-shadow:0 1px 0 var(--line);transition:opacity .18s,transform .18s}
+.azr.on{box-shadow:inset 4px 0 0 var(--ok),0 1px 0 var(--line)}
+.azr.gone{opacity:0;transform:translateX(30px)}
+.azr .w{font-weight:900;min-width:0;overflow-wrap:anywhere}
+.azr .a{font-size:13px;font-weight:700;color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.azr .acts{grid-row:span 2;display:flex;gap:6px}
+.azr .pc{grid-row:span 2}
+.ib{width:40px;height:40px;border-radius:12px;border:0;display:grid;place-items:center;font-size:20px;font-weight:900}
+.ib.ok{background:var(--ok-bg);color:var(--ok)}
+.ib.ok[aria-pressed="true"]{background:var(--ok);color:#fff}
+.ib.x{background:var(--bad-bg);color:var(--bad)}
+.ib svg{width:20px;height:20px}
+.pcb{border:0;border-radius:99px;padding:3px 9px;font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;background:var(--teal-l);color:var(--teal-d)}
+.pcb.v{background:var(--gold-l);color:#835500}.pcb.a{background:var(--coral-l);color:#A33A20}.pcb.m{background:#E4E7F7;color:#3A4580}
+.more{display:flex;justify-content:center;margin-top:10px}
+/* ---------- picture story writing ---------- */
+.ps-flow{display:none!important}
+.ps-flow span{display:inline-flex;align-items:center;gap:6px;background:var(--card);border-radius:99px;padding:3px 12px 3px 4px;font-weight:800;font-size:13px;box-shadow:0 1px 0 var(--line)}
+.ps-flow b{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px}
+.ps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.ps-card{border:0;background:var(--card);border-radius:18px;padding:10px;text-align:left;display:grid;gap:8px;box-shadow:0 2px 0 var(--line),0 8px 18px rgba(30,58,110,.06);transition:transform .15s}
+.ps-card:hover{transform:translateY(-2px)}
+.ps-thumbs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.ps-thumbs>span{aspect-ratio:300/230;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;max-width:100%}
+.ps-thumbs svg,.ps-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.ps-thumbs.sm{width:150px;flex:none}
+.ps-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ps-t{font-family:var(--display);font-weight:600;font-size:19px;margin-right:auto}
+.ps-b{font-weight:900;font-size:13px;background:var(--ok-bg);color:var(--ok);border-radius:99px;padding:1px 8px}
+.lv{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:2px 8px;background:var(--mint);color:#1C7A50}
+.lv-Medium{background:var(--butter);color:#7A5A00}.lv-Hard{background:var(--pink);color:#A3283A}
+.ps-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ps-h{font-size:clamp(26px,5vw,34px);margin-bottom:4px}
+.seg{display:inline-flex;background:var(--card);border-radius:99px;padding:4px;box-shadow:0 1px 0 var(--line)}
+.seg button{border:0;background:transparent;border-radius:99px;padding:7px 16px;font-weight:900;font-size:14px;color:var(--muted)}
+.seg button[aria-selected="true"]{background:var(--teal);color:#fff}
+.ps-ins{margin:0 0 12px;font-weight:700;color:var(--ink);background:var(--card);border-radius:12px;padding:10px 14px;border-left:4px solid var(--gold)}
+.ps-pics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.ps-pic{margin:0;display:grid;gap:8px;align-content:start;min-width:0}
+.ps-zoom{position:relative;display:block;width:100%;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;padding:0;cursor:zoom-in;aspect-ratio:300/230}
+.ps-zoom svg,.ps-zoom img{display:block;width:100%;height:100%;object-fit:contain}
+.ps-n{position:absolute;left:8px;top:8px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:900;font-size:13px;z-index:1}
+.ps-empty{display:grid;place-items:center;height:100%;color:var(--muted);font-weight:800}
+.ps-pic figcaption label{display:block;font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.ga,.ps-write textarea{width:100%;border:2px solid var(--line);border-radius:12px;padding:9px 12px;font:600 15.5px/1.5 var(--body);background:var(--card);resize:vertical}
+.ga:focus,.ps-write textarea:focus{border-color:var(--teal);outline:none}
+@media (max-width:700px){
+  .ps-pics{gap:6px;margin-bottom:4px}
+  .ps-zoom{border-radius:10px;border-width:1px}
+  .ps-n{width:20px;height:20px;font-size:11px;left:4px;top:4px}
+}
+.ps-tap{margin:0 0 10px;font-size:12.5px;font-weight:700;color:var(--muted);text-align:center}
+@media (min-width:701px){.ps-tap{display:none}}
+.gqs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+@media (max-width:700px){.gqs{grid-template-columns:1fr}}
+.gqi label{display:flex;gap:6px;align-items:flex-start;font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.ps-n.st{position:static;flex:none}
+.ps-help{display:grid;gap:8px;margin-bottom:12px}
+.ps-help details{background:var(--card);border-radius:14px;padding:10px 14px;box-shadow:0 1px 0 var(--line)}
+.ps-help summary{font-weight:900;cursor:pointer;color:var(--ink)}
+.ps-help ul{margin:8px 0 0;padding-left:20px;font-weight:700}
+.kv{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.kw{display:inline-flex;gap:6px;align-items:baseline;background:var(--sky);border-radius:10px;padding:4px 10px}
+.kw b{font-weight:900}.kw i{font-style:normal;font-weight:700;color:var(--muted);display:none}
+.az-on .kw i{display:inline}.kw.lk{background:var(--butter)}
+.tgl{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:13px;color:var(--muted);margin-top:6px}
+.plan{display:flex;align-items:stretch;gap:6px;flex-wrap:wrap}
+.plan>div{flex:1 1 160px;background:var(--card);border-radius:12px;padding:8px 12px;box-shadow:0 1px 0 var(--line)}
+.plan span{font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.plan p{margin:2px 0 0;font-weight:700;font-size:14px;overflow-wrap:anywhere}
+.plan>i{align-self:center;font-style:normal;font-weight:900;color:var(--muted)}
+.ps-write{background:var(--card);border-radius:18px;padding:14px;box-shadow:0 2px 0 var(--line),0 8px 18px rgba(30,58,110,.05);margin-top:12px}
+.ps-wh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.ps-wh>label:first-child{margin-right:auto}
+.wc{font-weight:900;font-size:14px;border-radius:99px;padding:2px 10px;background:var(--paper);font-variant-numeric:tabular-nums}
+.wc.lo{background:var(--butter);color:#7A5A00}.wc.ok{background:var(--ok-bg);color:var(--ok)}.wc.hi{background:var(--bad-bg);color:var(--bad)}
+.tg2{font-size:13px;font-weight:800;color:var(--muted)}
+.tg2 select{border:2px solid var(--line);border-radius:8px;padding:2px 4px;font-weight:800;background:var(--card)}
+.tmr{display:inline-flex;align-items:center;gap:8px}
+.tmr b{font-variant-numeric:tabular-nums;font-size:16px}.tmr b.late{color:var(--bad)}
+.ps-write textarea{min-height:130px;font-size:17px}
+.ps-msg{margin:6px 0 0;font-weight:800;font-size:14px;min-height:1.2em;color:var(--muted)}.ps-msg.bad{color:var(--bad)}
+.ps-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn.sm{padding:6px 12px;font-size:13px}
+.btn.danger{background:var(--bad);color:#fff;border-color:var(--bad)}
+#res{display:grid;gap:10px;margin-top:12px}
+.rbox{background:var(--card);border-radius:16px;padding:14px 16px;box-shadow:0 1px 0 var(--line)}
+.rbox h4{margin:0 0 8px;font-family:var(--display);font-weight:600;font-size:20px}
+.rbox ul{margin:0;padding-left:20px;font-weight:700}
+.rbox.note{background:var(--butter)}.rbox.note p{margin:0;font-weight:800}
+.rbox.think{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.spin{width:20px;height:20px;border-radius:50%;border:3px solid var(--teal-l);border-top-color:var(--teal);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rbox.score{display:flex;align-items:center;gap:16px;background:linear-gradient(120deg,var(--sky),var(--mint))}
+.rbox.score .big{font-family:var(--display);font-weight:700;font-size:64px;line-height:1;color:var(--teal-d)}
+.rbox.score .big small{font-size:28px;color:var(--muted)}
+.rbox.score p{margin:2px 0 0;font-weight:700}
+.rub{width:100%;border-collapse:collapse;font-weight:700}
+.rub td{padding:6px 4px;border-bottom:1px solid var(--line)}.rub td:last-child{text-align:right;font-weight:900;font-variant-numeric:tabular-nums}
+.rub tr.tot td{border-bottom:0;font-weight:900;color:var(--teal-d)}
+.pcheck{display:grid;gap:6px;margin-top:10px}
+.pcheck span{font-weight:700;font-size:14px;padding:6px 10px;border-radius:10px;background:var(--ok-bg)}.pcheck span.n{background:var(--bad-bg)}
+.mist{display:grid;gap:8px}
+.mist>div{background:var(--paper);border-radius:10px;padding:8px 12px;font-weight:700}
+.mist s{color:var(--bad)}.mist b{color:var(--ok)}.mist span{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.smp{margin:0;font-weight:700;font-size:16px;line-height:1.6;background:var(--paper);border-radius:10px;padding:10px 12px}
+.chk{list-style:none;padding:0!important;display:grid;gap:4px}
+.chk li{padding-left:24px;position:relative}
+.chk li::before{position:absolute;left:0;font-weight:900}
+.chk li.y::before{content:"✓";color:var(--ok)}.chk li.n::before{content:"!";color:#C98A00}
+.ps-hist{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ps-hist h4{margin:0 6px 0 0;font-size:14px}
+.ps-hist span{font-size:12.5px;font-weight:700;background:var(--card);border-radius:99px;padding:3px 10px;color:var(--muted)}
+.lb{position:fixed;inset:0;z-index:50;background:rgba(20,30,50,.85);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;padding:calc(16px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.lb[hidden]{display:none!important}
+.lbi{background:#fff;border-radius:14px;overflow:hidden;max-height:86vh;display:grid;place-items:center}
+.lbi svg,.lbi img{width:100%;height:auto;max-height:86vh;object-fit:contain;display:block}
+.lb button{border:0;background:#fff;color:var(--ink);width:44px;height:44px;border-radius:50%;font-size:26px;font-weight:900;line-height:1}
+@media (max-width:700px){.lb{grid-template-columns:minmax(0,1fr);padding-inline:8px}.lbp,.lbn{position:absolute;bottom:calc(28px + env(safe-area-inset-bottom,0px))}.lbp{left:calc(50% - 60px)}.lbn{right:calc(50% - 60px)}}
+.lbx{position:absolute;right:max(12px,env(safe-area-inset-right,0px));top:calc(12px + env(safe-area-inset-top,0px))}
+.psrow{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:12px;padding:8px;box-shadow:0 1px 0 var(--line);flex-wrap:wrap}
+.psrow .acts{margin-left:auto;display:flex;gap:6px}
+.pfx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.pfx{grid-template-columns:1fr}}
+.pfx fieldset{border:2px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:8px;min-width:0}
+.pfx legend{font-weight:900;padding:0 6px}
+.pprev{aspect-ratio:300/230;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.pprev svg,.pprev img{width:100%;height:100%;object-fit:contain;display:block}
+.form select{border:2px solid var(--line);border-radius:12px;padding:8px 10px;font-weight:700;background:var(--paper)}
+/* ---------- grammar & short passages ---------- */
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;max-width:640px;margin-inline:auto}
+@media (max-width:560px){.g2{gap:10px}}
+.g2c{position:relative;overflow:hidden;border:0;border-radius:24px;aspect-ratio:1/1;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;box-shadow:0 3px 0 rgba(30,58,110,.08),0 12px 26px rgba(30,58,110,.10);transition:transform .15s,box-shadow .15s}
+.g2c:hover{transform:translateY(-3px);box-shadow:0 3px 0 rgba(30,58,110,.08),0 18px 32px rgba(30,58,110,.16)}
+.g2c::after{content:"";position:absolute;right:-30px;bottom:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.35)}
+.g2c>*{position:relative;z-index:1}
+.g2c.topic{background:var(--butter)}.g2c.mix{background:var(--teal)}
+.g2c.mix .gn,.g2c.mix .gc{color:#fff}
+.g2c .g2i{width:clamp(54px,12vw,76px);height:clamp(54px,12vw,76px);border-radius:20px;background:#fff;color:var(--ink);display:grid;place-items:center;box-shadow:0 3px 0 rgba(30,58,110,.08)}
+.g2c .g2i svg{width:55%;height:55%}
+.g2c .gn{font-family:var(--display);font-weight:600;font-size:clamp(21px,5vw,32px);line-height:1.05;color:var(--ink)}
+.g2c .gc{font-size:clamp(12px,2.6vw,14px);font-weight:900;color:var(--teal-d);background:rgba(255,255,255,.6);border-radius:99px;padding:3px 12px}
+.g2c.mix .gc{background:rgba(255,255,255,.18)}
+.gb{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+@media (max-width:980px){.gb{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:640px){.gb{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}}
+.gbt{position:relative;overflow:hidden;border:0;border-radius:20px;background:var(--st);aspect-ratio:1/1;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;box-shadow:0 2px 0 rgba(30,58,110,.07),0 8px 18px rgba(30,58,110,.07);transition:transform .15s}
+.gbt:hover{transform:translateY(-2px)}
+.gbt .gno{position:absolute;left:8px;top:8px;min-width:22px;height:22px;border-radius:7px;background:rgba(255,255,255,.75);display:grid;place-items:center;font-size:11px;font-weight:900;color:var(--muted)}
+.gbt .gn{font-family:var(--display);font-weight:600;font-size:clamp(15px,2.6vw,21px);line-height:1.1;color:var(--ink);overflow-wrap:anywhere}
+.gbt .ga2{font-size:clamp(10.5px,2vw,12.5px);font-weight:800;color:var(--muted);line-height:1.2}
+.gbt .gc{position:absolute;left:0;right:0;bottom:8px;font-size:clamp(10px,2vw,12px);font-weight:900;color:var(--teal-d)}
+@media (max-width:560px){.gbt{border-radius:16px;padding:8px 6px 22px}.gbt .gno{left:5px;top:5px;min-width:18px;height:18px;font-size:10px}}
+.gbt.mix{background:var(--teal)}
+.gbt.mix .gn,.gbt.mix .ga2,.gbt.mix .gc{color:#fff}
+.gq{background:var(--card);border-radius:20px;padding:16px 18px;box-shadow:0 2px 0 var(--line),0 10px 24px rgba(30,58,110,.06);margin-bottom:12px;display:grid;gap:10px}
+.gp{display:flex;gap:10px;align-items:flex-start;font-weight:800;font-size:15px;color:var(--muted)}
+.gnum{flex:none;display:grid;place-items:center;min-width:28px;height:28px;border-radius:9px;background:var(--teal);color:#fff;font-weight:900;font-size:14px}
+.gs{font-weight:800;font-size:clamp(18px,3.4vw,21px);line-height:1.45;color:var(--ink)}
+.gs u,.gp u,.opt u{text-decoration-color:var(--coral);text-decoration-thickness:3px;text-underline-offset:3px}
+.gi{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px 14px;font-weight:700;font-size:16px}
+.gi b{color:var(--teal-d)}
+.gi.pick{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.gil{display:flex;align-items:center;gap:10px;border:2.5px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;background:var(--card)}
+.gil input{width:20px;height:20px;accent-color:var(--teal);flex:none}
+.gil:has(input:checked){border-color:var(--teal);background:var(--sky)}
+.gil.ok{border-color:var(--ok);background:var(--ok-bg)}.gil.bad{border-color:var(--bad);background:var(--bad-bg)}
+.opts.g .opt{font-size:16px}
+.gex{margin-top:2px;border-radius:12px;padding:10px 14px;font-weight:700;font-size:14.5px;background:var(--ok-bg);animation:rise .3s ease-out}
+.gex.n{background:var(--bad-bg)}.gex b{margin-right:6px}
+.psg{position:relative;background:#FFFDF6;border:2px solid #EEE3C4;border-radius:16px;padding:16px 18px 14px;margin-bottom:12px;font-weight:600;font-size:16px;line-height:1.6;box-shadow:0 6px 16px rgba(30,58,110,.06)}
+.psg::before{content:"";position:absolute;left:50%;top:-9px;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--coral);box-shadow:0 2px 0 #C9474E}
+.psg .sg{text-align:right;font-style:italic;font-weight:800;color:var(--teal-d);margin-top:6px}
+.rv .hint{font-size:13px}
+.tqr{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:start;background:var(--card);border-radius:12px;padding:9px 10px;box-shadow:0 1px 0 var(--line)}
+.tqr .n{font-family:var(--display);font-weight:600;color:var(--muted);font-size:13px;min-width:44px;padding-top:2px}
+.tqr b{font-weight:800;font-size:14.5px;overflow-wrap:anywhere}
+.tqr .ans{font-size:13px;font-weight:800;color:var(--ok);margin-top:2px}
+.tqr .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media (max-width:560px){.tqr{grid-template-columns:minmax(0,1fr)}.tqr .n{min-width:0}.tqr .acts{justify-content:flex-start}}
+.ofs{border:2px solid var(--line);border-radius:14px;padding:10px;display:grid;gap:6px;min-width:0}
+.ofs legend{font-weight:900;padding:0 6px}
+.form label.tgl{display:inline-flex;align-items:center;gap:8px;font-weight:800}
+.form label.tgl input{width:20px;height:20px;accent-color:var(--teal);flex:none}
+.orow{display:grid!important;grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:8px!important}
+.orow input[type=radio]{width:20px;height:20px;accent-color:var(--ok)}
+.form input[type=text].ov,.form input#ft,.form input#fn,.form input#fp,.form input#fs{border:2px solid var(--line);border-radius:10px;padding:7px 10px;font-weight:700;background:var(--paper);width:100%}
+/* ---------- ordering & review ---------- */
+.ordp{display:flex;flex-wrap:wrap;gap:8px}
+.ordb{border:2.5px solid var(--line);background:var(--card);border-radius:12px;padding:8px 12px;font-weight:800;font-size:15.5px;text-align:left;display:inline-flex;gap:8px;align-items:center}
+.ordb b{color:var(--teal-d)}
+.ordb:hover:not(:disabled){border-color:var(--teal)}
+.ordb:disabled{opacity:.35;cursor:default}
+.ords{min-height:52px;border:2px dashed var(--teal);border-radius:14px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--paper)}
+.ordc{background:var(--sky);border-radius:10px;padding:4px 10px;font-weight:800}
+.rvsel{border:2px solid var(--line);border-radius:10px;padding:6px 10px;font-weight:800;background:var(--card);max-width:100%}
+.rvc{background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 0 var(--line),0 10px 22px rgba(30,58,110,.07);display:grid;gap:10px;border-left:6px solid var(--gold)}
+.rvc.old{border-left-color:var(--ok)}
+.rvh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rvo{display:grid;gap:6px}
+.rvo span{padding:7px 10px;border-radius:10px;background:var(--paper);font-weight:700}
+.rvo span.ok{background:var(--ok-bg);box-shadow:inset 0 0 0 2px var(--ok)}
+.rvc .ans{font-weight:900;color:var(--ok)}
+.rvn{margin:16px 0 8px;font-family:var(--display);font-weight:600;font-size:18px;color:var(--muted)}
+.form input#fo2{border:2px solid var(--line);border-radius:10px;padding:7px 10px;font-weight:800;background:var(--paper);width:100%;letter-spacing:.05em}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head><body>
+<!-- Mr. Samir's Missions · Level 1 (Task 1–7) · A2–B1 · Created by Samir Balakişiyev -->
+<div id="top"></div>
+<main class="wrap" id="app"></main>
+<footer class="wrap">Mr. Samir's Missions — Created by <b>Samir Balakişiyev</b></footer>
+<script>
+
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function ls(k,v){try{if(v===undefined){return localStorage.getItem(k)}localStorage.setItem(k,v)}catch(e){return null}}
+let voice=null;
+function pickVoice(){try{const v=speechSynthesis.getVoices();voice=v.find(x=>/en-GB/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null}catch(e){}}
+try{pickVoice();speechSynthesis.onvoiceschanged=pickVoice}catch(e){}
+function say(w,r){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w);u.lang='en-GB';if(voice)u.voice=voice;u.rate=r||.85;speechSynthesis.speak(u)}catch(e){}}
+const svg=p=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+const ICON_SPK='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+const ICON_BACK=svg('<path d="M15 18l-6-6 6-6"/>');
+const ICON_HOME=svg('<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>');
+const ICON_GO=svg('<path d="M9 6l6 6-6 6"/>').replace('stroke-width="2.2"','stroke-width="3"');
+const top_=document.getElementById('top'),app=document.getElementById('app');
+/* müəllim baxışı: müəllim panelinə daxil olmuş cihazda bütün tasklar açıqdır */
+function unlocked(){return sbTeacher()}
+/* ---------- 👑 Premium: Task 1 pulsuz, Task 2+ premium (My New Vocabulary və English 5–11 cədvəlləri, eyni telefon nömrəsi) ---------- */
+const SB_URLS=['https://script.google.com/macros/s/AKfycby-l8bfI4EZElFAOMaEOvYCJgJXMUX85Y2oI73CaSkS0oPZFpKkkKOHV_pNtYdk818/exec','https://script.google.com/macros/s/AKfycbyOSIc5rhprMJ2g8fIPloN6q0WM4uSox99XAZlxqVP_R0HDT5Sr6CNqFu4DkjwiOHg/exec'];
+const SB_WA='https://wa.me/994557958625?text='+encodeURIComponent("Salam, Samir müəllim! Mr. Samir's Missions premium tasklarını açmaq istəyirəm.");
+function sbJ(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
+function sbReg(){return sbJ('mnv-reg2')||sbJ('e511-reg')||null}
+function sbTeacher(){return !!(sbJ('mnv-tkey')||sbJ('e511-tkey'))}
+let SB_PREM=sbTeacher()||ls('sb-prem')==='1';
+function sbPrem(){return SB_PREM}
+function sbLk(id){return id>1&&!SB_PREM}
+async function sbCheck(){
+ if(sbTeacher()){SB_PREM=true;return}
+ const r=sbReg();if(!r||!r.tel)return;
+ const res=await Promise.all(SB_URLS.map(u=>fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'pq',tel:r.tel})}).then(x=>x.json()).catch(()=>null)));
+ const ok=res.filter(x=>x&&x.ok);if(!ok.length)return;
+ const p=ok.some(x=>x.prem);ls('sb-prem',p?'1':'0');
+ if(p!==SB_PREM){SB_PREM=p;if(document.getElementById('mqlv'))msHub()}
+}
+function sbModal(){
+ const o=document.createElement('div');o.className='sb-ov';
+ o.innerHTML=`<div class="sb-md" role="dialog" aria-modal="true"><div class="sb-cr">👑</div><h3>Premium task</h3><p>Bu tasklar premiumdur. Bütün taskların açılması üçün ödəniş olunmalıdır. Ödəniş üçün Samir müəllimə müraciət edin.</p><a class="sb-wa" href="${SB_WA}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp: 055 795 86 25</a><button type="button" class="sb-x">Bağla</button></div>`;
+ const close=()=>o.remove();o.onclick=e=>{if(e.target===o)close()};o.querySelector('.sb-x').onclick=close;
+ document.body.appendChild(o);
+}
+(function(){const st=document.createElement('style');st.textContent=`
+.sb-ov{position:fixed;inset:0;z-index:50;background:rgba(15,25,50,.55);display:grid;place-items:center;padding:16px}
+.sb-md{background:#fff;border-radius:24px;max-width:420px;width:100%;padding:24px 20px 18px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);border:3px solid var(--gold)}
+.sb-cr{font-size:52px;line-height:1}
+.sb-md h3{margin:8px 0 6px;font-family:var(--display);font-size:26px;color:var(--ink)}
+.sb-md p{margin:0 0 16px;font-weight:700;font-size:17px;line-height:1.5;color:var(--ink)}
+.sb-wa{display:flex;align-items:center;justify-content:center;gap:8px;background:#25A55A;color:#fff;text-decoration:none;border-radius:16px;padding:14px;font-weight:900;font-size:18px}
+.sb-x{margin-top:10px;border:0;background:none;font-weight:800;font-size:15px;color:var(--muted);padding:8px 16px}
+.mq-t.pl{background:linear-gradient(160deg,#FFF6D6,#FFE79A);box-shadow:0 0 0 2px var(--gold-d),0 6px 14px rgba(201,154,16,.18)}
+.mq-t.pl .n{color:var(--gold-d)}
+.sb-ban{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--gold-l);border:2px solid var(--gold);border-radius:18px;padding:12px 14px;margin:0 0 14px;font-weight:800}
+.sb-ban span{flex:1 1 200px}
+.sb-ban a{background:#25A55A;color:#fff;text-decoration:none;border-radius:12px;padding:8px 12px;font-weight:900}
+.bar .logo{white-space:nowrap;font-size:clamp(16px,5.2vw,24px)}
+@media (max-width:440px){.bar .hbtn{font-size:0;gap:0;padding:6px 9px}.bar .hbtn svg{width:18px;height:18px}}
+.sb-back{white-space:nowrap;flex:none;display:inline-flex;align-items:center;gap:4px;color:#fff;text-decoration:none;border:2px solid rgba(255,255,255,.7);border-radius:99px;padding:5px 12px;font-weight:900;font-size:14px}
+`;document.head.appendChild(st)})();
+sbCheck();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sbCheck()});
+
+function setTop(){top_.innerHTML=`<div class="bar"><div class="wrap bar-in"><a class="sb-back" href="../">‹ Sayt</a><span class="logo">MR. SAMIR'S <b>M</b></span><button class="hbtn" type="button" id="hb">${ICON_HOME}Missiyalar</button></div></div>`;document.getElementById('hb').onclick=()=>msHub();window.scrollTo(0,0)}
+
+/* ================= Mr. Samir's Missions — Level 1 scenario tasks (A2–B1) ================= */
+(function(){const s=document.createElement('style');s.textContent=`
+.ms-ban{position:relative;overflow:hidden;width:100%;margin-top:14px;border:0;border-radius:22px;background:var(--teal-d);color:#fff;padding:16px 18px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;text-align:left;box-shadow:0 6px 0 #142A52,0 14px 26px rgba(30,58,110,.18);transition:transform .15s}
+.ms-ban:hover{transform:translateY(-2px)}
+.ms-ban::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 12px,transparent 12px 24px)}
+.ms-ban>*{position:relative}
+.ms-ban .ms-seal{width:62px;height:62px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:22px;box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 6px var(--gold-d)}
+.ms-ban h3{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(21px,3.4vw,28px);line-height:1.05}
+.ms-ban p{margin:3px 0 0;color:#C9D7F2;font-weight:700;font-size:13.5px}
+.ms-ban .ms-st{display:inline-block;margin-top:6px;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:2px solid var(--gold);border-radius:6px;padding:1px 7px;transform:rotate(-2deg)}
+.ms-ban .ms-go{width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--ink);display:grid;place-items:center}
+.ms-ban .ms-go svg{width:18px;height:18px}
+@media (max-width:480px){.ms-ban{grid-template-columns:auto minmax(0,1fr);padding:14px}.ms-ban .ms-go{display:none}.ms-ban .ms-seal{width:52px;height:52px;font-size:19px}}
+.ms-dos{position:relative;overflow:hidden;background:var(--teal-d);color:#fff;border-radius:22px;padding:16px 18px;margin-bottom:14px;display:grid;gap:10px}
+.ms-dos::after{content:"TOP SECRET";position:absolute;right:-8px;top:12px;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.14em;color:var(--coral);border:2.5px solid var(--coral);border-radius:6px;padding:1px 8px;transform:rotate(8deg);opacity:.9}
+.ms-dos .k{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.ms-dos h2{color:#fff;font-size:clamp(26px,5vw,34px)}
+.ms-dos .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ms-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border-radius:99px;padding:4px 12px;font-weight:800;font-size:13.5px;font-variant-numeric:tabular-nums}
+.ms-pill b{color:var(--gold)}
+.ms-xpbar{height:10px;border-radius:99px;background:rgba(255,255,255,.15);overflow:hidden}
+.ms-xpbar i{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width .4s}
+.ms-lnk{border:0;background:transparent;color:#C9D7F2;font-weight:800;font-size:13px;text-decoration:underline;padding:2px 0}
+.ms-zone{margin:16px 0 6px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ms-zone h3{margin:0;font-family:var(--display);font-weight:700;font-size:21px}
+.ms-zone span{font-weight:800;color:var(--muted);font-size:13.5px}
+.ms-zone .lk{color:var(--bad)}
+.ms-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:640px){.ms-grid{grid-template-columns:1fr}}
+.ms-card{position:relative;border:0;border-radius:18px;background:var(--card);padding:12px 14px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:center;text-align:left;box-shadow:0 2px 0 var(--line),0 8px 18px rgba(30,58,110,.06);transition:transform .12s}
+.ms-card:hover:not(:disabled){transform:translateY(-2px)}
+.ms-card .ic{grid-row:span 2;width:50px;height:50px;border-radius:14px;background:var(--teal-l);display:grid;place-items:center;font-size:27px}
+.ms-card .t{font-family:var(--display);font-weight:600;font-size:18px;line-height:1.1;min-width:0}
+.ms-card .s{font-size:12.5px;font-weight:800;color:var(--muted)}
+.ms-card .stars{position:absolute;right:10px;top:8px;font-size:13px;letter-spacing:1px;color:var(--gold-d)}
+.ms-card.done .ic{background:var(--gold-l)}
+.ms-card:disabled{cursor:default;opacity:.55}
+.ms-card:disabled .ic{background:var(--line);filter:grayscale(1)}
+.ms-tch{display:inline-block;background:var(--gold-l);color:#7A5A00;border-radius:10px;padding:6px 12px;font-weight:800;font-size:13px;margin-bottom:6px}
+.ms-cert-lock{margin-top:16px;border:2.5px dashed var(--line);border-radius:18px;padding:14px;text-align:center;color:var(--muted);font-weight:800}
+.ms-panel{background:var(--card);border-radius:20px;padding:16px;box-shadow:0 2px 0 var(--line),0 10px 22px rgba(30,58,110,.06);margin-bottom:12px}
+.ms-panel h3{margin:0 0 6px;font-family:var(--display);font-weight:700;font-size:22px}
+.ms-brief{background:var(--paper);border-left:4px solid var(--gold);border-radius:12px;padding:10px 12px;font-weight:700;color:var(--muted);margin-bottom:12px}
+.ms-brief b{color:var(--ink)}
+.ms-qh{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-weight:900;font-variant-numeric:tabular-nums}
+.ms-q{font-weight:800;font-size:18px;margin-bottom:12px;line-height:1.4}
+.ms-q .gap{display:inline-block;min-width:60px;border-bottom:3px solid var(--teal);margin:0 3px}
+.ms-fb{display:grid;gap:10px;justify-items:center;margin-top:12px}
+.ms-ex{width:100%;border-radius:12px;padding:9px 12px;font-weight:700;font-size:14.5px}
+.ms-ex.g{background:var(--ok-bg);color:#14593D}.ms-ex.b{background:var(--bad-bg);color:#8E2226}
+.ms-res{text-align:center}
+.ms-res .big{font-family:var(--display);font-weight:700;font-size:clamp(60px,15vw,90px);line-height:.9;color:var(--teal)}
+.ms-res .st3{font-size:34px;letter-spacing:4px;color:var(--gold-d);margin:6px 0}
+.ms-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gold-l);border-radius:99px;padding:6px 14px;font-weight:900;margin-top:8px}
+.ms-wit{display:grid;gap:8px}
+.ms-w{background:var(--card);border-radius:14px;padding:10px 12px;box-shadow:0 2px 0 var(--line);display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px}
+.ms-w .av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;color:#fff;font-size:17px}
+.ms-w b{display:block}.ms-w small{color:var(--muted);font-weight:800}
+.ms-w p{margin:4px 0 0;font-weight:600;line-height:1.5}
+details.ms-det{background:var(--paper);border-radius:14px;padding:8px 12px;margin-bottom:12px}
+details.ms-det summary{cursor:pointer;font-weight:900;color:var(--teal-d)}
+.ms-radio{display:grid;gap:12px;justify-items:center;text-align:center;background:var(--teal-d);color:#fff;border-radius:22px;padding:18px}
+.ms-radio .wave{display:flex;gap:4px;align-items:center;height:44px}
+.ms-radio .wave i{width:6px;border-radius:3px;background:var(--gold);height:10px}
+.ms-radio.on .wave i{animation:msw 1s ease-in-out infinite}
+.ms-radio .wave i:nth-child(2n){animation-delay:.2s}.ms-radio .wave i:nth-child(3n){animation-delay:.4s}
+@keyframes msw{50%{height:40px}}
+.ms-radio .lp{font-weight:800;color:#C9D7F2}
+.ms-in{width:100%;border:2.5px solid var(--line);border-radius:12px;padding:10px 12px;font-weight:800;background:var(--card)}
+textarea.ms-in{min-height:130px;resize:vertical;font-weight:600;line-height:1.5}
+.ms-chips{display:flex;flex-wrap:wrap;gap:7px}
+.ms-chip{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:6px 11px;font-weight:800}
+.ms-chip.on{border-color:var(--teal);background:var(--teal-l)}
+.ms-chip.ok{border-color:var(--ok);background:var(--ok-bg)}.ms-chip.bad{border-color:var(--bad);background:var(--bad-bg)}
+.ms-slot{min-height:54px;border:2.5px dashed var(--teal);border-radius:14px;padding:8px;display:flex;flex-wrap:wrap;gap:7px;margin-bottom:10px;background:var(--paper)}
+.ms-room{display:flex;gap:8px;margin-bottom:12px}
+.ms-room span{flex:1;text-align:center;border-radius:10px;padding:6px;font-weight:900;font-size:13px;background:var(--line);color:var(--muted)}
+.ms-room span.on{background:var(--teal);color:#fff}.ms-room span.ok{background:var(--ok);color:#fff}
+.ms-code{display:flex;gap:8px;justify-content:center}
+.ms-code input{width:56px;height:64px;text-align:center;font-family:var(--display);font-size:32px;font-weight:700;border:3px solid var(--teal-d);border-radius:12px;background:var(--card)}
+.ms-note{display:inline-block;background:var(--butter);border-radius:4px;padding:10px 14px;font-weight:900;transform:rotate(-2deg);box-shadow:0 4px 10px rgba(0,0,0,.08)}
+.ms-xr{display:flex;flex-wrap:wrap;gap:6px;font-size:19px;font-weight:800;margin:6px 0 12px}
+.ms-xr button{border:0;border-radius:10px;padding:6px 10px;font-weight:800;border-bottom:4px solid rgba(0,0,0,.2)}
+.ms-xr button.plain{background:var(--card);box-shadow:inset 0 0 0 2px var(--line);border-bottom-color:var(--line)}
+.r-S{background:#DCE8FB;color:#1E3A6E}.r-V{background:#FDE2E4;color:#8E2226}.r-O{background:#DCF5E8;color:#14593D}.r-IO{background:#ECE6FB;color:#4B3596}.r-A{background:#FFF1C7;color:#6B4E00}.r-C{background:#E3F3F7;color:#1D5866}.r-X{background:#EDEFF4;color:#4A5568}
+.ms-leg{display:flex;flex-wrap:wrap;gap:6px;font-size:12.5px;font-weight:800}
+.ms-leg span{border-radius:8px;padding:2px 8px}
+.ms-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.ms-city{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ms-bld{position:relative;border:0;border-radius:18px;padding:14px 10px;background:#2C3550;color:#AEB7CC;display:grid;justify-items:center;gap:4px;font-weight:900;min-height:120px;transition:background .3s}
+.ms-bld .e{font-size:42px;filter:grayscale(1) brightness(.7)}
+.ms-bld.lit{background:var(--gold-l);color:var(--ink)}
+.ms-bld.lit .e{filter:none}
+.ms-bld small{font-weight:800}
+.ms-wd{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+@media (max-width:480px){.ms-wd{grid-template-columns:1fr}}
+.ms-wd div{display:flex;align-items:center;gap:10px;background:var(--paper);border-radius:12px;padding:8px 10px}
+.ms-wd .spk{width:34px;height:34px;flex:none;box-shadow:0 3px 0 #C9474E}.ms-wd .spk svg{width:16px;height:16px}
+.ms-wd b{display:block}.ms-wd span{color:var(--muted);font-weight:700;font-size:14px}
+.ms-npc{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;margin-bottom:12px}
+.ms-npc .bub{background:var(--teal-l);border-radius:4px 16px 16px 16px;padding:10px 12px;font-weight:700}
+.ms-npc .face{font-size:34px}
+.ms-mood{display:flex;align-items:center;gap:8px;font-weight:900;font-size:13px;margin-bottom:10px}
+.ms-mood .prog{max-width:260px}
+.ms-bet{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.ms-bet button{border:2.5px solid var(--gold-d);background:var(--gold-l);border-radius:12px;padding:8px 14px;font-weight:900;font-variant-numeric:tabular-nums}
+.ms-bet button.on{background:var(--gold);box-shadow:0 3px 0 var(--gold-d)}
+.ms-bet button:disabled{opacity:.4;cursor:default}
+.ms-wallet{font-family:var(--display);font-weight:700;font-size:28px;color:var(--teal-d);font-variant-numeric:tabular-nums}
+.ms-tbl{width:100%;border-collapse:collapse;font-size:14px}
+.ms-tbl td,.ms-tbl th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.ms-tw{overflow-x:auto}
+.ms-boss{display:grid;justify-items:center;gap:6px;text-align:center;margin-bottom:12px}
+.ms-boss .face{font-size:72px;line-height:1}
+.ms-boss.hit .face{animation:shake .35s}
+.ms-hp{width:min(320px,100%);height:14px;border-radius:99px;background:var(--line);overflow:hidden}
+.ms-hp i{display:block;height:100%;background:var(--bad);transition:width .35s}
+.ms-hearts{font-size:22px;letter-spacing:3px}
+.ms-shelf{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-bottom:12px}
+.ms-shelf div{background:var(--paper);border-radius:12px;padding:8px 4px;text-align:center;font-weight:900;font-variant-numeric:tabular-nums}
+.ms-shelf small{display:block;color:var(--muted);font-size:11px}
+.ms-pics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.ms-pic{border-radius:14px;padding:10px 6px;text-align:center;display:grid;gap:4px}
+.ms-pic .e{font-size:40px}.ms-pic small{font-weight:800;font-size:12px;color:var(--ink)}
+.ms-dirs{display:grid;gap:8px}
+.ms-dir{border:2.5px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px;text-align:left;font-weight:800}
+.ms-dir.on{border-color:var(--teal);background:var(--teal-l)}
+.ms-wc{font-size:13px;font-weight:800;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.ms-ai{background:var(--lav);border-radius:14px;padding:12px;font-weight:600;line-height:1.5;display:grid;gap:6px}
+.ms-ai b{color:#4B3596}
+.ms-cert{position:relative;background:#FFFDF6;color:#1E3A6E;border:10px double var(--gold-d);border-radius:8px;padding:28px 18px;text-align:center;display:grid;gap:8px}
+.ms-cert .k{font-size:12px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-d)}
+.ms-cert h2{font-size:clamp(26px,6vw,40px)}
+.ms-cert .nm{font-family:var(--display);font-weight:700;font-size:clamp(30px,8vw,48px);color:var(--teal);border-bottom:2px solid var(--gold);padding-bottom:4px;margin:4px auto;max-width:100%;overflow-wrap:anywhere}
+.ms-cert .sig{margin-top:12px;font-weight:800}
+.ms-cert .sig i{display:block;font-family:var(--display);font-size:22px;color:var(--teal-d)}
+`;document.head.appendChild(s)})();
+
+(function(){const s=document.createElement('style');s.textContent=`
+.mq-opts .opt{-webkit-tap-highlight-color:transparent}
+@media (hover:none){.mq-opts .opt:hover:not(:disabled){border-color:var(--line)}}
+.mq-opts .opt:focus{outline:none}
+.mq-big{display:block;font-family:var(--display);font-weight:700;font-size:clamp(30px,8vw,44px);line-height:1.1;color:var(--ink);overflow-wrap:anywhere}
+.mq-big.az{font-family:var(--body);font-weight:900;font-size:clamp(24px,6vw,34px)}
+.mq-pos{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;background:var(--lav);color:#4B3596;border-radius:99px;padding:2px 9px;vertical-align:middle}
+.ms-q .mq-pos{margin-top:6px}
+.mq-exs{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(0,0,0,.15);color:var(--ink);font-weight:700;line-height:1.5}
+.mq-exs small{color:var(--muted)}
+mark{background:var(--gold-l);color:var(--ink);border-radius:4px;padding:0 3px;box-shadow:inset 0 -3px 0 var(--gold)}
+.mq-qlist li.mq-wr{color:var(--bad)}
+.mq-wrn{margin:8px 0 0;font-size:13px;font-weight:800;color:var(--bad)}
+.mq-learn{width:100%;border:0;border-radius:16px;background:var(--mint);padding:12px 14px;margin-bottom:10px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;text-align:left;box-shadow:0 2px 0 #BFE3CC}
+.mq-learn .e{font-size:30px}.mq-learn b{display:block;font-family:var(--display);font-size:19px}.mq-learn small{color:var(--muted);font-weight:800}
+.mq-learn .go{width:30px;height:30px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center}.mq-learn .go svg{width:15px;height:15px}
+.mq-lw{display:grid;gap:8px}
+.mq-lw .r{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:start;background:var(--card);border-radius:14px;padding:10px 12px;box-shadow:0 1px 0 var(--line)}
+.mq-lw .spk{width:36px;height:36px;box-shadow:0 3px 0 #C9474E}.mq-lw .spk svg{width:17px;height:17px}
+.mq-lw b{font-size:17px}.mq-lw .az{font-weight:800;color:var(--teal-d)}.mq-lw .ex{font-size:14px;font-weight:600;color:var(--muted);margin-top:3px;line-height:1.45}
+.mq-fc{perspective:900px;max-width:440px;margin:6px auto 12px;cursor:pointer;outline:none}
+.mq-fc .in{position:relative;min-height:220px;transition:transform .45s;transform-style:preserve-3d}
+.mq-fc.fl .in{transform:rotateY(180deg)}
+.mq-fc .f,.mq-fc .b{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;display:grid;place-content:center;justify-items:center;gap:8px;padding:18px;text-align:center;box-shadow:0 2px 0 var(--line),0 12px 26px rgba(30,58,110,.08)}
+.mq-fc .f{background:var(--card)}.mq-fc .b{background:var(--gold-l);transform:rotateY(180deg)}
+.mq-fc small{color:var(--muted);font-weight:800}.mq-fc p{margin:0;font-weight:700;line-height:1.5}
+.mq-fc:focus-visible .in{outline:3px solid var(--coral);border-radius:22px}
+.mq-fcn{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;font-weight:900;font-variant-numeric:tabular-nums}
+`;document.head.appendChild(s)})();
+
+/* ---------- task content (A2–B1) ---------- */
+const MQ_TASKS=[
+{id:1,t:'The Castle Secret',az:'Qalanın sirri',ic:'🏰',gate:'code',code:'3815',gateWhat:'kodu yazacaqsan',
+ story:"Sən Mr. Samir-in gənc agentisən. Şəki yaxınlığında köhnə <b>Qara Qala</b> var. 200 il əvvəl zəngin bir tacir xəzinə xəritəsini qalanın içində gizlədib. Qalanın dəmir qapısı <b>4 rəqəmli kodla</b> açılır. Kodun rəqəmləri mərhələlərdə gizlənib. Hər mərhələni keç, ipuclarını topla və qapını aç!",
+ goal:'Qalanın qapısını açan 4 rəqəmli kodu tap.',
+ vocab:[['ancient','qədim','The Black Castle is very ancient.'],['tower','qüllə','The castle has eight tall towers.'],['entrance','giriş','There is only one entrance.'],['guard','gözətçi, keşikçi','The guard checks the door every evening.'],['hidden','gizlədilmiş','The map is hidden inside the castle.'],['stone','daş','The walls are made of stone.'],['merchant','tacir','A rich merchant lived in the castle.'],['treasure','xəzinə','Nobody has found the treasure yet.']],
+ reading:{title:'The Black Castle',p:["The Black Castle stands on a hill near Sheki. It is very ancient: people built it more than four hundred years ago. The castle has thick stone walls and eight tall towers. From the highest tower you can see the whole valley.","Long ago, a rich merchant called Ali lived in the castle. He travelled to China and India and brought back silk, spices and gold. Before he died, he drew a map of his treasure and hid it somewhere inside the castle. Nobody has found it yet.","Today the castle is closed to visitors. There is only one entrance, a heavy iron door on the north side. It has a lock with four numbers. An old guard, Mr. Rashid, lives in a small house next to the castle. He has worked there for thirty years. Every evening he walks around the walls with his old dog, Bars, and checks that the door is locked.","Local people say that the treasure map is behind a painting of a white horse."],
+  qs:[{q:"How old is the castle?",o:["More than 400 years old","About 100 years old","Exactly 40 years old","Nobody knows"],a:0},
+      {q:"Where did Ali hide the map?",o:["Somewhere inside the castle","In China","In the guard's house","Under a tree on the hill"],a:0},
+      {q:"Where is the only entrance?",o:["On the north side","On the south side","Next to the highest tower","Behind the guard's house"],a:0},
+      {q:"Which countries did Ali travel to?",o:["China and India","Turkey and Iran","Italy and Spain","China and Japan"],a:0},
+      {q:"How long has Mr. Rashid worked at the castle?",o:["For thirty years","For thirteen years","For three years","For forty years"],a:0}],
+  detail:{q:"What is the name of the guard's dog?",o:["Bars","Ali","Rashid","Sheki"],a:0}},
+ listening:{who:'Mr. Rashid, the guard',p:["Hello, young agent. My name is Rashid. I am the guard of the Black Castle.","Listen to me carefully, because I will not repeat this many times.","The iron door does not open in the morning.","It opens only at one o'clock in the afternoon, when the sun is above the castle.","Please don't come by car. The road is too narrow.","Come on foot and bring a torch, because the rooms inside are very dark.","When you are inside, go up the stairs to the second floor.","The painting is in the library, next to the big window.","When you are inside, you will hear a bell. After the bell you have only twenty minutes, because the door closes again.","Remember: the third number of the code is the hour when the door opens. Good luck!"],
+  qs:[{q:"When does the iron door open?",o:["At one o'clock in the afternoon","In the morning","At midnight","At three o'clock"],a:0},
+      {q:"What must the agent bring?",o:["A torch","A map","A key","A camera"],a:0},
+      {q:"Where is the painting?",o:["In the library, next to the big window","In the guard's house","On the first floor, next to the door","In the highest tower"],a:0},
+      {q:"How should the agent come to the castle?",o:["On foot","By car","By bus","By bike"],a:0},
+      {q:"How much time does the agent have after the bell?",o:["Twenty minutes","Ten minutes","Two hours","Thirty minutes"],a:0}]},
+ build:[["The treasure map is behind the painting",'Xəzinə xəritəsi şəklin arxasındadır.'],["You must not come to the castle by car",'Qalaya maşınla gəlməməlisən.'],["The guard has worked there for thirty years",'Gözətçi orada otuz ildir işləyir.']],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>ancient</b>.",o:["very old","modern","quick","famous"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>heavy</b>.",o:["light","strong","big","dark"],a:0},
+  {k:'Definition',q:"A person whose job is to protect a building or a place.",o:["guard","merchant","tourist","painter"],a:0},
+  {k:'Synonym',q:"Choose the synonym of <b>hidden</b>.",o:["secret","broken","open","famous"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>narrow</b>.",o:["wide","short","long","thin"],a:0}],
+ clues:{vocab:"Kodun <b>1-ci rəqəmi: 3</b>",reading:"Kodun <b>2-ci rəqəmi</b> qalanın <b>qüllələrinin sayıdır</b>. Bu rəqəm mətndə yazılıb — yadda saxla!",listening:"Kodun <b>3-cü rəqəmi</b> dəmir qapının <b>açıldığı saatdır</b>. Gözətçi bunu dinləmədə dedi.",build:"Kodun <b>4-cü rəqəmi: 5</b>",words:"Qapının qarşısındasan. Qapını açmaq üçün əvvəlcə final qapısının 10 sualına cavab ver, sonra kodu yaz."},
+ final:[{q:"<b>qüllə</b> — ingiliscə?",o:["tower","gate","wall","stone"],a:0},
+  {q:"<b>entrance</b> nə deməkdir?",o:["giriş","çıxış","qala","pəncərə"],a:0},
+  {q:"Reading: How many towers does the castle have?",o:["Eight","Four","Three","Thirty"],a:0},
+  {q:"Reading: Who was Ali?",o:["A rich merchant","The guard","A painter","The guard's dog"],a:0},
+  {q:"Reading: What is the treasure map behind?",o:["A painting of a white horse","The iron door","A stone wall","A big window"],a:0},
+  {q:"Listening: Why must the agent not come by car?",o:["The road is too narrow.","There is no parking.","Cars are not allowed in Sheki.","The guard doesn't like cars."],a:0},
+  {q:"Listening: On which floor is the library?",o:["On the second floor","On the first floor","On the third floor","Under the ground"],a:0},
+  {q:"Choose the correct sentence.",o:["The guard checks the door every evening.","The guard every evening checks the door.","Checks the guard the door every evening.","The guard checks every evening door the."],a:0},
+  {q:"Which word is closest in meaning to <b>hidden</b>?",o:["secret","heavy","ancient","narrow"],a:0},
+  {q:"The castle ___ more than four hundred years ago.",o:["was built","built","is built","has build"],a:0}],
+ gateQ:"Dəmir qapının 4 rəqəmli kodunu daxil et.",
+ hint:"İpucu: 1-ci və 4-cü rəqəmlər dəftərində yazılıb. 2-ci rəqəm mətndən (qüllələr), 3-cü rəqəm dinləmədən (saat).",
+ end:"Kod qəbul olundu! Dəmir qapı ağır səslə açılır. Fənərini yandırıb ikinci mərtəbəyə qalxırsan, kitabxanada ağ at şəklinin arxasından köhnə xəritəni tapırsan. Missiya tamamlandı!"},
+
+{id:2,t:'Night at the Mountain Hotel',az:'Dağ otelində cinayət',ic:'🏨',gate:'culprit',
+ story:"Qəbələnin dağlarındakı <b>Snow Peak</b> otelində dünən gecə qiymətli <b>qızıl boyunbağı</b> oğurlanıb. Otelin sahibi Mrs. Green sənə müraciət edib. Dörd şübhəli var: aşpaz <b>Tom</b>, resepşn işçisi <b>Anna</b>, qonaq <b>Mr. Brown</b> və təmizlikçi <b>Lisa</b>. Hər mərhələ bir şübhəlinin günahsız olduğunu göstərəcək. Sonda cinayətkarı adlandır!",
+ goal:'Boyunbağını kimin oğurladığını tap və sübutu göstər.',
+ gateWhat:'cinayətkarı adlandıracaqsan',suspects:[['Tom','Chef','👨‍🍳',''],['Anna','Receptionist','💁‍♀️','reading'],['Mr. Brown','Guest','🧳','listening'],['Lisa','Cleaner','🧹','build']],answer:'Tom',
+ vocab:[['necklace','boyunbağı','She wore a golden necklace.'],['steal (stole)','oğurlamaq','Somebody stole the necklace.'],['guest','qonaq','Mr. Brown is a guest in room twelve.'],['suspect','şübhəli','There are four suspects.'],['witness','şahid','A witness saw a person near the office.'],['evidence','sübut','The police need evidence.'],['safe','seyf','She put the necklace in the safe.'],['footprints','ayaq izləri','There were white footprints near the door.']],
+ reading:{title:"Mrs. Green's statement",p:["My name is Helen Green, and I am the owner of the Snow Peak Hotel. Last night we had a big birthday party in the restaurant. I wore my golden necklace at the party. At about half past ten I took it off and put it in the safe in my office. Only two people know the code of the safe: me and our chef, Tom. He sometimes keeps expensive food in it.","At eleven o'clock the party finished. Anna, our receptionist, stayed at the front desk all night because a group of tourists arrived late. The security camera above the desk shows her there from ten until two in the morning.","This morning, when I opened the safe, the necklace was not there. I found some flour on the floor of my office and small white footprints near the door. Our cleaner, Lisa, says she didn't clean my office yesterday.","I am very upset. That necklace was a present from my mother."],
+  qs:[{q:"Where did Mrs. Green put the necklace?",o:["In the safe in her office","In her bag","In the restaurant","At the front desk"],a:0},
+      {q:"Who knows the code of the safe?",o:["Mrs. Green and the chef","Only Mrs. Green","Anna and Lisa","All the guests"],a:0},
+      {q:"Why did Anna stay at the front desk all night?",o:["Some tourists arrived late.","She was very tired.","The party was at the desk.","She lost her key."],a:0},
+      {q:"When did Mrs. Green put the necklace in the safe?",o:["At about half past ten","At eleven o'clock","At two in the morning","In the afternoon"],a:0},
+      {q:"What does Lisa, the cleaner, say?",o:["She didn't clean the office yesterday.","She saw Tom in the office.","She found the necklace.","She cleaned the office at night."],a:0}],
+  detail:{q:"What did Mrs. Green find on the floor of her office?",o:["Some flour","Some water","A golden ring","A small bag"],a:0}},
+ listening:{who:'Mr. Brown, guest in room 12',p:["Good morning. My name is James Brown. I am a guest in room twelve.","I know you think I took the necklace, but I didn't.","Last night I left the party at a quarter to eleven because I had a terrible headache.","I went to my room and called my wife in London.","We talked for almost an hour, from eleven until ten to twelve.","You can check the phone records at the reception.","Oh, and one more thing.","At about a quarter past eleven I looked out of my window and saw someone in a white jacket.","The person was walking quickly towards the owner's office and carrying a small bag.","I couldn't see the face."],
+  qs:[{q:"Why did Mr. Brown leave the party?",o:["He had a terrible headache.","He was hungry.","He wanted to sleep.","He had to work."],a:0},
+      {q:"Who did he call?",o:["His wife in London","The police","The receptionist","His brother"],a:0},
+      {q:"What was the person near the office wearing?",o:["A white jacket","A black coat","A red dress","A blue uniform"],a:0},
+      {q:"Where can you check the phone records?",o:["At the reception","In the restaurant","In his room","At the police station"],a:0},
+      {q:"What was the person carrying?",o:["A small bag","A big box","A golden necklace","A phone"],a:0}]},
+ build:[["Lisa was at her sister's wedding last night","Lisa dünən gecə bacısının toyunda idi."],["The chef always wears a white jacket","Aşpaz həmişə ağ gödəkcə geyinir."],["Flour was found near the office door","Ofisin qapısının yanında un tapıldı."]],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>upset</b>.",o:["sad","happy","busy","hungry"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>expensive</b>.",o:["cheap","golden","rich","heavy"],a:0},
+  {k:'Definition',q:"A person who sees a crime or an accident happen.",o:["witness","suspect","guest","owner"],a:0},
+  {k:'Definition',q:"A strong metal box for keeping money or jewellery.",o:["safe","bag","desk","drawer"],a:0},
+  {k:'Synonym',q:"Choose the synonym of <b>quickly</b>.",o:["fast","slowly","quietly","carefully"],a:0}],
+ clues:{vocab:"Polis qeydi: boyunbağı gecə saat <b>23:00 ilə 23:30</b> arasında seyfdən oğurlanıb.",reading:"❌ <b>Anna</b> şübhədən çıxır: kamera onu bütün gecə resepşndə göstərir.",listening:"❌ <b>Mr. Brown</b> şübhədən çıxır: 23:00–23:50 arası arvadı ilə telefonla danışırdı.",build:"❌ <b>Lisa</b> şübhədən çıxır: dünən gecə bacısının toyunda idi.",words:"Bir şübhəli qaldı. Final qapısındakı 10 suala cavab ver və cinayətkarı adlandır."},
+ final:[{q:"<b>şübhəli</b> — ingiliscə?",o:["suspect","witness","guest","owner"],a:0},
+  {q:"<b>evidence</b> nə deməkdir?",o:["sübut","şahid","seyf","ayaq izi"],a:0},
+  {q:"Reading: What time did the party finish?",o:["At eleven o'clock","At half past ten","At midnight","At two in the morning"],a:0},
+  {q:"Reading: Who gave the necklace to Mrs. Green?",o:["Her mother","Her husband","Tom","A guest"],a:0},
+  {q:"Reading: Why does Tom know the code of the safe?",o:["He sometimes keeps expensive food in it.","He is the owner's son.","He cleans the office.","He works at the front desk."],a:0},
+  {q:"Listening: Which room is Mr. Brown in?",o:["Room twelve","Room twenty","Room two","Room eleven"],a:0},
+  {q:"Listening: When did Mr. Brown see the person in the white jacket?",o:["At about a quarter past eleven","At a quarter to eleven","At ten to twelve","At half past ten"],a:0},
+  {q:"Choose the correct sentence.",o:["The chef always wears a white jacket.","The chef wears always a white jacket.","Always the chef a white jacket wears.","The chef always a white jacket wears."],a:0},
+  {q:"Choose the antonym of <b>cheap</b>.",o:["expensive","free","poor","easy"],a:0},
+  {q:"The necklace ___ last night.",o:["was stolen","stole","is stealing","has stole"],a:0}],
+ gateQ:"Boyunbağını kim oğurlayıb?",
+ evQ:{q:"Hansı sübutlar bunu göstərir?",o:["He knows the safe code, he wears a white jacket and he works with flour.","He was at the party until midnight.","The camera shows him at the front desk.","He called his wife at eleven o'clock."],a:0},
+ hint:"İpucu: dəftərinə bax — üç şübhəli artıq şübhədən çıxıb.",
+ end:"Düz tapdın! Aşpaz Tom seyfin kodunu bilirdi, ağ gödəkcə geyinirdi və ayaqqabısında mətbəxdən un var idi. Boyunbağı onun çantasından tapıldı. Mrs. Green çox xoşbəxtdir — missiya tamamlandı!"},
+
+{id:3,t:'The Missing Scientist',az:'İtkin alim',ic:'🔭',gate:'choice',
+ story:"Məşhur astronom <b>Dr. Leyla Rəhimova</b> üç gündür yoxa çıxıb. O, mühüm bir kəşf edib və kimsə onun tədqiqatını oğurlamaq istəyir. Gizlənməzdən əvvəl köməkçisi Kamal üçün ingilis dilində ipucları qoyub. Onun <b>harada</b> və <b>saat neçədə</b> gözlədiyini tap — gecikmə!",
+ goal:'Alimin gizləndiyi yeri və görüş vaxtını tap.',
+ gateWhat:'yeri və vaxtı seçəcəksən',choice:{a:{lab:'📍 Yer',opts:['Shamakhi Observatory','Baku Central Library','Sheki Castle','Gabala Airport'],ans:'Shamakhi Observatory'},b:{lab:'🕗 Vaxt',opts:['8:30 in the evening','8:30 in the morning','9:30 in the evening','6:30 in the evening'],ans:'8:30 in the evening'}},
+ vocab:[['scientist','alim','Leyla is a famous scientist.'],['discovery','kəşf','It is a very important discovery.'],['research','tədqiqat','She finished her research.'],['disappear','yoxa çıxmaq','The scientist disappeared three days ago.'],['assistant','köməkçi','Kamal is her assistant.'],['telescope','teleskop','It has the best telescope in the country.'],['dangerous','təhlükəli','It is dangerous to stay in the city.'],['observatory','rəsədxana','She worked at an observatory.']],
+ reading:{title:"Leyla's diary",p:["Monday, 14 October. Tonight I finished my research. I think I have found a new comet, a small ball of ice and rock that travels around the Sun. It is a very important discovery, but I have told only my assistant, Kamal.","Tuesday, 15 October. Someone called me three times today and asked about my research. The man didn't say his name. In the evening I saw a grey car outside my flat. I think somebody is watching me. It is dangerous to stay in Baku now.","Wednesday, 16 October. I am leaving the city today. I will go to the place where I worked for ten years before I moved to Baku. It is in the mountains, about 120 kilometres from the city, and it has the best telescope in the country. I love that place because the sky there is so clear. I will take only my laptop and a warm coat."],
+  qs:[{q:"What has Leyla discovered?",o:["A new comet","A new planet","A new island","An old map"],a:0},
+      {q:"Who knows about the discovery?",o:["Only her assistant, Kamal","All her friends","The man in the grey car","Nobody"],a:0},
+      {q:"Why does Leyla want to leave Baku?",o:["She thinks somebody is watching her.","She wants a holiday.","Her flat is too small.","She has a new job."],a:0},
+      {q:"When did Leyla finish her research?",o:["On Monday night","On Tuesday morning","On Wednesday","On Sunday"],a:0},
+      {q:"Why does Leyla love the place in the mountains?",o:["The sky there is so clear.","It is near the sea.","Her family lives there.","It is very warm."],a:0}],
+  detail:{q:"What colour was the car outside her flat?",o:["Grey","Black","White","Green"],a:0}},
+ listening:{who:"Leyla's voice message",p:["Kamal, it's me, Leyla. I can't talk for long. My phone battery is almost dead.","Please listen carefully. I am safe, don't worry.","I can't say the name of the place on the phone. You know where I worked before.","Come tomorrow, but not in the morning.","Come in the evening, at half past eight, when the first stars appear.","Don't take the bus. Take a taxi, and ask the driver to stop at the bottom of the hill. Then walk up.","Please bring my notebook with the green cover. It's on my desk.","Don't tell anyone. See you soon."],
+  qs:[{q:"Why can't Leyla talk for long?",o:["Her phone battery is almost dead.","She is very busy.","Someone is listening.","She is in a taxi."],a:0},
+      {q:"How should Kamal travel?",o:["By taxi","By bus","On foot from Baku","By car with friends"],a:0},
+      {q:"What must Kamal bring?",o:["Her notebook with the green cover","Her laptop","A warm coat","A telescope"],a:0},
+      {q:"Where is the notebook?",o:["On her desk","In her bag","In the taxi","Under her bed"],a:0},
+      {q:"What must Kamal do after the taxi stops?",o:["Walk up the hill","Call Leyla","Wait in the taxi","Take a bus"],a:0}]},
+ build:[["She worked at the observatory for ten years","O, rəsədxanada on il işləyib."],["The best telescope is in the mountains","Ən yaxşı teleskop dağlardadır."],["Nobody must know about the new comet","Yeni kometa haqqında heç kim bilməməlidir."]],
+ words:[{k:'Definition',q:"A building with a big telescope for watching the stars.",o:["observatory","library","museum","factory"],a:0},
+  {k:'Synonym',q:"Choose the synonym of <b>disappear</b>.",o:["vanish","appear","arrive","return"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>dangerous</b>.",o:["safe","difficult","strange","famous"],a:0},
+  {k:'Definition',q:"Something that somebody finds or learns for the first time.",o:["discovery","research","journey","problem"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>clear</b> (sky).",o:["cloudy","bright","blue","clean"],a:0}],
+ clues:{vocab:"Kamalın qeydi: Doktor ünvan yazmayıb, bir yeri təsvir edib. O yer <b>şəhərdə deyil</b>.",reading:"Yer şəhərdən təxminən <b>120 km</b> uzaqda, <b>dağlardadır</b> və orada ölkənin <b>ən yaxşı teleskopu</b> var.",listening:"<b>Görüşün vaxtı</b> səsli mesajda deyildi. Onu yadda saxla — dinləmə artıq bağlıdır!",build:"Kamal xatırlayır: Leyla Bakıya köçməzdən əvvəl <b>Şamaxıda</b> işləyirdi.",words:"Hamısı hazırdır. Final qapısının 10 sualına cavab ver, sonra yeri və vaxtı seç."},
+ final:[{q:"<b>köməkçi</b> — ingiliscə?",o:["assistant","scientist","driver","guard"],a:0},
+  {q:"<b>research</b> nə deməkdir?",o:["tədqiqat","kəşf","rəsədxana","teleskop"],a:0},
+  {q:"Reading: What is a comet, as Leyla explains it?",o:["A small ball of ice and rock that travels around the Sun","A very big star","A new kind of telescope","A planet with rings"],a:0},
+  {q:"Reading: How many times did the man call Leyla?",o:["Three times","Once","Twice","Ten times"],a:0},
+  {q:"Reading: What did Leyla take with her?",o:["Only her laptop and a warm coat","Her notebook and a telescope","Her car and her dog","Nothing"],a:0},
+  {q:"Listening: Where should the taxi stop?",o:["At the bottom of the hill","Next to the observatory door","In the centre of the town","At the bus station"],a:0},
+  {q:"Listening: What colour is the notebook's cover?",o:["Green","Grey","Blue","Red"],a:0},
+  {q:"Choose the correct sentence.",o:["Nobody must know about the new comet.","Nobody must about the new comet know.","Must nobody know about the new comet.","Nobody know must about the new comet."],a:0},
+  {q:"Choose the antonym of <b>dangerous</b>.",o:["safe","clear","famous","strange"],a:0},
+  {q:"If you ___ late, she will leave.",o:["are","will be","were","be"],a:0}],
+ gateQ:"Dr. Leyla harada və saat neçədə gözləyir?",
+ hint:"İpucu: yer — dağlarda, 120 km, ən yaxşı teleskop, Şamaxı. Vaxt — səsli mesajda deyildi.",
+ end:"Saat 20:30-da Şamaxı Rəsədxanasına çatırsan. Dr. Leyla teleskopun yanında səni gözləyir. Kometa haqqında tədqiqat təhlükəsizdir — missiya tamamlandı!"},
+
+{id:4,t:'The Airport Mix-up',az:'Hava limanında qarışıqlıq',ic:'🛄',gate:'culprit',gateWhat:'çantanı kimin apardığını tapacaqsan',
+ story:"Sən Bakıdan Londona <b>ingilis dili olimpiadasına</b> uçursan. Hava limanında çantan başqa sərnişinin çantası ilə qarışıb! İçində olimpiada üçün hazırladığın layihə var. Çantan belədir: <b>qara, kiçik, üstündə qırmızı lent</b>. Dörd sərnişin bu çantanı aparmış ola bilər. Uçuşa 40 dəqiqə qalıb — çantanı kimin götürdüyünü tap!",
+ goal:'Çantanı səhvən kimin apardığını tap.',
+ suspects:[['Leo','Football player','⚽',''],['Mr. Jones','Businessman','💼','reading'],['Sara','Student','🎻','listening'],['Mrs. Kim','Doctor','🩺','build']],answer:'Leo',
+ vocab:[['passenger','sərnişin','There were many passengers at the airport.'],['suitcase','çamadan','My suitcase is black and small.'],['security check','təhlükəsizlik yoxlanışı','We put our bags in boxes at the security check.'],['label','etiket, yarlıq','His bag has a label with his name.'],['luggage','baqaj','She put her bag in the luggage at check-in.'],['in a hurry','tələsik','He was in a hurry and ran to the gate.'],['announcement','elan','Listen to the announcement, please.'],['boarding','təyyarəyə minmə','The flight to Madrid is already boarding.']],
+ reading:{title:'Security report — Gate B',p:["At twenty past ten this morning there were a lot of people at the security check near Gate B. Four passengers were standing next to the X-ray machine at the same time. Each passenger put a bag in a grey box, and the boxes went through the machine together.","The first passenger was Mr. Jones, a businessman from Manchester. His bag has a big blue label with his name and phone number on it, so the officer found it and gave it back to him easily. The second passenger was Sara, a student who is travelling to Rome with her school orchestra.","The third passenger was a doctor, Mrs. Kim. She showed her passport to the officer and asked for the way to Gate 5. The last passenger was Leo, a young football player. He was in a hurry, because his team's flight to Madrid was already boarding.","Ten minutes later, a student came to the officer and said that his small black bag with a red ribbon was missing."],
+  qs:[{q:"What time was it at the security check?",o:["Twenty past ten","Ten past two","Half past ten","Twenty to ten"],a:0},
+      {q:"Why was it easy to give Mr. Jones his bag?",o:["It has a big blue label with his name.","It is very big and red.","He was the first passenger.","He knew the officer."],a:0},
+      {q:"Where is Sara travelling?",o:["To Rome","To Madrid","To London","To Manchester"],a:0},
+      {q:"Who is Sara travelling with?",o:["Her school orchestra","Her parents","A football team","Her teacher only"],a:0},
+      {q:"Why was Leo in a hurry?",o:["His flight was already boarding.","He lost his passport.","He wanted to buy food.","He was late for a match."],a:0}],
+  detail:{q:"What colour were the boxes at the security check?",o:["Grey","Black","Blue","Red"],a:0}},
+ listening:{who:"Sara's voice message",p:["Hello, this is Sara. I'm calling from Gate 12.","I heard the announcement about the small black bag with a red ribbon.","I opened my bag five minutes ago, and it is definitely mine.","My violin music, my school books and a photo of my little brother are inside.","But I want to help you. At the security check I was standing next to a tall young man in a green tracksuit.","He was talking on the phone and saying: Coach, I'm coming! Don't leave without me!","He took a bag from the boxes very quickly and didn't look at it.","I think his flight was to Madrid. I hope you find your bag!"],
+  qs:[{q:"Where is Sara calling from?",o:["Gate 12","Gate B","Gate 5","Gate 7"],a:0},
+      {q:"How does Sara know the bag is hers?",o:["Her own things are inside.","It has her name on it.","It is a different colour.","The officer told her."],a:0},
+      {q:"Whose photo is in Sara's bag?",o:["Her little brother's","Her mother's","Her teacher's","Her best friend's"],a:0},
+      {q:"What was the young man wearing?",o:["A green tracksuit","A blue suit","A red jacket","A white shirt"],a:0},
+      {q:"Who was the young man talking to on the phone?",o:["His coach","His mother","A pilot","Sara"],a:0}]},
+ build:[["Mrs. Kim put her bag in the luggage at check-in","Mrs. Kim qeydiyyatda çantasını baqaja verdi."],["The flight to London leaves in forty minutes","Londona uçuş qırx dəqiqəyə yola düşür."],["Please check your bag before you leave","Getməzdən əvvəl çantanı yoxla."]],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>missing</b>.",o:["lost","broken","heavy","found"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>arrive</b>.",o:["leave","come","land","stay"],a:0},
+  {k:'Definition',q:"A person who travels in a car, bus, train or plane but is not the driver.",o:["passenger","pilot","officer","coach"],a:0},
+  {k:'Definition',q:"A spoken message in a public place, for example at an airport.",o:["announcement","label","ticket","report"],a:0},
+  {k:'Synonym',q:"Choose the synonym of <b>in a hurry</b>.",o:["rushing","relaxed","bored","tired"],a:0}],
+ clues:{vocab:"Elan: çanta saat <b>10:20</b>-də <b>Gate B</b> yaxınlığındakı təhlükəsizlik yoxlanışında qarışıb.",reading:"❌ <b>Mr. Jones</b> şübhədən çıxır: onun çantasında adı yazılmış böyük göy etiket var.",listening:"❌ <b>Sara</b> şübhədən çıxır: çantasını açıb, içindəkilər onundur.",build:"❌ <b>Mrs. Kim</b> şübhədən çıxır: çantasını qeydiyyatda baqaja verib.",words:"Bir sərnişin qaldı. Final qapısındakı 10 suala cavab ver və onu adlandır."},
+ final:[{q:"<b>sərnişin</b> — ingiliscə?",o:["passenger","pilot","officer","coach"],a:0},
+  {q:"<b>luggage</b> nə deməkdir?",o:["baqaj","etiket","elan","bilet"],a:0},
+  {q:"Reading: Which gate was the security check near?",o:["Gate B","Gate 7","Gate 12","Gate 5"],a:0},
+  {q:"Reading: Where is Mr. Jones from?",o:["Manchester","London","Madrid","Rome"],a:0},
+  {q:"Reading: Where was Leo's team flying?",o:["To Madrid","To Rome","To London","To Paris"],a:0},
+  {q:"Listening: What music is in Sara's bag?",o:["Violin music","Piano music","Guitar music","Drum music"],a:0},
+  {q:"Listening: What did the young man do with the bag?",o:["He took it quickly and didn't look at it.","He opened it and checked it.","He gave it to the officer.","He left it at the gate."],a:0},
+  {q:"Choose the correct sentence.",o:["Please check your bag before you leave.","Please your bag check before you leave.","Check please before you leave your bag.","Please check before your bag you leave."],a:0},
+  {q:"Choose the antonym of <b>arrive</b>.",o:["leave","land","come","wait"],a:0},
+  {q:"While Leo ___ on the phone, he took the wrong bag.",o:["was talking","talked","is talking","talks"],a:0}],
+ gateQ:"Çantanı kim səhvən aparıb?",
+ evQ:{q:"Hansı sübutlar bunu göstərir?",o:["He was at the security check, he was in a hurry and he took a bag without looking at it.","He has a blue label with his name on his bag.","He put his bag in the luggage at check-in.","He opened his bag and found his own things."],a:0},
+ hint:"İpucu: dəftərinə bax — üç sərnişin artıq şübhədən çıxıb.",
+ end:"Düz tapdın! Leo tələsik səhv çantanı götürmüşdü. Hava limanı işçiləri onu Gate 7-də tapdılar və çantalar dəyişdirildi. Layihən yenə səninlədir — Londona uça bilərsən! Missiya tamamlandı!"},
+
+{id:5,t:'The Island Treasure',az:'Adanın xəzinəsi',ic:'🏝️',gate:'code',code:'2749',gateWhat:'sandığın kodunu yazacaqsan',
+ story:"Xəzər dənizində kiçik <b>Qağayı adası</b> var. 100 il əvvəl Kapitan Murad gəmisinin qızıl sikkələrini orada köhnə <b>dəmir sandıqda</b> gizlədib. Sandıq <b>4 rəqəmli kodla</b> açılır. Kapitanın gündəliyi və köhnə radio yazısı kodu gizlədir. Rəqəmləri tap və sandığı aç!",
+ goal:'Xəzinə sandığının 4 rəqəmli kodunu tap.',
+ vocab:[['island','ada','Seagull Island is very small.'],['captain','kapitan','The captain wrote a diary.'],['sailor','dənizçi','There were seven sailors on the ship.'],['chest','sandıq','The gold is in an iron chest.'],['storm','fırtına','A terrible storm started on the third day.'],['shore','sahil','There is a wooden boat on the west shore.'],['rock','qaya','The chest is under a big rock.'],['lighthouse','mayak','The old lighthouse is on the east side.']],
+ reading:{title:"The Captain's Diary",p:["My name is Captain Murad. In the summer of 1925, my ship, the Sea Star, sailed from Baku with seven sailors and a box of gold coins. On the third day a terrible storm started. The wind was so strong that we couldn't control the ship.","In the morning we saw a small island with white sand and hundreds of seagulls, so we called it Seagull Island. Our ship was badly damaged, and we stayed on the island for two weeks to repair it. We drank water from a small lake in the middle of the island.","Before we left, I put the gold coins in an iron chest. I buried the chest near the old lighthouse, on the east side of the island. Only my youngest sailor, Elnur, knows the way. I gave him my old compass, so he can always find the place."],
+  qs:[{q:"What was the name of the ship?",o:["The Sea Star","Seagull","The Gold Coin","The Storm"],a:0},
+      {q:"Why couldn't they control the ship?",o:["The wind was very strong.","The captain was ill.","The sailors were tired.","The ship had no engine."],a:0},
+      {q:"How long did they stay on the island?",o:["Two weeks","Two days","Three weeks","One month"],a:0},
+      {q:"Where did they get water?",o:["From a small lake in the middle of the island","From the sea","From the lighthouse","From the rain"],a:0},
+      {q:"Where did the captain bury the chest?",o:["Near the old lighthouse, on the east side","On the west shore","In the lake","Under the ship"],a:0}],
+  detail:{q:"What did the captain give to Elnur?",o:["His old compass","A gold coin","A map","His diary"],a:0}},
+ listening:{who:"Elnur's old radio recording",p:["This is Elnur. I was the youngest sailor on the Sea Star. Now I am very old, so I am recording this message.","If you want to find the chest, start at the small wooden boat on the west shore.","Walk to the lake, and then turn left.","Soon you will see the old lighthouse.","Near the lighthouse there are four big rocks. The chest is under the biggest one.","Be careful! Don't go there in the evening. At six o'clock the sea comes in and the water covers the rocks.","Take a spade and a strong rope, because the chest is very heavy.","Good luck, my young friend."],
+  qs:[{q:"Where should you start?",o:["At the small wooden boat on the west shore","At the lighthouse","At the lake","On the east side"],a:0},
+      {q:"Which way do you turn at the lake?",o:["Left","Right","Back","Straight on"],a:0},
+      {q:"Where exactly is the chest?",o:["Under the biggest rock","In the lighthouse","Next to the boat","In the lake"],a:0},
+      {q:"Why shouldn't you go there in the evening?",o:["The water covers the rocks.","It is too dark.","There are wild animals.","The lighthouse is closed."],a:0},
+      {q:"What must you take with you?",o:["A spade and a strong rope","A torch and a map","A boat and a compass","Food and water"],a:0}]},
+ build:[["The captain buried the chest near the lighthouse","Kapitan sandığı mayakın yanında basdırdı."],["We stayed on the island for two weeks","Biz adada iki həftə qaldıq."],["Do not go to the rocks in the evening","Axşam qayalara getmə."]],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>terrible</b>.",o:["awful","lovely","quiet","short"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>strong</b> (wind).",o:["weak","fast","cold","loud"],a:0},
+  {k:'Definition',q:"A tall tower near the sea with a bright light that helps ships.",o:["lighthouse","island","castle","bridge"],a:0},
+  {k:'Definition',q:"A large strong box for keeping things.",o:["chest","drawer","bag","basket"],a:0},
+  {k:'Synonym',q:"Choose the synonym of <b>damaged</b>.",o:["broken","clean","new","empty"],a:0}],
+ clues:{vocab:"Kodun <b>1-ci rəqəmi: 2</b>",reading:"Kodun <b>2-ci rəqəmi</b> kapitanın gəmisindəki <b>dənizçilərin sayıdır</b>. Bu rəqəm mətndə yazılıb — yadda saxla!",listening:"Kodun <b>3-cü rəqəmi</b> mayakın yanındakı <b>böyük qayaların sayıdır</b>. Elnur bunu dinləmədə dedi.",build:"Kodun <b>4-cü rəqəmi: 9</b>",words:"Sandığın qarşısındasan. Əvvəlcə final qapısının 10 sualına cavab ver, sonra kodu yaz."},
+ final:[{q:"<b>dənizçi</b> — ingiliscə?",o:["sailor","captain","island","storm"],a:0},
+  {q:"<b>shore</b> nə deməkdir?",o:["sahil","qaya","ada","fırtına"],a:0},
+  {q:"Reading: When did the Sea Star sail from Baku?",o:["In the summer of 1925","In the winter of 1925","In the summer of 1952","In the spring of 1925"],a:0},
+  {q:"Reading: Why did they call it Seagull Island?",o:["There were hundreds of seagulls there.","The captain liked seagulls.","It had white sand.","The ship's name was Seagull."],a:0},
+  {q:"Reading: Who knows the way to the chest?",o:["Elnur, the youngest sailor","Captain Murad's son","Nobody","All seven sailors"],a:0},
+  {q:"Listening: At what time does the sea cover the rocks?",o:["At six o'clock","At seven o'clock","At midnight","At four o'clock"],a:0},
+  {q:"Listening: Why is Elnur recording the message?",o:["He is very old now.","He is going on a trip.","He lost the compass.","The captain asked him to."],a:0},
+  {q:"Choose the correct sentence.",o:["The captain buried the chest near the lighthouse.","The captain the chest buried near the lighthouse.","Buried the captain the chest near the lighthouse.","The captain buried near the chest the lighthouse."],a:0},
+  {q:"Choose the synonym of <b>damaged</b>.",o:["broken","heavy","strong","awful"],a:0},
+  {q:"If you go there in the evening, the water ___ the rocks.",o:["will cover","covered","would covered","is cover"],a:0}],
+ gateQ:"Sandığın 4 rəqəmli kodunu daxil et.",
+ hint:"İpucu: 1-ci və 4-cü rəqəmlər dəftərində yazılıb. 2-ci rəqəm — dənizçilərin sayı (mətn), 3-cü rəqəm — böyük qayaların sayı (dinləmə).",
+ end:"Kod qəbul olundu! Ağır dəmir sandıq cırıltı ilə açılır. İçində parıldayan qızıl sikkələr və Kapitan Muradın köhnə şəkli var. Missiya tamamlandı!"},
+
+{id:6,t:'Space Station Alarm',az:'Kosmik stansiyada həyəcan',ic:'🚀',gate:'word',password:'PEPPER',gateWhat:'gizli parolu yazacaqsan',
+ story:"Sən Yer kürəsinin ətrafında uçan <b>Nova-7</b> kosmik stansiyasında gənc astronavtsan. Gecə həyəcan siqnalı səslənir: əsas kompüter sönüb və <b>oksigen sistemi bir saat sonra dayanacaq!</b> Kompüteri yenidən işə salmaq üçün <b>gizli parol</b> lazımdır. Komandir Ray Yerə uçub, amma ipucları qoyub. Parolu tap və stansiyanı xilas et!",
+ goal:'Kompüteri işə salan gizli parolu tap.',
+ wrong:{MAX:'Bu, Danielin itinin adıdır. Komandir isə qızından danışdı!',AYLIN:'Bu, komandirin qızının adıdır — parol isə onun ev heyvanının adıdır.',DANIEL:'Bu, komandirin oğlunun adıdır.',RAY:'Bu, komandirin öz adıdır.'},
+ vocab:[['astronaut','astronavt','Four astronauts live on the station.'],['oxygen','oksigen','We can not live without oxygen.'],['alarm','həyəcan siqnalı','Suddenly the alarm started.'],['commander','komandir','The commander is flying back to Earth.'],['password','parol','The computer will ask for a password.'],['screen','ekran','Sometimes the screen goes black.'],['muscle','əzələ','Our muscles become weak in space.'],['corridor','dəhliz','The control room is at the end of the corridor.']],
+ reading:{title:"Commander Ray's log",p:["Day 40. Life on the space station Nova-7 is busy. There are four astronauts here, and we fly around the Earth sixteen times a day. Every morning we exercise for two hours, because our muscles become weak in space.","I miss my family a lot. My son, Daniel, is ten. He has a big brown dog called Max, and they play football in the garden every day. My daughter, Aylin, is seven. She has a small white cat called Pepper. Aylin says that Pepper sleeps on my pillow when I am away.","Tomorrow I am flying back to Earth for an important meeting, so the young astronauts will be alone for three days. I am a little worried about the main computer. It is old, and sometimes the screen goes black. If that happens, the oxygen system can stop after one hour.","I have changed the computer password. I will not write it here, because somebody can read this log."],
+  qs:[{q:"How many astronauts are on Nova-7?",o:["Four","Seven","Sixteen","Ten"],a:0},
+      {q:"How many times a day does the station fly around the Earth?",o:["Sixteen","Six","Forty","Four"],a:0},
+      {q:"Why do the astronauts exercise every morning?",o:["Their muscles become weak in space.","They want to win a competition.","The commander likes sport.","They have nothing to do."],a:0},
+      {q:"Why is the commander flying back to Earth?",o:["For an important meeting","Because he is ill","To see a football match","To buy a new computer"],a:0},
+      {q:"What can happen if the screen goes black?",o:["The oxygen system can stop after one hour.","The station falls to Earth.","The radio stops working.","The lights go off for a day."],a:0}],
+  detail:{q:"What is the name of Daniel's dog?",o:["Max","Pepper","Ray","Nova"],a:0}},
+ listening:{who:"Commander Ray's recorded message",p:["Hello, team. This is Commander Ray. If you are listening to this, the main computer has stopped.","Don't panic. First, put on your oxygen masks. They are in the blue box next to the kitchen.","Then go to the control room. It's at the end of the long corridor, on the left.","Press the red button under the screen and wait for thirty seconds.","The computer will ask for a password.","The password is the name of my daughter's pet. Write it in capital letters.","Don't use the radio for the next ten minutes, because the computer needs all the power.","I'm sure you can do it. See you in three days."],
+  qs:[{q:"Where are the oxygen masks?",o:["In the blue box next to the kitchen","In the control room","Under the screen","In the commander's room"],a:0},
+      {q:"Where is the control room?",o:["At the end of the long corridor, on the left","Next to the kitchen","On the right of the corridor","Above the engine"],a:0},
+      {q:"What must you press?",o:["The red button under the screen","The blue button","The green button on the radio","The black button next to the door"],a:0},
+      {q:"How long must you wait after that?",o:["Thirty seconds","Thirteen seconds","Three minutes","Ten minutes"],a:0},
+      {q:"Why can't you use the radio for ten minutes?",o:["The computer needs all the power.","The radio is broken.","Nobody is listening on Earth.","It is too noisy."],a:0}]},
+ build:[["Put on your oxygen masks first","Əvvəlcə oksigen maskalarınızı taxın."],["The control room is at the end of the corridor","İdarəetmə otağı dəhlizin sonundadır."],["The computer will ask for a password","Kompüter parol soruşacaq."]],
+ words:[{k:'Antonym',q:"Choose the antonym of <b>weak</b>.",o:["strong","tired","small","slow"],a:0},
+  {k:'Synonym',q:"Choose the synonym of <b>worried</b>.",o:["nervous","happy","calm","proud"],a:0},
+  {k:'Definition',q:"A secret word that you must type to use a computer.",o:["password","screen","alarm","message"],a:0},
+  {k:'Definition',q:"A person who travels into space.",o:["astronaut","pilot","scientist","sailor"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>old</b> (computer).",o:["new","big","slow","broken"],a:0}],
+ clues:{vocab:"Komandirin qeydi: parol <b>6 hərfdən</b> ibarət bir addır.",reading:"Parol komandirin <b>ailəsi</b> ilə bağlıdır. Mətndəki adları yadda saxla!",listening:"Komandir parol haqqında dinləmədə vacib bir şey dedi. Xatırla — dinləmə artıq bağlıdır!",build:"Parolu <b>böyük hərflərlə</b> yaz.",words:"Kompüterin qarşısındasan. Final qapısının 10 sualına cavab ver, sonra parolu yaz."},
+ final:[{q:"<b>parol</b> — ingiliscə?",o:["password","screen","alarm","corridor"],a:0},
+  {q:"<b>oxygen</b> nə deməkdir?",o:["oksigen","əzələ","ekran","komandir"],a:0},
+  {q:"Reading: How long do the astronauts exercise every morning?",o:["For two hours","For one hour","For forty minutes","For three hours"],a:0},
+  {q:"Reading: How old is Aylin?",o:["Seven","Ten","Four","Sixteen"],a:0},
+  {q:"Reading: How long will the young astronauts be alone?",o:["Three days","One hour","Forty days","Two weeks"],a:0},
+  {q:"Listening: What colour is the button?",o:["Red","Blue","Green","Black"],a:0},
+  {q:"Listening: Where is the blue box?",o:["Next to the kitchen","In the control room","At the end of the corridor","Under the screen"],a:0},
+  {q:"Choose the correct sentence.",o:["The computer will ask for a password.","The computer will a password ask for.","Will the computer ask a password for.","The computer ask will for a password."],a:0},
+  {q:"Choose the antonym of <b>weak</b>.",o:["strong","worried","old","black"],a:0},
+  {q:"The station ___ around the Earth sixteen times a day.",o:["flies","fly","is fly","flying"],a:0}],
+ gateQ:"Kompüter parol soruşur. Parolu yaz:",
+ hint:"İpucu: komandir dinləmədə dedi ki, parol <b>qızının ev heyvanının adıdır</b>. Qızının adını və heyvanını mətndə tap.",
+ end:"PEPPER — parol qəbul olundu! Ekran yanır, oksigen sistemi yenidən işləyir. Komandir Ray radio ilə sənə təşəkkür edir: “Well done, astronaut!” Missiya tamamlandı!"},
+
+{id:7,t:'The Missing Trophy',az:'İtən kubok',ic:'🏆',gate:'choice',gateWhat:'kubokun yerini və onu gizlədəni seçəcəksən',
+ story:"Sabah məktəbinin futbol komandası şəhər çempionatının <b>finalında</b> oynayacaq. Amma bu səhər məktəbin <b>qızıl kuboku</b> vitrindən yoxa çıxıb! Direktor kuboku finaldan əvvəl oyunçulara təqdim etmək istəyirdi. Mərhələlərdən keç, kubokun <b>harada</b> olduğunu və onu <b>kimin</b> gizlətdiyini tap.",
+ goal:'Kubokun harada olduğunu və onu kimin gizlətdiyini tap.',
+ choice:{a:{lab:'📍 Kubok haradadır?',opts:['In the storage room next to the changing rooms','In the music room','In the library','In the headmaster’s office'],ans:'In the storage room next to the changing rooms'},b:{lab:'👤 Kim gizlədib?',opts:['Murad, the team captain','Mr. Hasanov, the PE teacher','Nigar, the cleaner','Ali, the goalkeeper'],ans:'Murad, the team captain'}},
+ vocab:[['trophy','kubok','Our school won a golden trophy.'],['cabinet','vitrin, şkaf','The trophy is in a glass cabinet.'],['headmaster','məktəb direktoru','The headmaster saw the empty cabinet.'],['caretaker','baxıcı (binaya baxan işçi)','The caretaker repairs windows and doors.'],['storage room','anbar otağı','They keep old balls in the storage room.'],['changing room','paltardəyişmə otağı','The players change their clothes in the changing room.'],['goalkeeper','qapıçı','Our goalkeeper wears a green shirt.'],['train','məşq etmək','The team trains every morning.']],
+ reading:{title:'School News: Where is our trophy?',p:["Our school's golden trophy is usually in the glass cabinet in the main hall. We won it three years ago, and tomorrow our football team will play in the city final again. The headmaster wants to give the trophy to the players before the match.","This morning the cleaner, Nigar, dusted the cabinet at half past seven, and the trophy was there. At a quarter past eight the headmaster walked past and saw that the cabinet was empty. The glass wasn't broken, so somebody opened it with a key.","There are only two keys. One belongs to the PE teacher, Mr. Hasanov, but he was at a meeting in another school all morning. The other key belongs to the team captain, Murad, because he comes early to train with the team. The players always train in their red shirts.","If you have any information, please speak to the headmaster."],
+  qs:[{q:"Where is the trophy usually kept?",o:["In the glass cabinet in the main hall","In the headmaster's office","In the sports hall","In the library"],a:0},
+      {q:"When did the school win the trophy?",o:["Three years ago","Last year","Three months ago","Thirty years ago"],a:0},
+      {q:"What time did Nigar dust the cabinet?",o:["At half past seven","At a quarter past eight","At seven o'clock","At half past eight"],a:0},
+      {q:"How do we know that somebody used a key?",o:["The glass wasn't broken.","The key was on the floor.","The headmaster saw it.","Nigar said so."],a:0},
+      {q:"Where was Mr. Hasanov all morning?",o:["At a meeting in another school","In the sports hall","At home","In the main hall"],a:0}],
+  detail:{q:"What colour shirts do the players train in?",o:["Red","Green","Blue","White"],a:0}},
+ listening:{who:'Mr. Karim, the school caretaker',p:["Hello, this is Karim, the school caretaker. I start work at seven o'clock every morning.","Today, at about eight o'clock, I was repairing a window in the sports hall.","I saw a boy in a red football shirt. He was carrying a heavy box with both hands.","He didn't look nervous. He was smiling and singing a song.","He went into the small storage room next to the changing rooms and closed the door.","Five minutes later he came out without the box and ran to the football field.","I didn't see his face, because he was wearing a cap.","I hope this helps!"],
+  qs:[{q:"What time does Karim start work?",o:["At seven o'clock","At eight o'clock","At half past seven","At six o'clock"],a:0},
+      {q:"What was Karim doing at about eight o'clock?",o:["Repairing a window in the sports hall","Cleaning the main hall","Talking to the headmaster","Playing football"],a:0},
+      {q:"How did the boy look?",o:["Happy — he was smiling and singing.","Nervous and scared","Angry","Tired and sad"],a:0},
+      {q:"What did the boy do five minutes later?",o:["He came out without the box and ran to the football field.","He took the box to the main hall.","He went home.","He spoke to Karim."],a:0},
+      {q:"Why didn't Karim see the boy's face?",o:["He was wearing a cap.","It was dark.","He was too far away.","The boy was wearing a mask."],a:0}]},
+ build:[["Goalkeepers wear green shirts in our team","Bizim komandada qapıçılar yaşıl köynək geyinir."],["The captain trains with the team every morning","Kapitan hər səhər komanda ilə məşq edir."],["Somebody opened the cabinet with a key","Kimsə vitrini açarla açdı."]],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>nervous</b>.",o:["worried","happy","proud","calm"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>empty</b>.",o:["full","broken","clean","open"],a:0},
+  {k:'Definition',q:"A cup or another prize that you get when you win a competition.",o:["trophy","medal box","ticket","cabinet"],a:0},
+  {k:'Definition',q:"A person whose job is to look after a building.",o:["caretaker","headmaster","coach","cleaner"],a:0},
+  {k:'Antonym',q:"Choose the antonym of <b>win</b>.",o:["lose","play","score","finish"],a:0}],
+ clues:{vocab:"Direktorun qeydi: kubok səhər <b>07:30 ilə 08:15</b> arasında yoxa çıxıb.",reading:"Vitrini yalnız iki nəfər aça bilər: <b>Mr. Hasanov</b> və <b>Murad</b>. ❌ Mr. Hasanov bütün səhər başqa məktəbdə idi.",listening:"Baxıcı qutunun aparıldığı <b>yeri</b> dedi. Xatırla — dinləmə artıq bağlıdır!",build:"❌ <b>Ali</b> şübhədən çıxır: qapıçılar yaşıl köynək geyinir, baxıcı isə qırmızı köynəkli oğlan görüb.",words:"Hamısı hazırdır. Final qapısının 10 sualına cavab ver, sonra yeri və şəxsi seç."},
+ final:[{q:"<b>kubok</b> — ingiliscə?",o:["trophy","cabinet","match","cap"],a:0},
+  {q:"<b>headmaster</b> nə deməkdir?",o:["məktəb direktoru","baxıcı","kapitan","məşqçi"],a:0},
+  {q:"Reading: When will the team play in the city final?",o:["Tomorrow","Today","Next week","Three years later"],a:0},
+  {q:"Reading: What time did the headmaster see the empty cabinet?",o:["At a quarter past eight","At half past seven","At eight o'clock","At a quarter to eight"],a:0},
+  {q:"Reading: How many keys are there?",o:["Two","One","Three","Four"],a:0},
+  {q:"Listening: Where did the boy run after five minutes?",o:["To the football field","To the main hall","To the classroom","Home"],a:0},
+  {q:"Listening: What was the boy carrying?",o:["A heavy box","A football","A school bag","A glass cabinet"],a:0},
+  {q:"Choose the correct sentence.",o:["Somebody opened the cabinet with a key.","Somebody the cabinet opened with a key.","Opened somebody the cabinet with a key.","Somebody opened with a key cabinet the."],a:0},
+  {q:"Choose the antonym of <b>empty</b>.",o:["full","nervous","broken","heavy"],a:0},
+  {q:"When Karim saw the boy, he ___ a window.",o:["was repairing","repairs","is repairing","repair"],a:0}],
+ gateQ:"Kubok haradadır və onu kim gizlədib?",
+ hint:"İpucu: yeri baxıcı dinləmədə dedi. Kim? — açarı olan, qırmızı köynək geyinən və qapıçı olmayan oğlan.",
+ end:"Düz tapdın! Kubok idman zalındakı anbar otağında idi. Kapitan Murad onu gizlətmişdi: finaldan əvvəl kuboku parıldatmaq və üstünə komandanın qırmızı lentini bağlamaq istəyirdi. Direktor gülümsəyir — missiya tamamlandı!"}
+];
+
+/* ---------- content patch: parts of speech, Learn Vocabulary, key-fact sentences, exact syn/ant ---------- */
+const MQ_POS={n:'isim',v:'fel',adj:'sifət',adv:'zərf',phr:'ifadə'};
+const MQ_PATCH={
+1:{pos:['adj','n','n','n','adj','n','n','n'],audio:'',
+ learn:[['valley','n','vadi','From the highest tower you can see the whole valley.'],['silk','n','ipək','He brought back silk, spices and gold.'],['lock','n','qıfıl','It has a lock with four numbers.'],['torch','n','fənər','Bring a torch, because the rooms are dark.'],['narrow','adj','dar','The road is too narrow.'],['painting','n','rəsm, şəkil','The map is behind a painting of a white horse.'],['library','n','kitabxana','The painting is in the library.'],['stairs','n','pilləkən','Go up the stairs to the second floor.'],['check','v','yoxlamaq','He checks that the door is locked.'],['bell','n','zəng','You will hear a bell.'],['trust','v','etibar etmək, güvənmək','Ali did not trust his sons.'],['visitor','n','ziyarətçi','The castle is closed to visitors.'],['on foot','phr','piyada','Come on foot and bring a torch.']],
+ build:[["Ali hid the map because he did not trust his sons","Əli xəritəni gizlətdi, çünki oğullarına güvənmirdi."],["The last number is five because Ali had five ships","Son rəqəm beşdir, çünki Əlinin beş gəmisi var idi."],["The guard locks the door because thieves come at night","Gözətçi qapını bağlayır, çünki oğrular gecə gəlir."]],
+ bfinal:[{q:"Why did Ali hide the map?",o:["He did not trust his sons.","He wanted to sell it.","The guard asked him to.","He was going to China."],a:0},{q:"Why is the last number of the code five?",o:["Ali had five ships.","The castle has five towers.","Ali had five sons.","The door opens at five."],a:0}],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>ancient</b>.",o:["very old","modern","famous","quick"],a:0},{k:'Antonym',q:"Choose the antonym of <b>heavy</b>.",o:["light","strong","big","dark"],a:0},{k:'Definition',q:"A person whose job is to protect a building or a place.",o:["guard","merchant","tourist","painter"],a:0},{k:'Synonym',q:"Choose the synonym of <b>begin</b>.",o:["start","finish","stop","wait"],a:0},{k:'Antonym',q:"Choose the antonym of <b>narrow</b>.",o:["wide","short","long","thin"],a:0}],
+ listen:["Hello, young agent. My name is Rashid. I am the guard of the Black Castle.","Listen to me carefully.","The iron door does not open in the morning.","It opens only at one o'clock in the afternoon, when the sun is above the castle.","Please don't come by car. The road is too narrow.","Come on foot and bring a torch, because the rooms inside are very dark.","When you are inside, go up the stairs to the second floor.","The painting is in the library, next to the big window.","After you go in, you will hear a bell. After the bell you have only twenty minutes, because the door closes again.","Remember: the third number of the code is the hour when the door opens. Good luck!"]},
+2:{pos:['n','v','n','n','n','n','n','n'],audio:'audio/task-2.mp3',
+ learn:[['owner','n','sahib','Helen Green is the owner of the hotel.'],['receptionist','n','resepşn işçisi','Anna is our receptionist.'],['flour','n','un','I found some flour on the floor.'],['headache','n','baş ağrısı','I had a terrible headache.'],['upset','adj','məyus, kədərli','I am very upset.'],['wedding','n','toy','Lisa was at her sister’s wedding.'],['expensive','adj','bahalı','He keeps expensive food in the safe.'],['carry','v','daşımaq, aparmaq','The person was carrying a small bag.'],['jacket','n','gödəkcə','I saw someone in a white jacket.'],['bake','v','bişirmək (sobada)','Tom was baking a cake.']],
+ build:[["Lisa was not at the hotel because her sister got married","Lisa oteldə deyildi, çünki bacısı ərə gedirdi."],["The chef always wears a white jacket in the kitchen","Aşpaz mətbəxdə həmişə ağ gödəkcə geyinir."],["There was flour on Tom's shoes because he was baking a cake","Tomun ayaqqabısında un var idi, çünki o, tort bişirirdi."]],
+ bfinal:[{q:"Why wasn't Lisa at the hotel last night?",o:["Her sister got married.","She was ill.","She was on holiday in London.","She cleaned another hotel."],a:0},{q:"Why was there flour on Tom's shoes?",o:["He was baking a cake.","He fell in the kitchen.","Lisa put it there.","He walked in the snow."],a:0}],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>finish</b>.",o:["end","start","open","stay"],a:0},{k:'Antonym',q:"Choose the antonym of <b>expensive</b>.",o:["cheap","golden","rich","heavy"],a:0},{k:'Definition',q:"A person who sees a crime or an accident happen.",o:["witness","suspect","guest","owner"],a:0},{k:'Definition',q:"A strong metal box for keeping money or jewellery.",o:["safe","bag","desk","drawer"],a:0},{k:'Synonym',q:"Choose the synonym of <b>quickly</b>.",o:["fast","slowly","quietly","carefully"],a:0}]},
+3:{pos:['n','n','n','v','n','n','adj','n'],audio:'audio/task-3.mp3',
+ learn:[['comet','n','kometa','I think I have found a new comet.'],['battery','n','batareya','My phone battery is almost dead.'],['laptop','n','noutbuk','I will take only my laptop.'],['appear','v','görünmək','Come when the first stars appear.'],['clear','adj','aydın, təmiz (səma)','The sky there is so clear.'],['hill','n','təpə','Stop at the bottom of the hill.'],['notebook','n','dəftər','Bring my notebook with the green cover.'],['watch','v','izləmək','I think somebody is watching me.'],['important','adj','vacib, mühüm','It is a very important discovery.'],['flat','n','mənzil','I saw a grey car outside my flat.']],
+ build:[["Leyla left Shamakhi because she got a job in Baku","Leyla Şamaxıdan getdi, çünki Bakıda iş tapdı."],["She worked at the Shamakhi Observatory for ten years","O, Şamaxı Rəsədxanasında on il işləyib."],["Nobody must know about the comet because it is very important","Kometa haqqında heç kim bilməməlidir, çünki bu, çox vacibdir."]],
+ bfinal:[{q:"Why did Leyla leave Shamakhi?",o:["She got a job in Baku.","The telescope was broken.","She wanted to live near the sea.","Somebody was watching her."],a:0},{q:"How long did Leyla work at the Shamakhi Observatory?",o:["For ten years","For two years","For twenty years","For one year"],a:0}],
+ words:[{k:'Definition',q:"A building with a big telescope for watching the stars.",o:["observatory","library","museum","factory"],a:0},{k:'Synonym',q:"Choose the synonym of <b>disappear</b>.",o:["vanish","appear","arrive","return"],a:0},{k:'Antonym',q:"Choose the antonym of <b>dangerous</b>.",o:["safe","difficult","strange","famous"],a:0},{k:'Definition',q:"Something that somebody finds or learns for the first time.",o:["discovery","research","journey","problem"],a:0},{k:'Antonym',q:"Choose the antonym of <b>appear</b>.",o:["disappear","arrive","return","begin"],a:0}]},
+4:{pos:['n','n','n','n','n','phr','n','n'],audio:'audio/task-4.mp3',
+ learn:[['orchestra','n','orkestr','Sara is travelling with her school orchestra.'],['tracksuit','n','idman forması','A young man in a green tracksuit.'],['coach','n','məşqçi','Coach, I’m coming!'],['definitely','adv','mütləq, şübhəsiz','It is definitely mine.'],['quickly','adv','tez, cəld','He took a bag very quickly.'],['missing','adj','itkin','His bag was missing.'],['ribbon','n','lent','A small black bag with a red ribbon.'],['officer','n','əməkdaş, zabit','The officer gave it back to him.'],['heavy','adj','ağır','The bag was too heavy.'],['at the same time','phr','eyni vaxtda','Four passengers were there at the same time.'],['on time','phr','vaxtında','Please be at the gate on time.']],
+ build:[["Mrs. Kim put her bag in the luggage because it was too heavy","Mrs. Kim çantasını baqaja verdi, çünki çanta çox ağır idi."],["Leo was late because he could not find his passport","Leo gecikdi, çünki pasportunu tapa bilmirdi."],["Please check your bag before you leave","Getməzdən əvvəl çantanı yoxla."]],
+ bfinal:[{q:"Why did Mrs. Kim put her bag in the luggage?",o:["It was too heavy.","It was broken.","She forgot it.","The officer asked her to."],a:0},{q:"Why was Leo late?",o:["He could not find his passport.","He was talking to Sara.","His bus was late.","He was eating in a café."],a:0}],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>missing</b>.",o:["lost","broken","heavy","found"],a:0},{k:'Antonym',q:"Choose the antonym of <b>arrive</b>.",o:["leave","come","land","stay"],a:0},{k:'Definition',q:"A person who travels in a car, bus, train or plane but is not the driver.",o:["passenger","pilot","officer","coach"],a:0},{k:'Definition',q:"A spoken message in a public place, for example at an airport.",o:["announcement","label","ticket","report"],a:0},{k:'Antonym',q:"Choose the antonym of <b>tall</b>.",o:["short","young","thin","small"],a:0}]},
+5:{pos:['n','n','n','n','n','n','n','n'],audio:'audio/task-5.mp3',
+ learn:[['bury','v','basdırmaq','I buried the chest near the lighthouse.'],['repair','v','təmir etmək','We stayed there to repair the ship.'],['damaged','adj','zədələnmiş','Our ship was badly damaged.'],['coin','n','sikkə','A box of gold coins.'],['compass','n','kompas','I gave him my old compass.'],['spade','n','bel (kürək)','Take a spade and a strong rope.'],['rope','n','kəndir, ip','Take a strong rope.'],['terrible','adj','dəhşətli','A terrible storm started.'],['heavy','adj','ağır','The chest is very heavy.'],['sail','v','üzmək (gəmi ilə)','The ship sailed from Baku.']],
+ build:[["The captain buried the chest near the lighthouse because nobody lived there","Kapitan sandığı mayakın yanında basdırdı, çünki orada heç kim yaşamırdı."],["The last number is nine because the captain was born in September","Son rəqəm doqquzdur, çünki kapitan sentyabrda doğulub."],["We stayed on the island for two weeks","Biz adada iki həftə qaldıq."]],
+ bfinal:[{q:"Why did the captain bury the chest near the lighthouse?",o:["Nobody lived there.","It was near the lake.","The sailors lived there.","It was easy to dig there."],a:0},{q:"Why is the last number of the code nine?",o:["The captain was born in September.","There were nine sailors.","They stayed nine days.","The ship had nine boxes."],a:0}],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>terrible</b>.",o:["awful","lovely","quiet","short"],a:0},{k:'Antonym',q:"Choose the antonym of <b>strong</b> (wind).",o:["weak","fast","cold","loud"],a:0},{k:'Definition',q:"A tall tower near the sea with a bright light that helps ships.",o:["lighthouse","island","castle","bridge"],a:0},{k:'Definition',q:"A large strong box for keeping things.",o:["chest","drawer","bag","basket"],a:0},{k:'Synonym',q:"Choose the synonym of <b>damaged</b>.",o:["broken","clean","new","empty"],a:0}]},
+6:{pos:['n','n','n','n','n','n','n','n'],audio:'audio/task-6.mp3',
+ learn:[['exercise','v','idman etmək','Every morning we exercise for two hours.'],['weak','adj','zəif','Our muscles become weak in space.'],['pillow','n','yastıq','Pepper sleeps on my pillow.'],['worried','adj','narahat','I am a little worried about the computer.'],['mask','n','maska','Put on your oxygen masks.'],['button','n','düymə','Press the red button.'],['panic','v','çaxnaşmaya düşmək','Don’t panic.'],['power','n','enerji, güc','The computer needs all the power.'],['log','n','gündəlik (jurnal)','Somebody can read this log.'],['miss','v','darıxmaq','I miss my family a lot.'],['at the end of','phr','…-ın sonunda','The control room is at the end of the long corridor.']],
+ build:[["The commander changed the password because somebody read his old log","Komandir parolu dəyişdi, çünki kimsə onun köhnə gündəliyini oxumuşdu."],["You must write the password in capital letters","Parolu böyük hərflərlə yazmalısan."],["The computer is old because the station was built in 2005","Kompüter köhnədir, çünki stansiya 2005-ci ildə tikilib."]],
+ bfinal:[{q:"Why did the commander change the password?",o:["Somebody read his old log.","He forgot the old one.","Aylin asked him to.","The computer was new."],a:0},{q:"Why is the computer old?",o:["The station was built in 2005.","Nobody repairs it.","It came from Daniel's school.","The commander bought it cheaply."],a:0}],
+ words:[{k:'Antonym',q:"Choose the antonym of <b>weak</b>.",o:["strong","tired","small","slow"],a:0},{k:'Synonym',q:"Choose the synonym of <b>worried</b>.",o:["anxious","happy","calm","proud"],a:0},{k:'Definition',q:"A secret word that you must type to use a computer.",o:["password","screen","alarm","message"],a:0},{k:'Definition',q:"A person who travels into space.",o:["astronaut","pilot","scientist","sailor"],a:0},{k:'Antonym',q:"Choose the antonym of <b>old</b> (computer).",o:["new","big","slow","broken"],a:0}]},
+7:{pos:['n','n','n','n','n','n','n','v'],audio:'audio/task-7.mp3',
+ learn:[['dust','v','tozunu silmək','Nigar dusted the cabinet.'],['empty','adj','boş','The cabinet was empty.'],['key','n','açar','Somebody opened it with a key.'],['repair','v','təmir etmək','I was repairing a window.'],['field','n','meydança','He ran to the football field.'],['cap','n','kepka','He was wearing a cap.'],['smile','v','gülümsəmək','He was smiling and singing.'],['nervous','adj','həyəcanlı, narahat','He didn’t look nervous.'],['match','n','oyun, matç','Before the match.'],['referee','n','hakim (oyunda)','The referee can see them easily.']],
+ build:[["Goalkeepers wear green shirts so the referee can see them","Qapıçılar yaşıl köynək geyinir ki, hakim onları görə bilsin."],["Murad comes to school early because he trains with the team","Murad məktəbə tez gəlir, çünki komanda ilə məşq edir."],["Somebody opened the cabinet with a key","Kimsə vitrini açarla açdı."]],
+ bfinal:[{q:"Why do goalkeepers wear green shirts?",o:["So the referee can see them","Because green is cheap","Because the captain likes green","So they can hide"],a:0},{q:"Why does Murad come to school early?",o:["He trains with the team.","He cleans the hall.","He helps the caretaker.","He has extra lessons."],a:0}],
+ words:[{k:'Synonym',q:"Choose the synonym of <b>repair</b>.",o:["fix","break","open","carry"],a:0},{k:'Antonym',q:"Choose the antonym of <b>empty</b>.",o:["full","broken","clean","open"],a:0},{k:'Definition',q:"A cup or another prize that you get when you win a competition.",o:["trophy","ticket","whistle","cabinet"],a:0},{k:'Definition',q:"A person whose job is to look after a building.",o:["caretaker","headmaster","coach","goalkeeper"],a:0},{k:'Antonym',q:"Choose the antonym of <b>win</b>.",o:["lose","play","score","finish"],a:0}]}
+};
+MQ_TASKS.forEach(T=>{const P=MQ_PATCH[T.id];if(!P)return;
+ T.vocab=T.vocab.map((w,i)=>[w[0],w[1],w[2],P.pos[i]]);
+ T.learn=T.vocab.map(w=>[w[0],w[3],w[1],w[2]]).concat(P.learn);
+ T.build=P.build;T.words=P.words;T.audio=P.audio||'';if(P.listen)T.listening.p=P.listen;
+ delete T.reading.detail;
+ const f=T.final.filter(q=>!/^Choose the correct sentence/.test(q.q));
+ T.final=f.slice(0,7).concat(P.bfinal,f.slice(7)).map(q=>/closest in meaning to <b>hidden/.test(q.q)?{q:"Choose the synonym of <b>begin</b>.",o:["start","finish","stop","wait"],a:0}:q);
+});
+
+(function(){const s=document.createElement('style');s.textContent=`
+.mq-lv{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+@media (max-width:480px){.mq-lv{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.mq-t{position:relative;border:0;border-radius:16px;aspect-ratio:1/1;background:var(--card);box-shadow:0 2px 0 var(--line),0 6px 14px rgba(30,58,110,.06);display:grid;place-items:center;align-content:center;gap:2px;padding:4px;transition:transform .12s}
+.mq-t:hover:not(:disabled){transform:translateY(-2px)}
+.mq-t .n{font-family:var(--display);font-weight:700;font-size:clamp(20px,5vw,28px);line-height:1}
+.mq-t .k{font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mq-t .e{font-size:20px;line-height:1}
+.mq-t.done{background:var(--gold-l)}
+.mq-t.cur{box-shadow:0 0 0 3px var(--teal),0 6px 14px rgba(30,58,110,.12)}
+.mq-t:disabled{background:var(--paper);box-shadow:inset 0 0 0 2px var(--line);cursor:default}
+.mq-t:disabled .n{color:#AFB8CB}
+.mq-l2{margin-top:14px;border-radius:18px;padding:14px;background:var(--paper);border:2.5px dashed var(--line);display:flex;gap:12px;align-items:center;font-weight:800;color:var(--muted)}
+.mq-l2 b{display:block;color:var(--ink);font-family:var(--display);font-size:19px}
+.mq-l2.open{background:var(--gold-l);border-style:solid;border-color:var(--gold-d)}
+.mq-st{display:grid;gap:8px;margin-bottom:12px}
+.mq-sb{border:0;border-radius:16px;background:var(--card);padding:12px 14px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 12px;align-items:center;text-align:left;box-shadow:0 2px 0 var(--line)}
+.mq-sb .no{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;background:var(--teal-l);color:var(--teal-d)}
+.mq-sb .tt{font-weight:900;min-width:0}.mq-sb .tt small{display:block;color:var(--muted);font-weight:700;font-size:13px}
+.mq-sb .ss{font-size:12px;font-weight:900;border-radius:99px;padding:2px 9px;background:var(--line);color:var(--muted);white-space:nowrap}
+.mq-sb.ok .no{background:var(--ok);color:#fff}.mq-sb.ok .ss{background:var(--ok-bg);color:var(--ok)}
+.mq-sb.now{box-shadow:0 0 0 3px var(--teal)}.mq-sb.now .ss{background:var(--teal);color:#fff}
+.mq-sb:disabled{opacity:.55;cursor:default}
+.mq-sb.fin .no{background:var(--gold);color:var(--ink)}
+.mq-nb{background:var(--butter);border-radius:16px;padding:12px 14px;margin-bottom:12px;box-shadow:0 2px 0 #EBD9A8}
+.mq-nb h3{margin:0 0 6px;font-family:var(--display);font-size:19px}
+.mq-nb ol{margin:0;padding-left:20px;display:grid;gap:4px;font-weight:700}
+.mq-nb .none{font-weight:700;color:var(--muted);margin:0}
+.mq-art{background:#FFFDF6;border:2px solid #EEE3C4;border-radius:16px;padding:16px 18px;font-weight:600;font-size:16.5px;line-height:1.65;margin-bottom:12px}
+.mq-art h3{margin:0 0 8px;font-family:var(--display);font-size:22px}
+.mq-art p{margin:0 0 10px;max-width:65ch}.mq-art p:last-child{margin:0}
+.mq-qlist{background:var(--teal-l);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.mq-qlist b{display:block;margin-bottom:6px;color:var(--teal-d)}
+.mq-qlist ol{margin:0;padding-left:20px;font-weight:800;display:grid;gap:4px}
+.mq-clue{background:var(--gold-l);border:2.5px solid var(--gold-d);border-radius:16px;padding:14px;text-align:center;display:grid;gap:6px;font-weight:700}
+.mq-clue .k{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#7A5A00}
+.mq-sus{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+@media (max-width:480px){.mq-sus{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mq-sus button{border:2.5px solid var(--line);background:var(--card);border-radius:14px;padding:10px 6px;display:grid;justify-items:center;gap:2px;font-weight:900}
+.mq-sus button .e{font-size:32px}.mq-sus button small{color:var(--muted);font-weight:800}
+.mq-sus button.on{border-color:var(--teal);background:var(--teal-l)}
+.mq-sus button.out{opacity:.45;text-decoration:line-through}
+`;document.head.appendChild(s)})();
+
+/* ---------- state ---------- */
+const MQ_KEY='e9-msq',MQ_LEVEL=20,MQ_AUTO=850;
+let MQ=(()=>{try{return JSON.parse(ls(MQ_KEY)||'null')}catch(e){return null}})()||{};
+if(!MQ.t||typeof MQ.t!=='object')MQ.t={};
+if(typeof MQ.name!=='string'){let n='';try{n=(JSON.parse(ls('e9-msn')||'{}').name)||''}catch(e){}MQ.name=n}
+function mqSave(){ls(MQ_KEY,JSON.stringify(MQ))}
+function mqT(id){if(!MQ.t[id])MQ.t[id]={s:{},used:0,seen:0,done:0};return MQ.t[id]}
+const MQ_STAGES=[['vocab','Vocabulary','Sözləri öyrən və testdən keç'],['reading','Reading','Mətni oxu, sualların cavabını tap'],['listening','Listening','Dinlə — maksimum 2 dəfə'],['build','Sentence building','Sözlərdən cümlə qur'],['words','Synonym · Antonym · Definition','Söz mənaları'],['final','Final gate','Hər şeyi xatırla və məqsədə çat']];
+function mqStars(){return Object.values(MQ.t).filter(x=>x.done).length}
+function mqOpenTask(id){if(id>MQ_TASKS.length)return false;return msTeacher()||id===1||(MQ.t[id-1]&&MQ.t[id-1].done)}
+function mqStageOpen(id,i){if(msTeacher()||i===0)return true;return !!mqT(id).s[MQ_STAGES[i-1][0]]}
+
+/* ---------- shared helpers ---------- */
+let MS_OWNER=false,MS_TOK=0;
+(async()=>{try{if(window.claude&&claude.use){const u=await claude.use('user');MS_OWNER=u?!!(await u.isOwner()):false;if(MS_OWNER&&document.getElementById('mqlv'))msHub()}}catch(e){}})();
+function msTeacher(){return MS_OWNER||unlocked()}
+let MQ_AU=null;
+function msHush(){MS_TOK++;try{speechSynthesis.cancel()}catch(e){}if(MQ_AU){try{MQ_AU.pause()}catch(e){}MQ_AU=null}}
+const msE=s=>esc(String(s));
+function msShufQ(q){const idx=shuffle(q.o.map((_,i)=>i));return Object.assign({},q,{o:idx.map(i=>q.o[i]),a:idx.indexOf(q.a)})}
+function msTop(){msHush();setTop(false)}
+function msBackBtn(lbl){return `<div style="margin-bottom:12px"><button class="tab" type="button" id="msbk">${ICON_BACK.replace('<svg','<svg style="width:15px;height:15px;vertical-align:-2px;margin-right:4px"')}${lbl}</button></div>`}
+function msBindBack(fn){const b=document.getElementById('msbk');if(b)b.onclick=fn||msHub}
+function msSpeak(parts,onProg,onEnd){
+ msHush();const tok=MS_TOK;
+ if(!('speechSynthesis' in window)){onEnd(false);return}
+ let i=0;const next=()=>{if(tok!==MS_TOK)return;if(i>=parts.length){onEnd(true);return}
+  let u;try{u=new SpeechSynthesisUtterance(parts[i]);u.lang='en-GB';if(voice)u.voice=voice;u.rate=.85}catch(e){onEnd(false);return}
+  u.onend=()=>{if(tok!==MS_TOK)return;i++;onProg(i/parts.length);next()};
+  u.onerror=ev=>{if(tok!==MS_TOK)return;if(ev&&ev.error==='not-allowed'){onEnd(false);return}i++;onProg(i/parts.length);next()};
+  try{speechSynthesis.speak(u)}catch(e){onEnd(false)}};
+ next()}
+function msQuiz(box,qs,done,opt={}){let i=0,ok=0;const wr=[];const strict=opt.strict||opt.hideAns;
+ const draw=()=>{const q=qs[i];try{const a=document.activeElement;if(a&&a.blur)a.blur()}catch(e){}
+  box.innerHTML=`${opt.head?opt.head():''}<div class="ms-qh"><span>${opt.label||'Sual'} ${i+1}/${qs.length}</span><div class="prog"><i style="width:${i/qs.length*100}%"></i></div></div>
+  ${q.k?`<p class="qhint" style="margin:0 0 4px">${q.k}</p>`:''}<div class="ms-q">${q.q.replace(/___/g,'<span class="gap"></span>')}</div><div class="opts mq-opts">${q.o.map((o,j)=>`<button class="opt" type="button" data-j="${j}"><span class="L">${'ABCD'[j]}</span><span>${o}</span></button>`).join('')}</div><div class="ms-fb" id="msfb"></div>`;
+  box.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.disabled)return;const j=+b.dataset.j,bs=box.querySelectorAll('.opt');bs.forEach(x=>x.disabled=true);
+   const good=j===q.a;if(good){ok++;b.classList.add('ok')}else{wr.push(q);b.classList.add('bad');if(!strict)bs[q.a].classList.add('ok')}
+   if(opt.onAnswer)opt.onAnswer(good,q);
+   const fb=box.querySelector('#msfb'),last=i+1>=qs.length;let gone=false;
+   const go=()=>{if(gone)return;gone=true;i++;if(!last)draw();else done(ok,qs.length,wr)};
+   const tok=MS_TOK,later=ms=>setTimeout(()=>{if(tok===MS_TOK&&fb.isConnected)go()},ms);
+   if(good){fb.innerHTML='<div class="ms-ex g">✓ Düzdür!</div>';later(MQ_AUTO);return}
+   if(strict){fb.innerHTML='<div class="ms-ex b">✗ Səhvdir.</div>';later(1300);return}
+   fb.innerHTML=`<div class="ms-ex b">✗ Səhvdir. Düz cavab yaşıl rənglə göstərilib.${q.ex?`<div class="mq-exs">${q.ex}</div>`:''}</div><button class="btn p" type="button" id="msnx">${last?'Davam':'Növbəti'}</button>`;
+   fb.querySelector('#msnx').onclick=go})};
+ draw()}
+
+/* ---------- home banner ---------- */
+function msnBanner(){const n=mqStars();
+ return `<button class="ms-ban" type="button" id="msban"><span class="ms-seal">S.B.</span><span style="min-width:0"><h3>Mr. Samir's Missions</h3><p>${MQ.name&&n?`Agent ${msE(MQ.name)} · Level 1 · ⭐ ${n}/${MQ_LEVEL}`:`Level 1 · ${MQ_LEVEL} task · hər task bir ssenari`}</p><span class="ms-st">Classified</span></span><span class="ms-go" aria-hidden="true">${ICON_GO}</span></button>`}
+function msnBind(){const b=document.getElementById('msban');if(b)b.onclick=msHub}
+
+/* ---------- hub: level 1 with 20 tasks ---------- */
+function msHub(){
+ msTop();if(!MQ.name){const r=sbReg();if(r&&r.ad){MQ.name=(r.ad+' '+(r.soyad||'')).trim();mqSave()}else{mqName();return}}
+ const st=mqStars(),nextId=MQ_TASKS.find(t=>!mqT(t.id).done);
+ app.innerHTML=`${msTeacher()?`<div class="ms-tch">Müəllim baxışı: bütün tasklar və mərhələlər açıqdır. Şagirdlər onları ardıcıl açır.</div>`:''}
+ <div class="ms-dos"><span class="k">Agent dossier · A2–B1</span><h2>Agent ${msE(MQ.name)}</h2>
+  <div class="row"><span class="ms-pill">Level: <b>1</b></span><span class="ms-pill">Ulduz: <b>⭐ ${st}</b> / ${MQ_LEVEL}</span></div>
+  <div class="ms-xpbar"><i style="width:${st/MQ_LEVEL*100}%"></i></div>
+  <div class="row" style="justify-content:space-between"><span style="font-size:13px;font-weight:700;color:#C9D7F2">${st>=MQ_LEVEL?'Level 1 tamamlandı!':`Level 2 üçün ${MQ_LEVEL-st} ulduz qalıb`}</span><button class="ms-lnk" type="button" id="msren">Adı dəyiş</button></div>
+ </div>
+ ${sbPrem()?'':`<div class="sb-ban"><span>👑 Task 1 pulsuzdur. Task 2–${MQ_TASKS.length} premiumdur — açmaq üçün Samir müəllimə yazın.</span><a href="${SB_WA}" target="_blank" rel="noopener">WhatsApp</a></div>`}
+ <div class="ms-zone"><h3>Level 1</h3><span>Hər task bir missiyadır · bitirdiyin hər task = 1 ⭐</span></div>
+ <div class="mq-lv" id="mqlv">${Array.from({length:MQ_LEVEL},(_,i)=>{const id=i+1,T=MQ_TASKS.find(x=>x.id===id),d=T&&mqT(id).done,op=T&&(d||mqOpenTask(id));
+  return `<button class="mq-t ${d?'done':''} ${T&&sbLk(id)?'pl':''} ${nextId&&nextId.id===id&&op?'cur':''}" type="button" data-id="${id}" ${op||(T&&sbLk(id))?'':'disabled'} aria-label="Task ${id}"><span class="k">Task</span><span class="n">${id}</span><span class="e">${d?'⭐':!T?'·':sbLk(id)?'👑':op?T.ic:'🔒'}</span></button>`}).join('')}</div>
+ <p class="lead" style="margin-top:8px">Tasklar ardıcıl açılır. Yeni tasklar tezliklə əlavə olunacaq (indi: ${MQ_TASKS.length} / ${MQ_LEVEL}).</p>
+ <div class="mq-l2 ${st>=MQ_LEVEL?'open':''}"><span style="font-size:30px">${st>=MQ_LEVEL?'🔓':'🔒'}</span><span><b>Level 2</b>${st>=MQ_LEVEL?'Açıldı! Yeni missiyalar tezliklə.':`Level 1-in ${MQ_LEVEL} taskını bitir — Level 2 açılacaq.`}</span></div>`;
+ app.querySelectorAll('.mq-t').forEach(b=>b.onclick=()=>mqTask(+b.dataset.id));
+ document.getElementById('msren').onclick=mqName;
+}
+function mqName(){
+ msTop();if(!MQ.name){const r=sbReg();if(r&&r.ad)MQ.name=(r.ad+' '+(r.soyad||'')).trim()}
+ app.innerHTML=`<div class="ms-dos"><span class="k">Recruitment</span><h2>Welcome, Agent!</h2><p style="margin:0;color:#C9D7F2;font-weight:700">Mr. Samir has a mission for you. Adını yaz — tapşırıqlar sənin adınla qeyd olunacaq.</p></div>
+ <div class="ms-panel"><label for="msnm" style="font-weight:900">Agent adı (ad və soyad)</label><input class="ms-in" id="msnm" maxlength="40" autocomplete="off" value="${msE(MQ.name||'')}" style="margin:8px 0 12px" placeholder="Məsələn: Aysel Məmmədova"><button class="btn p" type="button" id="msok">Missiyalara başla</button><p class="ms-wc" id="msnerr"></p></div>`;
+ const go=()=>{const v=document.getElementById('msnm').value.trim();if(v.length<2){document.getElementById('msnerr').textContent='Adını yaz (ən azı 2 hərf).';return}MQ.name=v;mqSave();msHub()};
+ document.getElementById('msok').onclick=go;document.getElementById('msnm').onkeydown=e=>{if(e.key==='Enter')go()};
+}
+
+/* ---------- task: story + stage map ---------- */
+function mqTask(id){
+ if(sbLk(id)){sbModal();return}
+ const T=MQ_TASKS.find(x=>x.id===id),S=mqT(id);msTop();
+ if(!S.seen){
+  app.innerHTML=msBackBtn('Level 1')+`<div class="ms-dos"><span class="k">Task ${id} · ${msE(T.az)}</span><h2>${T.ic} ${msE(T.t)}</h2><p style="margin:0;color:#E2EAF8;font-weight:700;line-height:1.55">${T.story}</p><span class="ms-pill" style="justify-self:start">🎯 Məqsəd: <b>${msE(T.goal)}</b></span></div>
+  <div class="ms-brief"><b>Necə keçilir:</b> 6 mərhələ var — Vocabulary, Reading, Listening, Sentence building, Synonym/Antonym/Definition və Final gate. Hər mərhələ sənə bir <b>ipucu</b> verir. Finalda bütün mərhələlərdən suallar olacaq, mətni və dinləməni isə aça bilməyəcəksən — hər şeyi yadda saxla! İstəsən, əvvəlcə <b>📚 Learn Vocabulary</b> blokunda sözləri öyrən.</div>
+  <div class="btns"><button class="btn g" type="button" id="mqgo">Missiyanı qəbul edirəm</button></div>`;
+  msBindBack();document.getElementById('mqgo').onclick=()=>{S.seen=1;mqSave();mqTask(id)};return}
+ const nextI=MQ_STAGES.findIndex(s=>!S.s[s[0]]);
+ app.innerHTML=msBackBtn('Level 1')+`<div class="head"><h2><small>Task ${id} · ${msE(T.az)}</small>${T.ic} ${msE(T.t)}</h2>${S.done?'<span class="chip live">⭐ Tamamlandı</span>':''}</div>
+ <details class="ms-det"><summary>Hekayəni yenidən oxu</summary><p style="margin:8px 0 0;font-weight:600;line-height:1.55">${T.story}</p><p style="margin:6px 0 0;font-weight:800">🎯 ${msE(T.goal)}</p></details>
+ <button class="mq-learn" type="button" id="mqlearn"><span class="e">📚</span><span><b>Learn Vocabulary</b><small>${T.learn.length} söz · missiyadan əvvəl istəsən öyrən</small></span><span class="go">${ICON_GO}</span></button>
+ <div class="mq-st">${MQ_STAGES.map((s,i)=>{const ok=!!S.s[s[0]],op=mqStageOpen(id,i),now=i===nextI;
+  return `<button class="mq-sb ${ok?'ok':''} ${now&&op?'now':''} ${s[0]==='final'?'fin':''}" type="button" data-i="${i}" ${op?'':'disabled'}><span class="no">${ok?'✓':s[0]==='final'?'🔐':i+1}</span><span class="tt">${s[1]}<small>${s[2]}</small></span><span class="ss">${ok?'Keçildi':op?(now?'Başla':'Açıq'):'🔒'}</span></button>`}).join('')}</div>
+ ${mqNotebook(T)}`;
+ msBindBack();
+ document.getElementById('mqlearn').onclick=()=>mqLearn(T);
+ app.querySelectorAll('.mq-sb').forEach(b=>b.onclick=()=>{const k=MQ_STAGES[+b.dataset.i][0];({vocab:mqVocab,reading:mqReading,listening:mqListening,build:mqBuild,words:mqWords,final:mqFinal})[k](T)});
+}
+function mqNotebook(T){const S=mqT(T.id),got=MQ_STAGES.slice(0,5).filter(s=>S.s[s[0]]);
+ return `<div class="mq-nb"><h3>🗒️ İpucu dəftəri</h3>${got.length?`<ol>${got.map(s=>`<li>${T.clues[s[0]]}</li>`).join('')}</ol>`:'<p class="none">Hələ ipucu yoxdur. Mərhələləri keçdikcə ipucları burada toplanacaq.</p>'}</div>`}
+function mqStageDone(T,key,score,msg){
+ const S=mqT(T.id);const first=!S.s[key];S.s[key]=Math.max(S.s[key]||0,score);mqSave();msTop();
+ app.innerHTML=msBackBtn('Task '+T.id)+`<div class="ms-panel ms-res"><span class="chip live">Mərhələ keçildi</span><div class="big">${score}%</div>${msg?`<p class="lead" style="margin:6px auto 12px">${msg}</p>`:''}
+  <div class="mq-clue"><span class="k">${first?'Yeni ipucu':'İpucu'}</span><span>${T.clues[key]}</span></div>
+  <div class="btns"><button class="btn p" type="button" id="mqnx">Növbəti mərhələ</button></div></div>`;
+ msBindBack(()=>mqTask(T.id));document.getElementById('mqnx').onclick=()=>mqTask(T.id);
+}
+function mqStageFail(T,score,need,retry,msg){msTop();
+ app.innerHTML=msBackBtn('Task '+T.id)+`<div class="ms-panel ms-res"><span class="chip soon">Mərhələ keçilmədi</span><div class="big">${score}%</div><p class="lead" style="margin:6px auto 0">Keçmək üçün ən azı ${need}% lazımdır. ${msg||''}</p><div class="btns"><button class="btn p" type="button" id="mqre">Yenidən cəhd et</button><button class="btn s" type="button" id="mqbk2">Task xəritəsi</button></div></div>`;
+ msBindBack(()=>mqTask(T.id));document.getElementById('mqre').onclick=retry;document.getElementById('mqbk2').onclick=()=>mqTask(T.id);
+}
+function mqHead(T,i){const s=MQ_STAGES[i];return msBackBtn('Task '+T.id)+`<div class="head"><h2><small>Task ${T.id} · Mərhələ ${i+1}/6</small>${s[1]}</h2></div>`}
+
+/* ---------- stage 1: vocabulary ---------- */
+function mqHi(ex,en){const w=en.split(/[ (]/)[0];return msE(ex).replace(new RegExp('\\b('+w.replace(/[^a-z]/gi,'')+'\\w*)','i'),'<mark>$1</mark>')}
+function mqPool(){if(mqPool.c)return mqPool.c;const m=new Map();MQ_TASKS.forEach(t=>(t.learn||[]).forEach(w=>{if(!m.has(w[0]))m.set(w[0],w)}));return mqPool.c=[...m.values()]}
+function mqDistr(L,f,T){const ok=x=>x[0]!==L[0]&&x[2]!==L[2];
+ const mine=shuffle((T.learn||[]).filter(x=>x[1]===L[1]&&ok(x))),rest=shuffle(mqPool().filter(x=>x[1]===L[1]&&ok(x))),any=shuffle(mqPool().filter(ok));
+ const out=[];for(const x of mine.concat(rest,any)){if(out.length>=3)break;if(x[f]!==L[f]&&!out.includes(x[f]))out.push(x[f])}return out}
+function mqVQ(L,dir,T){const pos=`<span class="mq-pos">${MQ_POS[L[1]]||''}</span>`,ex=`📖 ${mqHi(L[3],L[0])}<br><small>${msE(L[0])} — ${msE(L[2])}</small>`;
+ return dir==='en'?msShufQ({k:'Azərbaycanca tərcüməsini seç',q:`<span class="mq-big">${msE(L[0])}</span>${pos}`,o:[L[2],...mqDistr(L,2,T)].map(msE),a:0,ex,src:[L,dir]})
+  :msShufQ({k:'İngiliscəsini seç',q:`<span class="mq-big az">${msE(L[2])}</span>${pos}`,o:[L[0],...mqDistr(L,0,T)].map(msE),a:0,ex,src:[L,dir]})}
+function mqVocab(T){msTop();
+ app.innerHTML=mqHead(T,0)+`<div class="ms-brief"><b>Tapşırıq:</b> Bu 8 söz mətndə və dinləmədə qarşına çıxacaq. Öyrən, dinlə, sonra testə başla. Test iki hissədir: əvvəl ingiliscə söz → Azərbaycanca tərcümə, sonra Azərbaycanca söz → ingiliscə. Səhv etdiyin sözlər sonda yenidən soruşulur — hamısını düz tapmalısan.</div>
+ <div class="ms-wd">${T.vocab.map(w=>`<div><button class="spk" type="button" data-w="${msE(w[0])}" aria-label="Dinlə">${ICON_SPK}</button><span style="min-width:0"><b>${msE(w[0])}</b> <span class="mq-pos">${MQ_POS[w[3]]||''}</span><span>${msE(w[1])}</span><span style="display:block;font-size:13px;font-style:italic">${msE(w[2])}</span></span></div>`).join('')}</div>
+ <div class="btns"><button class="btn p" type="button" id="mqgo">Sözləri öyrəndim — testə başla</button></div>`;
+ msBindBack(()=>mqTask(T.id));app.querySelectorAll('.spk').forEach(x=>x.onclick=()=>say(x.dataset.w));
+ document.getElementById('mqgo').onclick=()=>{
+  const L=T.vocab.map(w=>[w[0],w[3],w[1],w[2]]);let first=null,round=0;
+  const run=items=>{round++;msTop();app.innerHTML=mqHead(T,0)+`<div class="ms-panel" id="msbox"></div>`;msBindBack(()=>mqTask(T.id));
+   msQuiz(document.getElementById('msbox'),items.map(([w,d])=>mqVQ(w,d,T)),(ok,n,wr)=>{if(!first)first=[ok,n];
+    if(!wr.length){mqStageDone(T,'vocab',Math.round(first[0]/first[1]*100),`İlk cəhddə ${first[0]} / ${first[1]} düz${round>1?' · bütün sözlər öyrənildi':''}`);return}
+    msTop();app.innerHTML=mqHead(T,0)+`<div class="ms-panel ms-res"><span class="chip soon">Təkrar</span><div class="big">${wr.length}</div><p class="lead" style="margin:6px auto 0">${wr.length} sözdə səhv etdin. Onları yenidən soruşuruq — hamısını düz tapmalısan.</p><div class="ms-chips" style="justify-content:center;margin-top:12px">${wr.map(q=>`<span class="ms-chip">${msE(q.src[0][0])} — ${msE(q.src[0][2])}</span>`).join('')}</div><div class="btns"><button class="btn p" type="button" id="mqre">Davam et</button></div></div>`;
+    msBindBack(()=>mqTask(T.id));document.getElementById('mqre').onclick=()=>run(shuffle(wr.map(q=>q.src)))},{label:'Söz'})};
+  run(shuffle(L).map(w=>[w,'en']).concat(shuffle(L).map(w=>[w,'az'])));
+ };
+}
+
+/* ---------- stage 2: reading ---------- */
+function mqArt(T){return `<div class="mq-art"><h3>${msE(T.reading.title)}</h3>${T.reading.p.map(p=>`<p>${msE(p)}</p>`).join('')}</div>`}
+function mqReading(T,att,wrong){att=att||1;msTop();const R=T.reading;
+ app.innerHTML=mqHead(T,1)+`<div class="ms-brief"><b>Tapşırıq:</b> Mətni çox diqqətlə oxu və bu <b>${R.qs.length} sualın</b> cavabını tap. Testə başlayanda mətn bağlanacaq. Səhv cavab qırmızı olacaq və geri qayıtmaq olmayacaq. Növbəti mərhələyə keçmək üçün <b>bütün suallara</b> düz cavab verməlisən.</div>
+ <div class="mq-qlist"><b>Oxuyarkən bu sualların cavabını axtar:</b><ol>${R.qs.map(q=>`<li class="${wrong&&wrong.includes(q.q)?'mq-wr':''}">${msE(q.q)}</li>`).join('')}</ol>${wrong?'<p class="mq-wrn">Qırmızı sualların cavabını əvvəlki dəfə səhv tapmışdın.</p>':''}</div>${mqArt(T)}
+ <div class="btns"><button class="btn p" type="button" id="mqgo">Oxudum — testə başla</button></div>`;
+ msBindBack(()=>mqTask(T.id));
+ document.getElementById('mqgo').onclick=()=>{msTop();
+  app.innerHTML=mqHead(T,1)+`<div class="ms-brief" style="border-left-color:var(--coral)">Mətn bağlıdır. Cəhd: <b>${att}</b></div><div class="ms-panel" id="msbox"></div>`;
+  msBindBack(()=>mqTask(T.id));
+  msQuiz(document.getElementById('msbox'),R.qs.map(q=>Object.assign({},q,{q:msE(q.q),o:q.o.map(msE),raw:q.q})).map(msShufQ),(ok,n,wr)=>{
+   if(!wr.length){mqStageDone(T,'reading',Math.max(60,110-att*10),att===1?`${n} / ${n} düz — ilk cəhddə!`:`Hamısı düz · ${att}-cü cəhd`);return}
+   msTop();app.innerHTML=mqHead(T,1)+`<div class="ms-panel ms-res"><span class="chip soon">Mətni bir də oxu</span><div class="big" style="color:var(--bad)">${wr.length} / ${n}</div>
+    <p class="lead" style="margin:6px auto 10px">${wr.length} sualın cavabını səhv tapdın. Mətni bir də diqqətlə oxu və testi yenidən həll et.</p>
+    <div class="mq-qlist" style="text-align:left;background:var(--bad-bg)"><b style="color:var(--bad)">Səhv tapdığın suallar:</b><ol>${wr.map(q=>`<li>${msE(q.raw)}</li>`).join('')}</ol></div>
+    <div class="btns"><button class="btn p" type="button" id="mqre">📖 Mətnə qayıt</button></div></div>`;
+   msBindBack(()=>mqTask(T.id));document.getElementById('mqre').onclick=()=>mqReading(T,att+1,wr.map(q=>q.raw))},{label:'Sual',strict:true})};
+}
+
+/* ---------- stage 3: listening ---------- */
+function mqListening(T,att,wrong){att=att||1;
+ const S=mqT(T.id),L=T.listening;msTop();
+ if(S.s.listening&&!msTeacher()){
+  app.innerHTML=mqHead(T,2)+`<div class="ms-panel ms-res"><div style="font-size:50px">🔇</div><h3>Bu dinləmə bağlanıb</h3><p class="lead" style="margin:6px auto 0">Sən bu mərhələni artıq keçmisən. Eşitdiklərini yadda saxla — final qapısında lazım olacaq.</p></div>`;
+  msBindBack(()=>mqTask(T.id));return}
+ let heard=false,plays=0,useTTS=!T.audio,playing=false;
+ app.innerHTML=mqHead(T,2)+`<div class="ms-brief"><b>Tapşırıq:</b> Əvvəlcə sualları oxu, sonra səsi dinlə. Səsi <b>istədiyin qədər</b> dinləyə bilərsən. Testə başlamaq üçün səsi ən azı bir dəfə sonuna qədər dinlə. Test zamanı səs bağlanır. Növbəti mərhələyə keçmək üçün <b>bütün suallara</b> düz cavab verməlisən.</div>
+ <div class="mq-qlist"><b>Dinləyərkən bu sualların cavabını axtar:</b><ol>${L.qs.map(q=>`<li class="${wrong&&wrong.includes(q.q)?'mq-wr':''}">${msE(q.q)}</li>`).join('')}</ol>${wrong?'<p class="mq-wrn">Qırmızı sualların cavabını əvvəlki dəfə tapmamışdın — onlara xüsusi diqqət et.</p>':''}</div>
+ <div class="ms-radio" id="msrd"><span style="font-size:11px;font-weight:900;letter-spacing:.14em;color:var(--gold)">AUDIO · ${msE(L.who)}</span>
+  <div class="wave">${'<i></i>'.repeat(14)}</div><div class="prog" style="width:min(320px,100%);flex:none"><i id="msrp" style="width:0%"></i></div><span class="lp" id="mqtime">&nbsp;</span>
+  <button class="btn g" type="button" id="msplay">▶ Dinlə</button><span class="lp" id="msleft">Dinləmə sayı: 0</span></div>
+ <div class="btns"><button class="btn p" type="button" id="mqtest" disabled>Testə başla</button></div><p class="ms-wc" id="mqtw" style="text-align:center">Testə başlamaq üçün səsi sonuna qədər dinlə.</p>`;
+ msBindBack(()=>mqTask(T.id));
+ const pb=document.getElementById('msplay'),rd=document.getElementById('msrd'),pr=document.getElementById('msrp'),tm=document.getElementById('mqtime'),tb=document.getElementById('mqtest');
+ const fmt=x=>isFinite(x)?Math.floor(x/60)+':'+String(Math.floor(x%60)).padStart(2,'0'):'0:00';
+ const ui=()=>{if(!pb.isConnected)return;pb.textContent=playing?'⏸ Dayandır':plays||heard?'▶ Yenidən dinlə':'▶ Dinlə';rd.classList.toggle('on',playing);
+  document.getElementById('msleft').textContent=`Dinləmə sayı: ${plays}`;tb.disabled=!heard;document.getElementById('mqtw').textContent=heard?'İstəsən bir daha dinlə, sonra testə başla.':'Testə başlamaq üçün səsi sonuna qədər dinlə.'};
+ const ended=()=>{playing=false;plays++;heard=true;pr.style.width='100%';ui()};
+ let au=null;
+ if(!useTTS){au=new Audio();au.preload='auto';au.setAttribute('playsinline','');au.setAttribute('webkit-playsinline','');au.src=T.audio;MQ_AU=au;
+  au.addEventListener('timeupdate',()=>{if(au.duration){pr.style.width=(au.currentTime/au.duration*100)+'%';tm.textContent=fmt(au.currentTime)+' / '+fmt(au.duration)}});
+  au.addEventListener('loadedmetadata',()=>{tm.textContent='0:00 / '+fmt(au.duration)});
+  au.addEventListener('ended',ended);
+  au.addEventListener('pause',()=>{if(!au.ended){playing=false;ui()}});
+  au.addEventListener('error',()=>{if(useTTS)return;useTTS=true;playing=false;tm.textContent='Səs faylı açılmadı — brauzer səsi ilə oxunur';ui()});}
+ pb.onclick=()=>{
+  if(!useTTS&&au){if(playing){au.pause();return}if(au.ended||au.currentTime>=au.duration-.05)au.currentTime=0;playing=true;ui();
+   const pp=au.play();if(pp&&pp.catch)pp.catch(()=>{playing=false;ui();tm.textContent='Səsi başlatmaq üçün düyməyə bir də toxun'});return}
+  if(playing){msHush();playing=false;ui();return}
+  playing=true;ui();const tok=MS_TOK+1;
+  msSpeak(L.p,f=>{pr.style.width=f*100+'%'},ok=>{if(!pb.isConnected)return;if(!ok){playing=false;heard=true;ui();
+   if(!document.getElementById('mqtr'))rd.insertAdjacentHTML('afterend',`<details class="ms-det" id="mqtr" open><summary>Mətn (bu cihazda səs işləmir)</summary><p>${L.p.map(msE).join(' ')}</p></details>`);return}ended()});};
+ tb.onclick=()=>{if(!heard)return;msTop();
+  app.innerHTML=mqHead(T,2)+`<div class="ms-brief" style="border-left-color:var(--coral)">Səs bağlıdır. Cəhd: <b>${att}</b></div><div class="ms-panel" id="msbox"></div>`;
+  msBindBack(()=>mqTask(T.id));
+  msQuiz(document.getElementById('msbox'),L.qs.map(q=>Object.assign({},q,{q:msE(q.q),o:q.o.map(msE),raw:q.q})).map(msShufQ),(ok,n,wr)=>{
+   if(!wr.length){mqStageDone(T,'listening',Math.max(60,110-att*10),`Hamısı düz${att>1?` · ${att}-cü cəhd`:' — ilk cəhddə!'}. Diqqət: bu dinləmə artıq bağlandı — eşitdiklərini yadda saxla!`);return}
+   msTop();app.innerHTML=mqHead(T,2)+`<div class="ms-panel ms-res"><span class="chip soon">Yenə dinlə</span><div class="big" style="color:var(--bad)">${wr.length} / ${n}</div>
+    <p class="lead" style="margin:6px auto 10px">Bu ${wr.length} sualın cavabını tapmadın. Qayıt, yenə dinlə və testi yenidən həll et.</p>
+    <div class="mq-qlist" style="text-align:left;background:var(--bad-bg)"><b style="color:var(--bad)">Cavabını tapmadığın suallar:</b><ol>${wr.map(q=>`<li>${msE(q.raw)}</li>`).join('')}</ol></div>
+    <div class="btns"><button class="btn p" type="button" id="mqre">🎧 Qayıt, yenə dinlə</button></div></div>`;
+   msBindBack(()=>mqTask(T.id));document.getElementById('mqre').onclick=()=>mqListening(T,att+1,wr.map(q=>q.raw))},{label:'Sual',strict:true})};
+ ui();
+}
+
+/* ---------- stage 4: sentence building ---------- */
+function mqBuild(T){let k=0,err=0;msTop();
+ app.innerHTML=mqHead(T,3)+`<div class="ms-brief"><b>Tapşırıq:</b> Cümlələrin sözləri qarışıb. Azərbaycanca mənasına bax və sözləri düzgün ardıcıllıqla düz. <b>Diqqət:</b> bu cümlələrdə məqsədə aparan vacib məlumatlar var — onları yadda saxla, final qapısında soruşulacaq!</div><div class="ms-panel" id="msbox"></div>`;
+ msBindBack(()=>mqTask(T.id));const box=document.getElementById('msbox');
+ const step=()=>{const W=T.build[k][0].split(' '),pool=shuffle(W.map((_,i)=>i)),pick=[];
+  const draw=()=>{box.innerHTML=`<div class="ms-qh"><span>Cümlə ${k+1}/${T.build.length}</span><div class="prog"><i style="width:${k/T.build.length*100}%"></i></div></div>
+   <p style="font-weight:800;margin:0 0 8px">🇦🇿 ${msE(T.build[k][1])}</p>
+   <div class="ms-slot">${pick.map((i,j)=>`<button class="ms-chip on" type="button" data-p="${j}">${msE(W[i])}</button>`).join('')||'<span class="ms-wc">Sözlərə toxun…</span>'}</div>
+   <div class="ms-chips">${pool.filter(i=>!pick.includes(i)).map(i=>`<button class="ms-chip" type="button" data-i="${i}">${msE(W[i])}</button>`).join('')}</div><div class="ms-fb" id="msfb"></div>`;
+   box.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{pick.push(+b.dataset.i);draw()});
+   box.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{pick.splice(+b.dataset.p,1);draw()});
+   if(pick.length===W.length){const fb=document.getElementById('msfb');fb.innerHTML='<button class="btn p" type="button" id="msck">Yoxla</button>';
+    document.getElementById('msck').onclick=()=>{
+     if(pick.map(i=>W[i]).join(' ')!==W.join(' ')){err++;fb.innerHTML='<div class="ms-ex b">✗ Ardıcıllıq səhvdir. Xatırla: mübtəda → xəbər → tamamlıq → yer/vaxt.</div><button class="btn s" type="button" id="msclr">Yenidən düz</button>';document.getElementById('msclr').onclick=()=>{pick.length=0;draw()};return}
+     fb.innerHTML=`<div class="ms-ex g">✓ ${msE(W.join(' '))}.<div class="mq-exs">🧠 Yadda saxla: ${msE(T.build[k][1])}</div></div>`;
+     const tok=MS_TOK;setTimeout(()=>{if(tok!==MS_TOK||!fb.isConnected)return;k++;k<T.build.length?step():mqStageDone(T,'build',Math.max(60,100-err*10),`Səhv cəhdlər: ${err}`)},2600)}}};
+  draw()};
+ step();
+}
+
+/* ---------- stage 5: synonym / antonym / definition ---------- */
+function mqWords(T){msTop();
+ app.innerHTML=mqHead(T,4)+`<div class="ms-brief"><b>Tapşırıq:</b> Hekayədəki sözlərin sinonim, antonim və izahlarını tap. Keçmək üçün ${T.words.length} sualdan ən azı ${T.words.length-1}-i düz olmalıdır.</div><div class="ms-panel" id="msbox"></div>`;
+ msBindBack(()=>mqTask(T.id));
+ msQuiz(document.getElementById('msbox'),shuffle(T.words).map(msShufQ),(ok,n)=>{const p=Math.round(ok/n*100);ok>=n-1?mqStageDone(T,'words',p,`${ok} / ${n} düz`):mqStageFail(T,p,80,()=>mqWords(T))},{label:'Sual'});
+}
+
+/* ---------- stage 6: final gate ---------- */
+function mqFinal(T){msTop();
+ app.innerHTML=mqHead(T,5)+`<div class="ms-dos"><span class="k">Final gate</span><h2>${T.ic} Son addım</h2><p style="margin:0;color:#E2EAF8;font-weight:700">Qapıçı sənə bütün mərhələlərdən <b>${T.final.length} sual</b> verəcək: sözlər, mətn, dinləmə, qurduğun cümlələrdəki məlumatlar və söz mənaları. Mətni və dinləməni açmaq olmaz — yalnız yaddaşına güvən. Ən azı ${T.final.length-2} düz cavab lazımdır, sonra ${T.gateWhat}.</p></div>
+ ${mqNotebook(T)}<div class="btns"><button class="btn g" type="button" id="mqgo">Hazıram</button></div>`;
+ msBindBack(()=>mqTask(T.id));
+ document.getElementById('mqgo').onclick=()=>{msTop();
+  app.innerHTML=mqHead(T,5)+`<div class="ms-panel" id="msbox"></div>`;msBindBack(()=>mqTask(T.id));
+  msQuiz(document.getElementById('msbox'),T.final.map(msShufQ),(ok,n)=>{
+   if(ok<n-2){mqStageFail(T,Math.round(ok/n*100),Math.ceil((n-2)/n*100),()=>mqFinal(T),'Qapı açılmadı. Mətni yenidən oxuya, sözləri təkrarlaya bilərsən — amma dinləmə bağlıdır.');return}
+   mqGate(T,ok)},{label:'Sual',strict:true})};
+}
+function mqGate(T,ok){msTop();let tries=0;
+ const win=()=>{const S=mqT(T.id),first=!S.done;S.s.final=Math.round(ok*10);S.done=1;mqSave();msTop();const st=mqStars();
+  app.innerHTML=`<div class="ms-dos"><span class="k">Mission complete</span><h2>${T.ic} ${msE(T.t)}</h2><p style="margin:0;color:#E2EAF8;font-weight:700;line-height:1.55">${msE(T.end)}</p></div>
+  <div class="ms-panel ms-res"><div style="font-size:64px;line-height:1">⭐</div><h3>${first?'+1 ulduz qazandın!':'Bu taskı artıq bitirmisən'}</h3><p class="lead" style="margin:6px auto 0">Level 1: <b>${st} / ${MQ_LEVEL}</b> ulduz${st>=MQ_LEVEL?' — Level 2 açıldı!':''}</p>
+  <div class="btns"><button class="btn p" type="button" id="mqh">Level 1-ə qayıt</button></div></div>`;
+  document.getElementById('mqh').onclick=msHub};
+ const fail=(box,msg)=>{tries++;box.innerHTML=`<div class="ms-ex b">✗ ${msg}</div>${tries>=2?`<p class="ms-wc" style="text-align:center">${T.hint}</p>`:''}`};
+ let html=mqHead(T,5)+`<div class="ms-panel ms-res"><span class="chip live">${T.final.length} sualdan ${ok}-i düz</span><h3 style="margin-top:8px">${msE(T.gateQ)}</h3>`;
+ if(T.gate==='code'){
+  app.innerHTML=html+`<div class="ms-code" style="margin:12px 0"><input id="c1" inputmode="numeric" maxlength="1" aria-label="1-ci rəqəm"><input id="c2" inputmode="numeric" maxlength="1" aria-label="2-ci rəqəm"><input id="c3" inputmode="numeric" maxlength="1" aria-label="3-cü rəqəm"><input id="c4" inputmode="numeric" maxlength="1" aria-label="4-cü rəqəm"></div>
+  <div class="btns" style="margin-top:0"><button class="btn g" type="button" id="mqok">🔓 Qapını aç</button></div><div id="mqfb" style="margin-top:10px"></div></div>${mqNotebook(T)}`;
+  const ids=['c1','c2','c3','c4'];ids.forEach((id,k)=>{const el=document.getElementById(id);el.oninput=()=>{el.value=el.value.replace(/\D/g,'');if(el.value&&ids[k+1])document.getElementById(ids[k+1]).focus()}});
+  document.getElementById('mqok').onclick=()=>{const v=ids.map(x=>document.getElementById(x).value).join('');v===T.code?win():fail(document.getElementById('mqfb'),'Kod yanlışdır. Qapı açılmadı.')};
+ }else if(T.gate==='culprit'){let pick='';
+  const S=mqT(T.id),out=T.suspects.filter(x=>x[3]&&S.s[x[3]]).map(x=>x[0]);
+  app.innerHTML=html+`<div class="mq-sus" style="margin-top:12px">${T.suspects.slice().sort((x,y)=>x[0].localeCompare(y[0])).map(s=>`<button type="button" data-n="${msE(s[0])}" class="${out.includes(s[0])?'out':''}"><span class="e">${s[2]}</span>${msE(s[0])}<small>${msE(s[1])}</small></button>`).join('')}</div>
+  <div id="mqev"></div><div id="mqfb" style="margin-top:10px"></div></div>${mqNotebook(T)}`;
+  const ev=document.getElementById('mqev');
+  app.querySelectorAll('.mq-sus button').forEach(b=>b.onclick=()=>{pick=b.dataset.n;app.querySelectorAll('.mq-sus button').forEach(x=>x.classList.toggle('on',x===b));
+   if(pick!==T.answer){fail(document.getElementById('mqfb'),'Bu şəxs deyil — onun alibisi var. Dəftərinə bax və başqasını seç.');ev.innerHTML='';return}
+   document.getElementById('mqfb').innerHTML='';const q=msShufQ(T.evQ);
+   ev.innerHTML=`<p style="font-weight:900;margin:6px 0 8px">${msE(q.q)}</p><div class="opts">${q.o.map((o,j)=>`<button class="opt" type="button" data-j="${j}"><span class="L">${'ABCD'[j]}</span><span>${msE(o)}</span></button>`).join('')}</div>`;
+   ev.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{+o.dataset.j===q.a?(o.classList.add('ok'),setTimeout(win,MQ_AUTO)):(o.classList.add('bad'),o.disabled=true,fail(document.getElementById('mqfb'),'Bu sübut deyil. Dəftərinə və eşitdiklərinə bir də fikir ver.'))})});
+ }else if(T.gate==='word'){
+  app.innerHTML=html+`<input class="ms-in" id="mqpw" maxlength="20" autocomplete="off" spellcheck="false" style="margin:12px auto;max-width:320px;text-align:center;text-transform:uppercase;letter-spacing:.2em;font-size:24px;font-family:var(--display)" placeholder="······">
+  <div class="btns" style="margin-top:0"><button class="btn g" type="button" id="mqok">🔓 Daxil et</button></div><div id="mqfb" style="margin-top:10px"></div></div>${mqNotebook(T)}`;
+  const inp=document.getElementById('mqpw');
+  const chk=()=>{const v=inp.value.trim().toUpperCase().replace(/\s+/g,'');if(!v)return;if(v===T.password){win();return}
+   fail(document.getElementById('mqfb'),(T.wrong&&T.wrong[v])||'Parol yanlışdır. Kompüter qəbul etmədi.')};
+  document.getElementById('mqok').onclick=chk;inp.onkeydown=e=>{if(e.key==='Enter')chk()};
+ }else{const C=T.choice,val={a:'',b:''};
+  app.innerHTML=html+['a','b'].map(g=>`<p style="font-weight:900;margin:12px 0 6px;text-align:left">${C[g].lab}</p><div class="ms-dirs" id="mq_${g}">${shuffle(C[g].opts).map(p=>`<button class="ms-dir" type="button" data-v="${msE(p)}">${msE(p)}</button>`).join('')}</div>`).join('')+`
+  <div class="btns"><button class="btn g" type="button" id="mqok">Yoxla</button></div><div id="mqfb" style="margin-top:10px"></div></div>${mqNotebook(T)}`;
+  ['a','b'].forEach(g=>app.querySelectorAll('#mq_'+g+' .ms-dir').forEach(b=>b.onclick=()=>{val[g]=b.dataset.v;app.querySelectorAll('#mq_'+g+' .ms-dir').forEach(x=>x.classList.toggle('on',x===b))}));
+  document.getElementById('mqok').onclick=()=>{const fb=document.getElementById('mqfb');if(!val.a||!val.b){fb.innerHTML='<div class="ms-ex b">Hər iki sualı cavablandır.</div>';return}
+   const A=val.a===C.a.ans,B=val.b===C.b.ans;
+   if(A&&B)win();else fail(fb,!A&&!B?'İkisi də səhvdir.':!A?`${C.b.lab.replace(/^\S+\s/,'')} — düzdür, amma birinci cavab səhvdir.`:`${C.a.lab.replace(/^\S+\s/,'')} — düzdür, amma ikinci cavab səhvdir.`)};
+ }
+ msBindBack(()=>mqTask(T.id));
+}
+
+/* ---------- Learn Vocabulary ---------- */
+function mqLearn(T,mode,idx){mode=mode||'list';idx=idx||0;msTop();const W=T.learn;
+ const tabs=`<div class="ms-tabs"><button class="tab" type="button" data-m="list" aria-pressed="${mode==='list'}">📋 Siyahı</button><button class="tab" type="button" data-m="card" aria-pressed="${mode==='card'}">🃏 Kartlar</button></div>`;
+ const head=msBackBtn('Task '+T.id)+`<div class="head"><h2><small>Task ${T.id} · ${msE(T.az)}</small>📚 Learn Vocabulary</h2><p class="lead">Bu missiyada qarşına çıxacaq ən vacib ${W.length} A2 sözü. İstəsən əvvəlcədən öyrən.</p></div>`+tabs;
+ if(mode==='list'){
+  app.innerHTML=head+`<div class="mq-lw">${W.map((w,i)=>`<div class="r"><button class="spk" type="button" data-w="${msE(w[0])}" aria-label="Dinlə">${ICON_SPK}</button><div style="min-width:0"><div><b>${msE(w[0])}</b> <span class="mq-pos">${MQ_POS[w[1]]||''}</span> <span class="az">— ${msE(w[2])}</span></div><div class="ex">${mqHi(w[3],w[0])}</div></div></div>`).join('')}</div>`;
+ }else{const w=W[idx];
+  app.innerHTML=head+`<div class="mq-fc" id="mqfc" role="button" tabindex="0" aria-label="Kartı çevir"><div class="in"><div class="f"><span class="mq-big">${msE(w[0])}</span><span class="mq-pos">${MQ_POS[w[1]]||''}</span><small>Tərcüməni görmək üçün toxun</small></div><div class="b"><span class="mq-big az">${msE(w[2])}</span><p>${mqHi(w[3],w[0])}</p></div></div></div>
+  <div class="mq-fcn"><button class="btn s" type="button" id="mqpv" ${idx?'':'disabled'}>‹ Əvvəlki</button><span>${idx+1} / ${W.length}</span><button class="spk" type="button" id="mqsp" aria-label="Dinlə">${ICON_SPK}</button><button class="btn p" type="button" id="mqnx2" ${idx<W.length-1?'':'disabled'}>Növbəti ›</button></div>`;
+  const fc=document.getElementById('mqfc');const flip=()=>fc.classList.toggle('fl');fc.onclick=flip;fc.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
+  document.getElementById('mqsp').onclick=()=>say(w[0]);
+  document.getElementById('mqpv').onclick=()=>mqLearn(T,'card',idx-1);document.getElementById('mqnx2').onclick=()=>mqLearn(T,'card',idx+1);
+ }
+ msBindBack(()=>mqTask(T.id));
+ app.querySelectorAll('.ms-tabs .tab').forEach(b=>b.onclick=()=>mqLearn(T,b.dataset.m,0));
+ app.querySelectorAll('.mq-lw .spk').forEach(b=>b.onclick=()=>say(b.dataset.w));
+}
+
+
+const MQ_AUD={"1": "audio/task1.mp3", "2": "audio/task2.mp3", "3": "audio/task3.mp3", "4": "audio/task4.mp3", "5": "audio/task5.mp3", "6": "audio/task6.mp3", "7": "audio/task7.mp3"};
+MQ_TASKS.forEach(T=>{if(MQ_AUD[T.id])T.audio=MQ_AUD[T.id]});
+msHub();
+
+</script>
+</body></html>
