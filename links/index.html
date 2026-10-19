@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Faydalı linklər · My New Vocabulary</title>
+<meta name="theme-color" content="#1C9F95">
+<link rel="icon" href="../icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* layout: one column of link cards grouped by kind, sticky back bar on top */
+:root{--bg:#F5F9FA;--card:#FFFFFF;--ink:#26363E;--muted:#5E717A;--line:#E1E9ED;--tq:#1C9F95;--tq-s:#DFF4F2;--yt:#D93025;--yt-s:#FDE7E5;--mine:#E0843A;--mine-s:#FCEEDF;--font:Nunito,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#162026;--card:#1E2B31;--ink:#E5EDF0;--muted:#A3B4BB;--line:#2D3D44;--tq:#4CC4BA;--tq-s:#1B3836;--yt:#F28B82;--yt-s:#3A2321;--mine:#F2A564;--mine-s:#38291C;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#162026;--card:#1E2B31;--ink:#E5EDF0;--muted:#A3B4BB;--line:#2D3D44;--tq:#4CC4BA;--tq-s:#1B3836;--yt:#F28B82;--yt-s:#3A2321;--mine:#F2A564;--mine-s:#38291C;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;padding-inline:16px;padding-block:0 40px;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:720px;margin:0 auto}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;gap:10px;padding-block:14px 12px}
+.back{flex:none;display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;color:var(--ink);font-weight:800;text-decoration:none}
+.back:focus-visible,.go:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
+h1{margin:6px 0 4px;font-size:clamp(28px,8vw,40px);font-weight:900;line-height:1.1;color:var(--tq);text-wrap:balance}
+.lead{margin:0 0 18px;color:var(--muted);font-weight:700}
+h2{margin:22px 0 10px;font-size:15px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.list{display:grid;gap:10px}
+.card{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:14px;text-decoration:none;color:inherit}
+.card:hover{border-color:var(--yt)}
+.card.mine{border-color:var(--mine);background:var(--mine-s)}
+.ic{flex:none;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--yt-s);color:var(--yt)}
+.mine .ic{background:var(--card);color:var(--mine)}
+.ic svg{width:26px;height:26px;fill:currentColor}
+.tx{flex:1;min-width:0}
+.tx b{display:block;font-size:17px;font-weight:900;line-height:1.25;overflow-wrap:anywhere}
+.tx small{display:block;color:var(--muted);font-weight:700;font-size:14px;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font-size:12px;font-weight:800;border-radius:999px;padding:2px 9px;background:var(--tq-s);color:var(--tq)}
+.go{flex:none;font-weight:900;font-size:14px;color:#fff;background:var(--yt);border-radius:12px;padding:9px 12px;white-space:nowrap}
+.mine .go{background:var(--mine)}
+.foot{margin-top:26px;text-align:center;color:var(--muted);font-weight:700;font-size:14px}
+@media (max-width:380px){.go{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a class="back" href="../">‹ Əsas səhifə</a></div>
+  <h1>🔗 Faydalı linklər</h1>
+  <p class="lead">İngilis dilini öyrənmək üçün Samir müəllimin seçdiyi videolar və kanallar. Toxunun, YouTube-da açılsın.</p>
+  <div id="groups"></div>
+  <p class="foot">Created by Samir Balakishiyev · WhatsApp 055 795 86 25</p>
+</div>
+<script>
+/* Yeni link əlavə etmək üçün: aşağıdakı siyahıya bir sətir əlavə edin. g = qrup, t = başlıq, d = qısa izah, tags = etiketlər, mine = Samir müəllimin öz videoları */
+const LINKS=[
+ {g:'Samir müəllimin videoları',mine:1,t:'English Grammar and Vocabulary · Video izahlar',d:'Balakishiyev.S · 38 video',tags:['Qrammatika','Sözlər'],u:'https://youtube.com/playlist?list=PLgX9_nD0ECBxTWk1h5fZRQJiZaWLiyJLg'},
+ {g:'Dinləmə və dialoqlar',t:'Slow English Dialogues for Beginners',d:'Enjoy English Practice · 68 video · yavaş danışılan dialoqlar',tags:['A1–A2','Dinləmə'],u:'https://youtube.com/playlist?list=PLVjqDBgp36p4-PheQDRVRCMwk12yQzz58'},
+ {g:'Dinləmə və dialoqlar',t:'VOA Learning English',d:'Yavaş oxunan xəbərlər və hekayələr · Amerika ingiliscəsi',tags:['A2–B2','Dinləmə'],u:'https://www.youtube.com/@voalearningenglish'},
+ {g:'Dinləmə və dialoqlar',t:'EnglishClass101',d:'Mövzular üzrə sözlər, dinləmə və danışıq dərsləri',tags:['Başlanğıcdan','Danışıq'],u:'https://www.youtube.com/@englishclass101'},
+ {g:'Qrammatika, sözlər və tələffüz',t:'BBC Learning English',d:'Qrammatika, gündəlik ifadələr və tələffüz · Britaniya ingiliscəsi',tags:['Bütün səviyyələr'],u:'https://www.youtube.com/@bbclearningenglish'},
+ {g:'Qrammatika, sözlər və tələffüz',t:'English with Lucy',d:'Söz ehtiyatı, qrammatika və Britaniya tələffüzü',tags:['B1+','Tələffüz'],u:'https://www.youtube.com/@englishwithlucy'},
+ {g:'Qrammatika, sözlər və tələffüz',t:"Rachel's English",d:'Amerika tələffüzü: səslər, vurğu və intonasiya',tags:['Tələffüz'],u:'https://www.youtube.com/@rachelsenglish'}
+];
+const YT='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12 31 31 0 0 0 1 16.8a3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15.1V8.9l5.8 3.1-5.8 3.1z"/></svg>';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const groups=[...new Set(LINKS.map(l=>l.g))];
+document.getElementById('groups').innerHTML=groups.map(g=>`<h2>${esc(g)}</h2><div class="list">`+LINKS.filter(l=>l.g===g).map(l=>`<a class="card${l.mine?' mine':''}" href="${esc(l.u)}" target="_blank" rel="noopener"><span class="ic">${YT}</span><span class="tx"><b>${esc(l.t)}</b><small>${esc(l.d)}</small>${l.tags&&l.tags.length?`<span class="tags">${l.tags.map(x=>`<span class="tag">${esc(x)}</span>`).join('')}</span>`:''}</span><span class="go">Aç ↗</span></a>`).join('')+`</div>`).join('');
+</script>
+</body>
+</html>
