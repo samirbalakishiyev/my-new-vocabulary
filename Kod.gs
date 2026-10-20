@@ -5,6 +5,18 @@
    Yeniləmək: Deploy → Manage deployments → ✏️ → Version: New version → Deploy (link dəyişmir). */
 const KEY = 'BURAYA-OZ-ACARINIZI-YAZIN';
 const SKEY = 'BURAYA-LUGET-SIFRESI'; /* 📚 PDF lüğətlərin şifrəsi — heç kimə verməyin */
+const SLUG_IDS = ['g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11'];
+/* "g5,g8" → ['g5','g8'] (köhnə TRUE = hamısı) */
+function slugList(v) {
+  if (v === true || String(v).toUpperCase() === 'TRUE') return SLUG_IDS.slice();
+  return String(v || '').split(/[,\s]+/).filter(x => SLUG_IDS.includes(x));
+}
+/* hər kitabın öz şifrəsi: HMAC-SHA256(SKEY, kitab) */
+function slugKeys(ids) {
+  const k = Utilities.base64Decode(SKEY), o = {};
+  ids.forEach(id => { o[id] = Utilities.base64Encode(Utilities.computeHmacSignature(Utilities.MacAlgorithm.HMAC_SHA_256, Utilities.newBlob(id).getBytes(), k)); });
+  return o;
+}
 
 function out(o) {
   return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
@@ -48,7 +60,7 @@ function usersImport(s) {
       const tel = String(r[idx[0]] || '').replace(/\D/g, '').replace(/^994/, '').replace(/^0/, '');
       if (!tel || have.has(tel)) return;
       have.add(tel);
-      add.push(idx.map((i, j) => j === 0 ? "'" + tel : i < 0 ? (j === 6 || j === 9 || j === 10 ? false : '') : r[i]));
+      add.push(idx.map((i, j) => j === 0 ? "'" + tel : i < 0 ? (j === 6 || j === 9 ? false : '') : r[i]));
     });
   });
   if (add.length) s.getRange(s.getLastRow() + 1, 1, add.length, UL.length).setValues(add);
@@ -67,7 +79,7 @@ function usersSheet() {
     if (n > 0 && idx[0] < 0) return s; /* tanınmayan format: heç nəyə toxunma */
     if (n > 0 && idx.some((i, j) => i !== j)) {
       const all = s.getRange(2, 1, n, w).getValues();
-      const nv = all.map(r => idx.map((i, j) => i < 0 ? (j === 9 || j === 10 ? false : '') : r[i]));
+      const nv = all.map(r => idx.map((i, j) => i < 0 ? (j === 9 ? false : '') : r[i]));
       s.getRange(2, 1, n, Math.max(w, UL.length)).clearContent();
       s.getRange(2, 1, n, UL.length).setValues(nv);
     }
@@ -82,19 +94,19 @@ function usersFix(s) {
   if (n < 1) return;
   const rg = s.getRange(2, 1, n, UL.length), v = rg.getValues();
   let ch = false;
-  v.forEach(r => { [4, 5, 8].forEach(j => { const d = asDate(r[j]); if (d !== r[j]) { r[j] = d; ch = true; } }); const b = isTrue(r[6]); if (r[6] !== b) { r[6] = b; ch = true; } const p = isTrue(r[9]); if (r[9] !== p) { r[9] = p; ch = true; } const q = isTrue(r[10]); if (r[10] !== q) { r[10] = q; ch = true; } });
+  v.forEach(r => { [4, 5, 8].forEach(j => { const d = asDate(r[j]); if (d !== r[j]) { r[j] = d; ch = true; } }); const b = isTrue(r[6]); if (r[6] !== b) { r[6] = b; ch = true; } const p = isTrue(r[9]); if (r[9] !== p) { r[9] = p; ch = true; } });
   if (ch) rg.setValues(v);
   s.getRange(2, 5, n, 2).setNumberFormat(DF);
   s.getRange(2, 9, n, 1).setNumberFormat(DF);
   s.getRange(2, 7, n, 1).insertCheckboxes();
   s.getRange(2, 10, n, 1).insertCheckboxes();
-  s.getRange(2, 11, n, 1).insertCheckboxes();
+  s.getRange(2, 11, n, 1).removeCheckboxes().setNumberFormat('@');
 }
 function usersRows(s) {
   usersImport(s);
   usersFix(s);
   const v = s.getDataRange().getValues(); v.shift();
-  return v.filter(r => r[0] !== '').map(r => ({ tel: String(r[0]), ad: r[1], soyad: r[2], rol: r[3], qeyd: ms(r[4]), son: ms(r[5]), blok: isTrue(r[6]), sayt: r[7], elaqe: ms(r[8]), prem: isTrue(r[9]), slug: isTrue(r[10]) }));
+  return v.filter(r => r[0] !== '').map(r => ({ tel: String(r[0]), ad: r[1], soyad: r[2], rol: r[3], qeyd: ms(r[4]), son: ms(r[5]), blok: isTrue(r[6]), sayt: r[7], elaqe: ms(r[8]), prem: isTrue(r[9]), slug: slugList(r[10]) }));
 }
 function userRow(s, tel) {
   const n = s.getLastRow();
@@ -107,12 +119,11 @@ function userPing(o, now) {
   const s = usersSheet();
   const r = userRow(s, o.tel);
   if (!r) {
-    s.appendRow(["'" + (o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', new Date(+o.qeyd || now), new Date(now), false, o.sayt || '', '', false, false]);
+    s.appendRow(["'" + (o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', new Date(+o.qeyd || now), new Date(now), false, o.sayt || '', '', false, '']);
     const lr = s.getLastRow();
     s.getRange(lr, 5, 1, 2).setNumberFormat(DF);
     s.getRange(lr, 7).insertCheckboxes();
     s.getRange(lr, 10).insertCheckboxes();
-    s.getRange(lr, 11).insertCheckboxes();
     return { ok: true, blok: false, prem: false };
   }
   const val = s.getRange(r, 1, 1, 11).getValues()[0];
@@ -126,7 +137,15 @@ function userSet(o, now) {
   if (!r) return { ok: false, error: 'tel' };
   if (o.a === 'block') { s.getRange(r, 7).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
   if (o.a === 'premium') { s.getRange(r, 10).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
-  if (o.a === 'slug') { s.getRange(r, 11).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
+  if (o.a === 'slug') { /* 📚 hər kitab ayrıca: "g5,g8" */
+    const c = s.getRange(r, 11), set = new Set(slugList(c.getValue()));
+    const b = String(o.b || '');
+    if (!SLUG_IDS.includes(b)) return { ok: false, error: 'b' };
+    if (o.v) set.add(b); else set.delete(b);
+    const list = SLUG_IDS.filter(x => set.has(x));
+    c.setNumberFormat('@').setValue(list.join(','));
+    return { ok: true, slug: list };
+  }
   s.getRange(r, 9).setValue(o.v ? new Date(now) : '').setNumberFormat(DF);
   return { ok: true, t: o.v ? now : '' };
 }
@@ -183,10 +202,10 @@ function doPost(e) {
       return out({ ok: true });
     }
     if (o.a === 'skey') { /* 📚 məktəb lüğətləri: şifrə yalnız kilidi açılmış nömrəyə (və müəllimə) verilir */
-      if (o.key === KEY) return out({ ok: true, k: SKEY });
+      if (o.key === KEY) return out({ ok: true, keys: slugKeys(SLUG_IDS) });
       const s = usersSheet(), r = userRow(s, o.tel);
-      const ok = r && isTrue(s.getRange(r, 11).getValue()) && !isTrue(s.getRange(r, 7).getValue());
-      return out(ok ? { ok: true, k: SKEY } : { ok: false, error: 'lock' });
+      if (!r || isTrue(s.getRange(r, 7).getValue())) return out({ ok: true, keys: {} });
+      return out({ ok: true, keys: slugKeys(slugList(s.getRange(r, 11).getValue())) });
     }
     if (o.key !== KEY) return out({ ok: false, error: 'key' });
     if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium' || o.a === 'slug') return out(userSet(o, now));
