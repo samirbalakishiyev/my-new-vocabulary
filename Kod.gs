@@ -4,13 +4,14 @@
    Köhnə "Qeydiyyat" vərəqindəki istifadəçilər avtomatik "Users" vərəqinə köçürülür; köhnə vərəqlər silinmir.
    Yeniləmək: Deploy → Manage deployments → ✏️ → Version: New version → Deploy (link dəyişmir). */
 const KEY = 'BURAYA-OZ-ACARINIZI-YAZIN';
+const SKEY = 'BURAYA-LUGET-SIFRESI'; /* 📚 PDF lüğətlərin şifrəsi — heç kimə verməyin */
 
 function out(o) {
   return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
 }
 
 /* ---------- Users vərəqi (oxunaqlı başlıqlar, tarixlər, blok qutucuqları) ---------- */
-const UL = ['Telefon', 'Ad', 'Soyad', 'Rol', 'Qeydiyyat tarixi', 'Son giriş', 'Bloklanıb', 'Sayt', 'Əlaqə saxlanılıb', 'Premium'];
+const UL = ['Telefon', 'Ad', 'Soyad', 'Rol', 'Qeydiyyat tarixi', 'Son giriş', 'Bloklanıb', 'Sayt', 'Əlaqə saxlanılıb', 'Premium', 'PDF lüğət'];
 const DF = 'dd.mm.yyyy hh:mm';
 const isTrue = x => x === true || /^(true|bəli|beli|yes|1|blok)$/i.test(String(x).trim());
 const ms = x => x instanceof Date ? x.getTime() : (+x || '');
@@ -29,7 +30,8 @@ function colMap(hv) {
     k => k === 'blok' || k.startsWith('blok') || k === 'block',
     k => k === 'sayt' || k === 'site',
     k => k === 'elaqe' || k.startsWith('əlaqə') || k.startsWith('elaqe'),
-    k => k === 'prem' || k.startsWith('premium')];
+    k => k === 'prem' || k.startsWith('premium'),
+    k => k === 'slug' || k.startsWith('pdf')];
   return T.map(f => h.findIndex(f));
 }
 /* başqa vərəqlərdə qalmış köhnə istifadəçiləri Users-ə köçürür (təkrarlamadan) */
@@ -46,7 +48,7 @@ function usersImport(s) {
       const tel = String(r[idx[0]] || '').replace(/\D/g, '').replace(/^994/, '').replace(/^0/, '');
       if (!tel || have.has(tel)) return;
       have.add(tel);
-      add.push(idx.map((i, j) => j === 0 ? "'" + tel : i < 0 ? (j === 6 || j === 9 ? false : '') : r[i]));
+      add.push(idx.map((i, j) => j === 0 ? "'" + tel : i < 0 ? (j === 6 || j === 9 || j === 10 ? false : '') : r[i]));
     });
   });
   if (add.length) s.getRange(s.getLastRow() + 1, 1, add.length, UL.length).setValues(add);
@@ -65,7 +67,7 @@ function usersSheet() {
     if (n > 0 && idx[0] < 0) return s; /* tanınmayan format: heç nəyə toxunma */
     if (n > 0 && idx.some((i, j) => i !== j)) {
       const all = s.getRange(2, 1, n, w).getValues();
-      const nv = all.map(r => idx.map((i, j) => i < 0 ? (j === 9 ? false : '') : r[i]));
+      const nv = all.map(r => idx.map((i, j) => i < 0 ? (j === 9 || j === 10 ? false : '') : r[i]));
       s.getRange(2, 1, n, Math.max(w, UL.length)).clearContent();
       s.getRange(2, 1, n, UL.length).setValues(nv);
     }
@@ -80,18 +82,19 @@ function usersFix(s) {
   if (n < 1) return;
   const rg = s.getRange(2, 1, n, UL.length), v = rg.getValues();
   let ch = false;
-  v.forEach(r => { [4, 5, 8].forEach(j => { const d = asDate(r[j]); if (d !== r[j]) { r[j] = d; ch = true; } }); const b = isTrue(r[6]); if (r[6] !== b) { r[6] = b; ch = true; } const p = isTrue(r[9]); if (r[9] !== p) { r[9] = p; ch = true; } });
+  v.forEach(r => { [4, 5, 8].forEach(j => { const d = asDate(r[j]); if (d !== r[j]) { r[j] = d; ch = true; } }); const b = isTrue(r[6]); if (r[6] !== b) { r[6] = b; ch = true; } const p = isTrue(r[9]); if (r[9] !== p) { r[9] = p; ch = true; } const q = isTrue(r[10]); if (r[10] !== q) { r[10] = q; ch = true; } });
   if (ch) rg.setValues(v);
   s.getRange(2, 5, n, 2).setNumberFormat(DF);
   s.getRange(2, 9, n, 1).setNumberFormat(DF);
   s.getRange(2, 7, n, 1).insertCheckboxes();
   s.getRange(2, 10, n, 1).insertCheckboxes();
+  s.getRange(2, 11, n, 1).insertCheckboxes();
 }
 function usersRows(s) {
   usersImport(s);
   usersFix(s);
   const v = s.getDataRange().getValues(); v.shift();
-  return v.filter(r => r[0] !== '').map(r => ({ tel: String(r[0]), ad: r[1], soyad: r[2], rol: r[3], qeyd: ms(r[4]), son: ms(r[5]), blok: isTrue(r[6]), sayt: r[7], elaqe: ms(r[8]), prem: isTrue(r[9]) }));
+  return v.filter(r => r[0] !== '').map(r => ({ tel: String(r[0]), ad: r[1], soyad: r[2], rol: r[3], qeyd: ms(r[4]), son: ms(r[5]), blok: isTrue(r[6]), sayt: r[7], elaqe: ms(r[8]), prem: isTrue(r[9]), slug: isTrue(r[10]) }));
 }
 function userRow(s, tel) {
   const n = s.getLastRow();
@@ -104,14 +107,15 @@ function userPing(o, now) {
   const s = usersSheet();
   const r = userRow(s, o.tel);
   if (!r) {
-    s.appendRow(["'" + (o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', new Date(+o.qeyd || now), new Date(now), false, o.sayt || '', '', false]);
+    s.appendRow(["'" + (o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', new Date(+o.qeyd || now), new Date(now), false, o.sayt || '', '', false, false]);
     const lr = s.getLastRow();
     s.getRange(lr, 5, 1, 2).setNumberFormat(DF);
     s.getRange(lr, 7).insertCheckboxes();
     s.getRange(lr, 10).insertCheckboxes();
+    s.getRange(lr, 11).insertCheckboxes();
     return { ok: true, blok: false, prem: false };
   }
-  const val = s.getRange(r, 1, 1, 10).getValues()[0];
+  const val = s.getRange(r, 1, 1, 11).getValues()[0];
   s.getRange(r, 2, 1, 3).setValues([[o.ad || val[1], o.soyad || val[2], o.rol || val[3]]]);
   s.getRange(r, 6).setValue(new Date(now)).setNumberFormat(DF);
   return { ok: true, blok: isTrue(val[6]), prem: isTrue(val[9]) };
@@ -122,6 +126,7 @@ function userSet(o, now) {
   if (!r) return { ok: false, error: 'tel' };
   if (o.a === 'block') { s.getRange(r, 7).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
   if (o.a === 'premium') { s.getRange(r, 10).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
+  if (o.a === 'slug') { s.getRange(r, 11).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
   s.getRange(r, 9).setValue(o.v ? new Date(now) : '').setNumberFormat(DF);
   return { ok: true, t: o.v ? now : '' };
 }
@@ -177,8 +182,14 @@ function doPost(e) {
       s.getRange(s.getLastRow(), 1).setNumberFormat(DF);
       return out({ ok: true });
     }
+    if (o.a === 'skey') { /* 📚 məktəb lüğətləri: şifrə yalnız kilidi açılmış nömrəyə (və müəllimə) verilir */
+      if (o.key === KEY) return out({ ok: true, k: SKEY });
+      const s = usersSheet(), r = userRow(s, o.tel);
+      const ok = r && isTrue(s.getRange(r, 11).getValue()) && !isTrue(s.getRange(r, 7).getValue());
+      return out(ok ? { ok: true, k: SKEY } : { ok: false, error: 'lock' });
+    }
     if (o.key !== KEY) return out({ ok: false, error: 'key' });
-    if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium') return out(userSet(o, now));
+    if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium' || o.a === 'slug') return out(userSet(o, now));
     if (o.a === 'cfg') { cfgSheet().getRange('A1').setNumberFormat('@').setValue(JSON.stringify(o.state || {})); return out({ ok: true }); }
     return out({ ok: false, error: 'a' });
   } finally {
