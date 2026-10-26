@@ -153,6 +153,8 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .fbox{position:absolute;top:14px;right:16px;font-size:12px;font-weight:800;color:var(--muted)}.fbox.new{color:var(--ok)}
 .fw{font-size:clamp(32px,10vw,46px);font-weight:900;color:var(--c);line-height:1.1;overflow-wrap:anywhere}
 .fw.sm{font-size:24px}
+.fsign{font-size:26px;font-weight:900;color:var(--c);margin:4px 0}
+.task.fcdone{background:var(--pu-s,#EEE8FB);border-color:var(--pu,#7C5CC4)}.task.fcdone .t,.task.fcdone .sc{color:var(--pu,#7C5CC4)}
 .ftr{font-size:22px;font-weight:900;color:var(--ink)}.ftr.ru{font-size:18px;color:var(--muted);font-weight:800}
 .fhint{margin:10px 0 0;color:var(--muted);font-size:13px;font-weight:700}
 .fcbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fcbtns .btn,.fcnav .btn{margin:0}
@@ -379,7 +381,8 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media (min-width:640px){.vgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .vtile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-height:92px;padding:12px;border-radius:16px;background:var(--s);border:2px solid transparent;color:var(--ink);font:inherit;cursor:pointer;min-width:0}
-.vtile:hover{border-color:var(--c)}.vtile:disabled{opacity:.6;cursor:default}
+.vtile:hover{border-color:var(--c)}
+.vtile.vkey{border:3px solid #7F0000;box-shadow:0 2px 0 #7F000033}.vtile.vkey:hover{border-color:#5A0000}.vtile:disabled{opacity:.6;cursor:default}
 .vtile .vt{font-size:16.5px;font-weight:900;color:var(--c);line-height:1.15}
 .vtile .vs{font-size:12.5px;font-weight:700;color:var(--muted);line-height:1.3}
 .vtile .vb{margin-top:auto;padding-top:4px;font-size:12.5px;font-weight:900;color:var(--c)}
@@ -8167,7 +8170,7 @@ function home(){
   const t='My New Vocabulary'.split('').map((ch,i)=>ch===' '?' ':`<span class="c${i%5}">${ch}</span>`).join('');
   let h=`<div class="dn-host topbar${dnOn(DNOTE)?' has-note':''}"><div class="tb-l"><header class="brand"><h1 class="logo">${t}</h1></header><div class="credit"><span>Created by <b><span onclick="teacher()">S</span>amir Balakishiyev</b></span><a class="wa" href="https://wa.me/994557958625" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>055 795 86 25</a><button type="button" class="applink" data-cp="https://samirbalakishiyev.github.io/my-new-vocabulary/">🔗 Proqramın linki</button></div></div><div class="dnote-slot">${dnHTML()}</div></div>`+a2hsTip()+profHTML()+`<button class="fbbtn" onclick="fbHome()">✍️ Rəy və təklifləriniz <span>— yazın, oxuyuruq</span></button><div class="grid hgrid">`;
   const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0);
-  h+=`<a class="tile wide" href="links/" style="${colorVars('tq')};text-decoration:none"><div><h2>🔗 Faydalı linklər</h2><p>YouTube videoları və kanallar</p></div><span class="badge" style="margin-left:auto">YouTube</span></a>`;
+  h+=`<a class="tile wide" href="links/" style="${colorVars('bl')};background:var(--bl-s);border-color:var(--bl);text-decoration:none"><div><h2>🔗 Faydalı linklər</h2><p>YouTube videoları və kanallar</p></div><span class="badge" style="margin-left:auto">YouTube</span></a>`;
   h+=`<a class="tile wide" href="missions/" style="background:linear-gradient(135deg,#FFE680,#FFC22E);border-color:#C99A10;color:#3B2A00;text-decoration:none"><div><h2 style="color:#3B2A00">👑 Mr. Samir's Missions</h2><p style="color:#5C4300">A2–B1 · Task 1 pulsuz</p></div><span class="badge" style="margin-left:auto;background:#3B2A00;color:#FFD54A">PREMIUM</span></a>`;
   h+=`</div><div class="mgrid">`;
   const wN=LV.reduce((u,[l])=>u+CATS.reduce((v,[c])=>v+liveCount('words',l,c),0),0);
@@ -8188,12 +8191,13 @@ function vocabHome(){
   V={vh:1};const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0);
   const vb=(t,sub,badge,c,js,dis)=>`<button class="vtile" style="${colorVars(c)}" ${dis?'disabled':`onclick="${js}"`}><span class="vt">${t}</span><span class="vs">${sub}</span><span class="vb">${badge}</span></button>`;
   let h=hdr('Vocabulary','Bölməni seçin','home()','tq')+`<div class="vgrid">`;
+  {const fk=Object.keys(ST.fc||{}).filter(id=>live(id)&&LSECS.includes(IDX[id].s)&&ST.fc[id].b>=1).length;
+   h+=vb('📘 Sözləri öyrən','Bax, öyrən, imtahan ver',lk+'/'+lt,'bl','learnHome()').replace('class="vtile"','class="vtile vkey"');
+   h+=vb('🃏 Sözləri kartlarla öyrən','Flashcards · tasklar üzrə',fk+'/'+lt,'in','fcHome()').replace('class="vtile"','class="vtile vkey"');}
   h+=vb('Synonym','Sinonimlər',count('syn')+' söz','gr',"levels('syn')");
   h+=vb('Antonym','Antonimlər',count('ant')+' söz','pk',"levels('ant')");
   h+=vb('Definition','Təriflər',count('def')+' söz','or',"levels('def')");
   h+=vb('Make Up Sentences','Cümlə qur',count('mk')+' cümlə','pu',"levels('mk')");
-  h+=vb('Sözləri öyrən','Bax, öyrən, imtahan ver',lk+'/'+lt,'bl','learnHome()');
-  h+=typeof fcHome==='function'?vb('Sözləri kartlarla öyrən','Flashcards','Kartlar','in','fcHome()'):vb('Sözləri kartlarla öyrən','Flashcards','Tezliklə','in','',1);
   h+=vb('Words Exam','Sözlərin tərcüməsi',count('words')+' söz','tq',"levels('words')");
   h+=vb('Sentences','Boşluğu doldur',count('gap')+' sual','bl',"levels('gap')");
   h+=vb('Topic Vocabulary','Mövzular üzrə sözlər',TOPS.length+' mövzu','am','topicHome()');
@@ -8201,61 +8205,81 @@ function vocabHome(){
   app.innerHTML=h+`</div>`;window.scrollTo(0,0);
 }
 const VSECS=['words','syn','ant','def','gap','mk'];
-/* ---------- 🃏 Sözləri kartlarla öyrən (Flashcards) ----------
-   Leitner qutuları: «Bildim» → kart növbəti qutuya keçir və sonra (1, 3, 7, 14, 30 gün) yenidən çıxır;
+/* ---------- 🃏 Sözləri kartlarla öyrən (Flashcards) — «Sözləri öyrən» kimi: bölmə → səviyyə → (nitq hissəsi) → task ----------
+   Leitner qutuları: «Bildim» → kart növbəti qutuya keçir (1, 3, 7, 14, 30 gün sonra yenə çıxır);
    «Təkrar etməliyəm» → kart 1-ci qutuya qayıdır və bu dəstdə 3 kartdan sonra yenə göstərilir. */
 const FCDAY=86400000,FCGAP=[0,1,3,7,14,30];
-let FCL='A',FCC='all';
-function fcIds(l,c){const out=[];for(const [cc] of CATS){if(c!=='all'&&cc!==c)continue;(D.words[l][cc]||[]).forEach(e=>{const id=ID('words',l,cc,e);if(!DEL.has(id))out.push(id)})}return out}
-function fcStat(ids){const F=ST.fc||{},now=Date.now();let kn=0,due=0,nw=0;ids.forEach(id=>{const f=F[id];if(!f)nw++;else{if(f.b>=1)kn++;if(f.d<=now)due++}});return {kn,due,nw,n:ids.length}}
+const fcKnown=id=>{const f=(ST.fc||{})[id];return !!(f&&f.b>=1)};
+const fcCount=(s,l,c)=>{let ids=[];if(l==null){for(const [L] of LV)ids=ids.concat(fcLvIds(s,L))}else ids=c==null?fcLvIds(s,l):taskIdsAll(s,l,c);return ids.filter(fcKnown).length};
+function fcLvIds(s,l){if(s!=='words')return taskIdsAll(s,l,'');let o=[];for(const [c] of CATS)o=o.concat(taskIdsAll(s,l,c));return o}
+function taskIdsAll(s,l,c){return pool(s,l,c).map(e=>ID(s,l,c,e)).filter(id=>!DEL.has(id))}
 function fcHome(){
-  V={};if(!ST.fc)ST.fc={};
-  let h=hdr('Sözləri kartlarla öyrən','Flashcards · səviyyə və nitq hissəsini seçin','vocabHome()','in')+`<div style="${colorVars('in')}">`;
-  h+=`<p class="fcl">Səviyyə</p><div class="chips fcch">`+LV.map(([l,n,az])=>`<button class="chip ${FCL===l?'on':''}" onclick="FCL='${l}';fcHome()">${n} <small>${az}</small></button>`).join('')+`</div>`;
-  h+=`<p class="fcl">Nitq hissəsi</p><div class="list">`;
-  const row=(c,n,az)=>{const ids=fcIds(FCL,c);if(!ids.length)return '';const st=fcStat(ids);
-    return `<button class="row" onclick="FCC='${c}';fcStart()"><div><div class="t">${n}</div><div class="s">${az} · ${st.n} söz${st.due?` · <b style="color:var(--rd)">${st.due} təkrar gözləyir</b>`:''}</div></div><span class="badge">${st.kn}/${st.n}</span></button>`};
-  h+=row('all','Hamısı','Bütün nitq hissələri');
-  for(const [c,n,az] of CATS)h+=row(c,n,az);
-  h+=`</div><p class="mhint" style="margin-top:12px">Sağdakı rəqəm: «Bildim» dediyin kartlar / hamısı</p>`;
+  V={};if(!ST.fc)ST.fc={};let h=hdr('Sözləri kartlarla öyrən','Bölməni seçin','vocabHome()','in')+`<p class="tnote">Karta bax, toxun — arxasında tərcümə və nümunə var. Bildinsə «✓ Bildim», bilmədinsə «↻ Təkrar etməliyəm» bas. Hamısını bildiyin task mavi olur.</p><div class="list">`;
+  for(const s of LSECS){const o=SECS[s];h+=`<button class="row" style="${colorVars(o.c)}" onclick="fcLevels('${s}')"><div><div class="t" style="color:var(--c)">${o.n}</div><div class="s">${esc(o.az)}</div></div><span class="badge">${fcCount(s)}/${count(s)}</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
-function fcStart(){
-  const F=ST.fc||(ST.fc={}),now=Date.now(),ids=fcIds(FCL,FCC);
-  const due=shuf(ids.filter(id=>F[id]&&F[id].d<=now)).sort((a,b)=>F[a].b-F[b].b);
-  const fresh=shuf(ids.filter(id=>!F[id]));
-  let deck=due.concat(fresh).slice(0,20);
-  if(!deck.length)deck=shuf(ids).sort((a,b)=>(F[a]?F[a].d:0)-(F[b]?F[b].d:0)).slice(0,20);/* hamısı öyrənilib: ən tez vaxtı çatacaqlar */
-  V={fc:{deck,i:0,flip:false,ok:0,rep:0,seen:{}}};fcShow();
+function fcLevels(s){
+  V={};const o=SECS[s];let h=hdr(o.n+' · kartlar','Səviyyəni seçin','fcHome()',o.c)+`<div class="list" style="${colorVars(o.c)}">`;
+  for(const [l,name,az] of LV)h+=`<button class="row" onclick="${s==='words'?`fcCats('${l}')`:`fcTasks('${s}','${l}','')`}"><div><div class="lvl">${name}</div><div class="s">${az}</div></div><span class="badge">${fcCount(s,l)}/${levelCount(s,l)}</span></button>`;
+  app.innerHTML=h+'</div>';window.scrollTo(0,0);
+}
+function fcCats(l){
+  V={};let h=hdr('Words '+lvName(l)+' · kartlar','Nitq hissəsini seçin',"fcLevels('words')",'tq')+`<div class="list" style="${colorVars('tq')}">`;
+  for(const [c,n,az] of CATS)h+=`<button class="row" onclick="fcTasks('words','${l}','${c}')"><div><div class="t">${n}</div><div class="s">${az} · ${nTasks('words',l,c)} task</div></div><span class="badge">${fcCount('words',l,c)}/${liveCount('words',l,c)}</span></button>`;
+  app.innerHTML=h+'</div>';window.scrollTo(0,0);
+}
+function fcTasks(s,l,c){
+  V={};const o=SECS[s],title=(s==='words'?CATS.find(x=>x[0]===c)[1]:o.n)+' · kartlar',back=s==='words'?`fcCats('${l}')`:`fcLevels('${s}')`,now=Date.now();
+  let h=hdr(title,lvName(l)+' · mavi = hamısını bilirsən',back,o.c)+`<div class="tasks" style="${colorVars(o.c)}">`;
+  for(let t=0;t<nTasks(s,l,c);t++){const ids=taskIds(s,l,c,t);if(!ids.length)continue;const k=ids.filter(fcKnown).length,all=k===ids.length;
+    h+=`<button class="task ${all?'done':'todo'}" onclick="fcStart('${s}','${l}','${c}',${t})"><div class="t">Task ${t+1}</div><div class="s">${ids.length} kart</div><div class="sc">${all?'Bilirsən ✓':'Bildim '+k+'/'+ids.length}</div></button>`}
+  app.innerHTML=h+'</div>';window.scrollTo(0,0);
+}
+function fcStart(s,l,c,t){
+  const F=ST.fc||(ST.fc={}),now=Date.now(),ids=taskIds(s,l,c,t);if(!ids.length)return;
+  const rank=id=>{const f=F[id];if(!f)return 1;if(f.b===0)return 0;if(f.d<=now)return 2;return 3};/* təkrar → yeni → vaxtı çatan → bilinən */
+  const deck=shuf(ids).sort((a,b)=>rank(a)-rank(b));
+  V={fc:{s,l,c,t,deck,i:0,flip:false,ok:0,rep:0,seen:{},okd:{}}};fcShow();
+}
+function fcFace(id){
+  const r=IDX[id],e=entry(r),s=r.s,cat=s==='words'?(CATS.find(x=>x[0]===r.c)||['','',''])[1]:SECS[s].n;
+  const sp=(t,sm)=>`<button class="say${sm?' sm':''}" aria-label="Dinlə" onclick="event.stopPropagation();say('${esc(jsq(t))}',${sm?.92:.8})">${SPK}</button>`;
+  const tr=w=>{const x=s==='words'?(e[1]+(e[2]?' · '+e[2]:'')):wTr(w);return x?`<div class="ftr ru">${esc(x)}</div>`:''};
+  const q=s==='syn'?'Sinonimi nədir?':s==='ant'?'Antonimi nədir?':s==='def'?'Mənası nədir?':'Tərcüməsi nədir?';
+  const front=`<span class="fpos">${esc(cat)}</span><div class="fw">${esc(e[0])}</div>${s==='words'&&e[4]?`<p class="ipa">/${esc(e[4])}/</p>`:''}${sp(e[0])}<p class="fhint">${q} Karta toxun</p>`;
+  let back=`<span class="fpos">${esc(cat)}</span><div class="fw sm">${esc(e[0])}</div>`;
+  if(s==='words')back+=`<div class="ftr">🇦🇿 ${esc(e[1])}</div>${e[2]?`<div class="ftr ru">🇷🇺 ${esc(e[2])}</div>`:''}${e[3]?`<div class="exrow" style="margin-top:12px"><p class="ex">${exHTML(e[3])}</p>${sp(e[3],1)}</div>`:''}`;
+  else if(s==='syn'||s==='ant')back+=`${tr(e[0])}<div class="fsign">${s==='syn'?'=':'↔'}</div><div class="wrow" style="justify-content:center"><div class="fw sm" style="color:var(--ink)">${esc(e[1])}</div>${sp(e[1],1)}</div>${tr(e[1])}`;
+  else back+=`${tr(e[0])}<p class="ex" style="font-weight:700;margin-top:10px">${esc(e[1])}</p>${wEx(e[0])?`<div class="exrow" style="margin-top:8px"><p class="ex">${exHTML(wEx(e[0]))}</p></div>`:''}`;
+  return [front,back,e[0]];
 }
 function fcShow(){
   const S=V.fc,id=S.deck[S.i];if(!id)return fcEnd();
-  const r=IDX[id],e=entry(r),cat=CATS.find(x=>x[0]===r.c)||['','',''];
-  const f=(ST.fc||{})[id];
-  let h=hdr('Kartlar · '+lvName(FCL),FCC==='all'?'Bütün nitq hissələri':(CATS.find(x=>x[0]===FCC)||[0,''])[1],'fcHome()','in')+`<div style="${colorVars('in')}">`;
+  const o=SECS[S.s],f=(ST.fc||{})[id],[front,back,w]=fcFace(id);
+  const title=(S.s==='words'?CATS.find(x=>x[0]===S.c)[1]:o.n)+' · Task '+(S.t+1);
+  let h=hdr(title,lvName(S.l)+' · kartlar',`fcTasks('${S.s}','${S.l}','${S.c}')`,o.c)+`<div style="${colorVars(o.c)}">`;
   h+=`<div class="bar"><i style="width:${S.i/S.deck.length*100}%"></i></div><div class="qmeta"><span>Kart ${S.i+1} / ${S.deck.length}</span><span>Bildim: ${S.ok}</span></div>`;
-  h+=`<div class="fcard${S.flip?' flip':''}" role="button" tabindex="0" aria-label="Kartı çevir" onclick="fcFlip()"><div class="fcin">`;
-  h+=`<div class="fcf"><span class="fpos">${esc(cat[1])} · ${esc(cat[2])}</span><div class="fw">${esc(e[0])}</div>${e[4]?`<p class="ipa">/${esc(e[4])}/</p>`:''}<button class="say" aria-label="Dinlə" onclick="event.stopPropagation();say('${esc(jsq(e[0]))}',.8)">${SPK}</button><p class="fhint">Tərcüməni görmək üçün karta toxun</p>${f?`<span class="fbox">${f.b?'Qutu '+f.b:'Təkrar'}</span>`:'<span class="fbox new">Yeni</span>'}</div>`;
-  h+=`<div class="fcb"><span class="fpos">${esc(cat[1])}</span><div class="fw sm">${esc(e[0])}</div><div class="ftr">🇦🇿 ${esc(e[1])}</div>${e[2]?`<div class="ftr ru">🇷🇺 ${esc(e[2])}</div>`:''}${e[3]?`<div class="exrow" style="margin-top:12px"><p class="ex">${exHTML(e[3])}</p><button class="say sm" aria-label="Cümləni dinlə" onclick="event.stopPropagation();say('${esc(jsq(e[3]))}',.92)">${SPK}</button></div>`:''}</div>`;
-  h+=`</div></div>`;
+  h+=`<div class="fcard${S.flip?' flip':''}" role="button" tabindex="0" aria-label="Kartı çevir" onclick="fcFlip()"><div class="fcin"><div class="fcf">${front}${f?`<span class="fbox">${f.b?'Qutu '+f.b:'Təkrar'}</span>`:'<span class="fbox new">Yeni</span>'}</div><div class="fcb">${back}</div></div></div>`;
   h+=`<div class="fcbtns"><button class="btn fcrep" onclick="fcMark(0)">↻ Təkrar etməliyəm</button><button class="btn fcok" onclick="fcMark(1)">✓ Bildim</button></div>`;
   h+=`<div class="fcnav"><button class="btn ghost" ${S.i?'':'disabled'} onclick="fcGo(-1)">‹ Əvvəlki</button><button class="btn ghost" onclick="fcGo(1)">Növbəti ›</button></div>`;
   app.innerHTML=h+'</div>';
-  if(!S.flip&&S.spoke!==S.i){S.spoke=S.i;setTimeout(()=>say(e[0],.8),250)}
+  if(!S.flip&&S.spoke!==S.i){S.spoke=S.i;setTimeout(()=>say(w,.8),250)}
 }
 function fcFlip(){V.fc.flip=!V.fc.flip;const c=document.querySelector('.fcard');if(c)c.classList.toggle('flip',V.fc.flip)}
 function fcGo(d){const S=V.fc;S.i=Math.max(0,S.i+d);S.flip=false;if(S.i>=S.deck.length)return fcEnd();fcShow()}
 function fcMark(ok){
   const S=V.fc,id=S.deck[S.i],F=ST.fc||(ST.fc={}),now=Date.now(),f=F[id]||{b:0,d:0};
-  if(ok){f.b=Math.min(5,(f.b||0)+1);f.d=now+FCGAP[f.b]*FCDAY;if(!S.okd)S.okd={};if(!S.okd[id]){S.okd[id]=1;S.ok++}}
-  else{f.b=0;f.d=now;S.rep++;const at=Math.min(S.deck.length,S.i+4);S.deck.splice(at,0,id)}
+  if(ok){f.b=Math.min(5,(f.b||0)+1);f.d=now+FCGAP[f.b]*FCDAY;if(!S.okd[id]){S.okd[id]=1;S.ok++}}
+  else{f.b=0;f.d=now;S.rep++;delete S.okd[id];const at=Math.min(S.deck.length,S.i+4);S.deck.splice(at,0,id)}
   S.seen[id]=1;F[id]=f;save();fcGo(1);
 }
 function fcEnd(){
-  const S=V.fc,st=fcStat(fcIds(FCL,FCC));
-  let h=hdr('Kartlar bitdi',lvName(FCL),'fcHome()','in')+`<div style="${colorVars('in')}"><div class="res"><div class="big">🃏 ${S.ok}</div><p>Bu dəstdə «Bildim» dediyin kartlar.${S.rep?`<br>${S.rep} dəfə «Təkrar etməliyəm» dedin — onlar tez-tez qarşına çıxacaq.`:''}</p><p class="mhint">Bu bölmədə: ${st.kn}/${st.n} söz bilinir${st.due?` · ${st.due} təkrar gözləyir`:''}</p></div>`;
-  h+=`<button class="btn" onclick="fcStart()">Yenə 20 kart</button><button class="btn ghost" onclick="fcHome()">Geri qayıt</button></div>`;
-  app.innerHTML=h;window.scrollTo(0,0);if(S.ok>=15)fireworks();
+  const S=V.fc,o=SECS[S.s],ids=taskIds(S.s,S.l,S.c,S.t),k=ids.filter(fcKnown).length;
+  let h=hdr('Kartlar bitdi','Task '+(S.t+1)+' · '+lvName(S.l),`fcTasks('${S.s}','${S.l}','${S.c}')`,o.c)+`<div style="${colorVars(o.c)}"><div class="res"><div class="big">🃏 ${k}/${ids.length}</div><p>Bu taskda «Bildim» dediyin kartlar.${S.rep?`<br>${S.rep} dəfə «Təkrar etməliyəm» dedin — onlar tez-tez qarşına çıxacaq.`:''}</p></div>`;
+  h+=`<button class="btn" onclick="fcStart('${S.s}','${S.l}','${S.c}',${S.t})">Bu taskı yenə işlə</button>`;
+  for(let t=S.t+1;t<nTasks(S.s,S.l,S.c);t++){if(taskIds(S.s,S.l,S.c,t).length){h+=`<button class="btn" onclick="fcStart('${S.s}','${S.l}','${S.c}',${t})">Növbəti task (Task ${t+1})</button>`;break}}
+  h+=`<button class="btn ghost" onclick="fcTasks('${S.s}','${S.l}','${S.c}')">Tasklara qayıt</button></div>`;
+  app.innerHTML=h;window.scrollTo(0,0);if(k===ids.length)fireworks();
 }
 document.addEventListener('keydown',e=>{if(!V.fc||!document.querySelector('.fcard'))return;if(e.key===' '||e.key==='Enter'){e.preventDefault();fcFlip()}else if(e.key==='ArrowRight')fcGo(1);else if(e.key==='ArrowLeft'&&V.fc.i)fcGo(-1)});
 /* ---------- 📊 Nəticələrim: bütün nəticələr; göndərilməyənlər bir düymə ilə müəllimə gedir, göndərilən bir daha getmir ---------- */
