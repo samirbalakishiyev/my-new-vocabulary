@@ -199,18 +199,43 @@ function cfgSheet() {
   return ss.getSheetByName('Config') || ss.insertSheet('Config');
 }
 
-/* ✍️ Rəy və təkliflər: "Rəylər" vərəqi */
-const FL = ['Tarix', 'Telefon', 'Ad', 'Soyad', 'Rol', 'Rəy'];
+/* ✍️ Rəy və təkliflər: "Rəylər" vərəqi. Status: Yeni / Oxundu / Cavablandı / Arxiv.
+   "Şagird gizlədib" = şagird öz tərəfində silib (müəllim yenə görür). ID = telefon|vaxt. */
+const FL = ['Tarix', 'Telefon', 'Ad', 'Soyad', 'Rol', 'Rəy', 'Status', 'Cavab', 'Cavab tarixi', 'Şagird gizlədib', 'ID'];
+const FST = ['Yeni', 'Oxundu', 'Cavablandı', 'Arxiv'];
 function fbSheet() {
   const ss = SpreadsheetApp.getActive();
   let s = ss.getSheetByName('Rəylər');
-  if (!s) { s = ss.insertSheet('Rəylər'); s.appendRow(FL); s.getRange(1, 1, 1, FL.length).setFontWeight('bold'); s.setFrozenRows(1); s.setColumnWidth(6, 420); }
+  if (!s) { s = ss.insertSheet('Rəylər'); s.setFrozenRows(1); s.setColumnWidth(6, 420); s.setColumnWidth(8, 360); }
+  const w = Math.max(s.getLastColumn(), 1), hv = s.getRange(1, 1, 1, w).getValues()[0].map(String);
+  if (hv.slice(0, FL.length).join('|') !== FL.join('|')) s.getRange(1, 1, 1, FL.length).setValues([FL]).setFontWeight('bold'); /* köhnə 6 sütun eynidir, yenilər sağa əlavə olunur */
   return s;
 }
-function fbRows() {
+function fbAll() {
   const s = fbSheet();
-  if (s.getLastRow() < 2) return [];
-  return s.getRange(2, 1, s.getLastRow() - 1, FL.length).getValues().map(r => ({ at: ms(r[0]), tel: String(r[1]), ad: r[2], soyad: r[3], rol: r[4], x: String(r[5]) }));
+  if (s.getLastRow() < 2) return { s, v: [] };
+  const rg = s.getRange(2, 1, s.getLastRow() - 1, FL.length), v = rg.getValues();
+  let ch = false;
+  v.forEach(r => { if (!r[10] && r[1] !== '') { r[10] = String(r[1]).replace(/^'/, '') + '|' + ms(r[0]); ch = true; } if (!r[6] && r[1] !== '') { r[6] = 'Yeni'; ch = true; } });
+  if (ch) { s.getRange(2, 11, v.length, 1).setNumberFormat('@'); rg.setValues(v); }
+  return { s, v };
+}
+const fbObj = r => ({ id: String(r[10]), at: ms(r[0]), tel: String(r[1]), ad: r[2], soyad: r[3], rol: r[4], x: String(r[5]), st: String(r[6] || 'Yeni'), rep: String(r[7] || ''), rat: ms(r[8]), hid: isTrue(r[9]) });
+function fbRows() { return fbAll().v.filter(r => r[1] !== '').map(fbObj); }
+/* müəllim: status / cavab / silmə */
+function fbSet(o, now) {
+  const { s, v } = fbAll(), i = v.findIndex(r => String(r[10]) === String(o.id));
+  if (i < 0) return { ok: false, error: 'id' };
+  const row = i + 2;
+  if (o.del) { s.deleteRow(row); return { ok: true, del: true }; }
+  if (typeof o.rep === 'string') {
+    const t = o.rep.trim().slice(0, 2000);
+    s.getRange(row, 7, 1, 3).setValues([[t ? 'Cavablandı' : 'Oxundu', t, t ? new Date(now) : '']]);
+    if (t) s.getRange(row, 9).setNumberFormat(DF);
+    return { ok: true, st: t ? 'Cavablandı' : 'Oxundu', rat: t ? now : '' };
+  }
+  if (FST.includes(o.st)) { s.getRange(row, 7).setValue(o.st); return { ok: true, st: o.st }; }
+  return { ok: false, error: 'a' };
 }
 
 /* Oxu: ?a=cfg (hamı üçün) · ?a=users&key=… · ?a=plist&key=… (müəllim) */
@@ -249,9 +274,21 @@ function doPost(e) {
     if (o.a === 'fb') { /* şagirdin rəyi (açar lazım deyil) */
       const x = String(o.x || '').trim().slice(0, 2000);
       if (!x) return out({ ok: false, error: 'x' });
-      const s = fbSheet();
-      s.appendRow([new Date(+o.at || now), "'" + String(o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', x]);
+      const s = fbSheet(), at = +o.at || now, id = String(o.tel || '') + '|' + at;
+      if (s.getLastRow() > 1 && s.getRange(2, 11, s.getLastRow() - 1, 1).createTextFinder(id).matchEntireCell(true).findNext()) return out({ ok: true, id });
+      s.appendRow([new Date(at), "'" + String(o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', x, 'Yeni', '', '', false, "'" + id]);
       s.getRange(s.getLastRow(), 1).setNumberFormat(DF);
+      return out({ ok: true, id });
+    }
+    if (o.a === 'fbmine') { /* şagird: öz rəyləri və müəllimin cavabları (gizlətdikləri görünmür) */
+      const tel = String(o.tel || '');
+      if (!tel) return out({ ok: true, rows: [] });
+      return out({ ok: true, rows: fbRows().filter(f => f.tel === tel && !f.hid).map(f => ({ id: f.id, at: f.at, x: f.x, rep: f.rep, rat: f.rat })) });
+    }
+    if (o.a === 'fbhide') { /* şagird öz tərəfində silir: müəllimdə qalır */
+      const { s, v } = fbAll(), i = v.findIndex(r => String(r[10]) === String(o.id) && String(r[1]) === String(o.tel || ''));
+      if (i < 0) return out({ ok: false, error: 'id' });
+      s.getRange(i + 2, 10).insertCheckboxes().setValue(true);
       return out({ ok: true });
     }
     if (o.a === 'skey') { /* 📚 məktəb lüğətləri: şifrə yalnız kilidi açılmış nömrəyə (və müəllimə) verilir */
@@ -262,6 +299,7 @@ function doPost(e) {
     }
     if (o.key !== KEY) return out({ ok: false, error: 'key' });
     if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium' || o.a === 'slug' || o.a === 'grp') return out(userSet(o, now));
+    if (o.a === 'fbset') return out(fbSet(o, now));
     if (o.a === 'cfg') { cfgSheet().getRange('A1').setNumberFormat('@').setValue(JSON.stringify(o.state || {})); return out({ ok: true }); }
     return out({ ok: false, error: 'a' });
   } finally {
