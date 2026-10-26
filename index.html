@@ -135,6 +135,13 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .mi .x{color:var(--muted);font-weight:600;font-size:14px}
 .mi .del{flex:none;margin-left:auto;width:36px;height:36px;border-radius:10px;color:var(--muted);font-size:20px}
 .mi .del:hover{background:var(--rd-s);color:var(--rd)}
+.mi .lrn{flex:none;margin-left:auto;border:1.5px solid var(--ok);color:var(--ok);background:var(--card);border-radius:10px;padding:7px 10px;font:inherit;font-weight:800;font-size:13px;white-space:nowrap}
+.mi .say+.lrn{margin-left:4px}
+.mtabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.mtabs button{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:11px 8px;font:inherit;font-weight:800;font-size:14px;color:var(--ink)}
+.mtabs button b{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--line)}
+.mtabs button.on{border-color:var(--rd);background:var(--rd-s)}.mtabs button.on.un{border-color:#E0A100;background:#FFF4CC;color:#5C4300}
+.mhint{margin:0 0 10px;color:var(--muted);font-size:13px;font-weight:600;text-align:center}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font-weight:800;font-size:14px}
 .chip.on{background:var(--rd);border-color:var(--rd);color:#fff}
@@ -8137,7 +8144,7 @@ function home(){
   h+=mb('📖','Reading','Mətnlər və suallar',RLV.reduce((u,L)=>u+(READ[L]||[]).length,0)+' mətn','in','readHome()');
   h+=mb('✍️','Paragraph','Nümunə paraqraflar',Object.keys(ST.pa||{}).length+'/'+PARA.length,'te','paraHome()');
   h+=mb('🧩','Grammar','10 mövzu · 2437 test','130 blok','pu','grammarHome()');
-  h+=mb('❗','Səhvlərim','Səhv cavab verdiklərin',String(m),'rd','mistakes()');
+  {const nu=Object.keys(ST.uns||{}).filter(live).length,ng=Object.keys(grMist()).length;h+=mb('❗','Səhvlərim','Səhv cavablar · Əmin olmadıqlarım',String(m+ng)+(nu?' · 🤔 '+nu:''),'rd','mistakes()');}
   h+=mb('🏆','Ümumi Sınaqlar','Siniflər üzrə sınaqlar','Tezliklə','am','examsHome()');
   h+=`</div>`;
   h+=RCONF?`<div class="foot"><p class="perr" style="color:var(--rd);font-weight:800;margin:0 0 8px">Bütün nəticələr, bildiyin sözlər və səhvlər silinsin?</p><div class="pbtns" style="justify-content:center"><button class="pbtn dl" style="text-decoration:none;color:var(--rd);font-size:15px" onclick="resetYes()">Bəli, sıfırla</button><button class="pbtn gh" style="text-decoration:none;font-size:15px" onclick="resetNo()">Xeyr</button></div></div>`:`<div class="foot"><button onclick="resetAll()">Bütün nəticələri sıfırla</button></div>`;
@@ -8219,10 +8226,10 @@ function balance(qs){
   mc.forEach((q,i)=>{const t=Math.min(p[i],q.opts.length-1),o=q.opts.filter(x=>x!==q.ans);o.splice(t,0,q.ans);q.opts=o;q.correct=t});
   return qs;
 }
-function run(ids,ctx){V={...V,ctx,qs:balance(ids.filter(live).map(id=>makeQ(id,ctx.dir||(ctx.mode==='mist'&&ST.mist[id]&&ST.mist[id].dir)||''))),qi:0,pick:null,right:0,wrong:[],ok:[],built:[],hint:false,uq:[]};if(V.qs.length)quiz();else home()}
+function run(ids,ctx){V={...V,ctx,qs:balance(ids.filter(live).map(id=>makeQ(id,ctx.dir||(ctx.mode==='mist'&&ST.mist[id]&&ST.mist[id].dir)||(ctx.mode==='uns'&&ST.uns&&ST.uns[id]&&ST.uns[id].dir)||''))),qi:0,pick:null,right:0,wrong:[],ok:[],built:[],hint:false,uq:[]};if(V.qs.length)quiz();else home()}
 function quiz(){
   const {qs,qi,pick,ctx}=V,q=qs[qi],o=SECS[q.s];
-  const title=ctx.mode==='mist'?'Səhvlərimi məşq et':ctx.mode==='retry'?'Səhvləri təkrar':ctx.mode==='read'?READ[ctx.l][ctx.pi].t:(q.s==='words'?CATS.find(x=>x[0]===q.c)[1]:q.s==='tv'?TV[q.l].n:o.n)+' · Task '+(ctx.t+1)+(ctx.partial?' · yeni':'');
+  const title=ctx.mode==='mist'?'Səhvlərimi məşq et':ctx.mode==='uns'?'Əmin olmadıqlarım':ctx.mode==='retry'?'Səhvləri təkrar':ctx.mode==='read'?READ[ctx.l][ctx.pi].t:(q.s==='words'?CATS.find(x=>x[0]===q.c)[1]:q.s==='tv'?TV[q.l].n:o.n)+' · Task '+(ctx.t+1)+(ctx.partial?' · yeni':'');
   let h=hdr(title+(q.dir==='az'?' · AZ → EN':''),lvName(q.l),ctx.back,ctx.mode==='mist'?'rd':dirC(q.dir,o.c));
   h+=`<div style="${colorVars(dirC(q.dir,o.c))}"><div class="bar"><i style="width:${(qi+(pick!=null?1:0))/qs.length*100}%"></i></div>`;
   h+=`<div class="qmeta"><span>Sual ${qi+1} / ${qs.length}</span><span>Düz: ${V.right}</span></div>`;
@@ -8309,26 +8316,53 @@ function mItem(id,del){
   else if(r.s==='rq'){w=e[1];x=e[0]+(RQP[id]?' · '+READ[r.l][RQP[id].pi].t:'')}
   else{w=e[0];x=(r.s==='syn'?'sinonim: ':'antonim: ')+e[1]}
   const sent=isW(r.s)&&e[3]?`<p class="ex">${exHTML(e[3])}</p>`:r.s==='gap'?`<p class="ex">${gapHTML(e[0],e[1])}</p>`:'';
-  return `<div class="mi" style="--mc:var(--${o.c})"><div><div class="w">${esc(w)}${isW(r.s)&&e[4]?` <span class="ipa">/${esc(e[4])}/</span>`:''}</div>${x?`<div class="x">${esc(x)}</div>`:''}${sent}</div>${isW(r.s)?`<button class="say sm" style="margin-left:auto;--c:var(--tq)" aria-label="Dinlə" onclick="sayW('${esc(jsq(id))}')">${SPK}</button>`:''}${del?`<button class="del" aria-label="Sil" onclick="delMist('${esc(jsq(id))}')">×</button>`:''}</div>`;
+  return `<div class="mi" style="--mc:var(--${o.c})"><div><div class="w">${esc(w)}${isW(r.s)&&e[4]?` <span class="ipa">/${esc(e[4])}/</span>`:''}</div>${x?`<div class="x">${esc(x)}</div>`:''}${sent}</div>${isW(r.s)?`<button class="say sm" style="margin-left:auto;--c:var(--tq)" aria-label="Dinlə" onclick="sayW('${esc(jsq(id))}')">${SPK}</button>`:''}${del?`<button class="lrn" onclick="learnt('${esc(jsq(id))}','${del}')">✓ Öyrəndim</button>`:''}</div>`;
 }
-let MF='all';
+let MF='all',MT='mist';
+/* Grammar səhvləri grammar/ səhifəsində saxlanılır (gr_mist: "blok#n" → say); sual mətnləri lazım olanda oradan oxunur */
+let GTD=null,GTL=0;
+function grMist(){try{return JSON.parse(localStorage.getItem('gr_mist')||'{}')||{}}catch(e){return {}}}
+function grLoad(){if(GTD||GTL)return;GTL=1;fetch('grammar/index.html',{cache:'force-cache'}).then(r=>r.text()).then(t=>{const i=t.indexOf('const GT = ')+11,j=t.indexOf('\n',i);GTD=JSON.parse(t.slice(i,j).replace(/;\s*$/,''));if(document.getElementById('mlist-root'))mistakes()}).catch(()=>{GTL=0})}
+const plainG=s=>String(s).replace(/<br\/?>/g,' ').replace(/<[^>]+>/g,'');
+function grItem(k){
+  const [bid,n]=k.split('#');if(!GTD)return `<div class="mi" style="--mc:var(--pu)"><div><div class="x">Grammar · yüklənir…</div></div></div>`;
+  const b=GTD.blocks.find(x=>x.id===bid),q=b&&b.tests[+n];if(!q)return '';
+  const tp=GTD.topics.find(x=>x.id===b.topic);
+  return `<div class="mi" style="--mc:var(--pu)"><div><div class="x">🧩 ${esc((tp?tp.name+': ':'')+b.name)}</div><div class="w" style="font-weight:800">${esc(plainG(q.q))}${q.i?` <span class="x">(${esc(q.i.map((s2,k2)=>(k2+1)+'. '+plainG(s2)).join(', '))})</span>`:''}</div><div class="x" style="color:var(--ok)">Düz cavab: ${'ABCDE'[q.a]}) ${esc(plainG(q.o[q.a]))}</div></div><button class="lrn" onclick="learnt('${esc(jsq(k))}','gr')">✓ Öyrəndim</button></div>`;
+}
 function mistakes(){
-  V={};const all=Object.entries(ST.mist).filter(([id])=>live(id)).sort((a,b)=>b[1].at-a[1].at);
-  const list=all.filter(([id])=>MF==='all'||IDX[id].s===MF);
-  let h=hdr('Səhvlərim','Düz cavab verdikdə buradan avtomatik silinir','home()','rd');
-  h+=`<div class="chips"><button class="chip ${MF==='all'?'on':''}" onclick="MF='all';mistakes()">Hamısı (${all.length})</button>`;
-  for(const s in SECS){const n=all.filter(([id])=>IDX[id].s===s).length;h+=`<button class="chip ${MF===s?'on':''}" onclick="MF='${s}';mistakes()">${SECS[s].n} (${n})</button>`}
+  V={};if(!ST.uns)ST.uns={};
+  const src=MT==='uns'?ST.uns:ST.mist;
+  const all=Object.entries(src).filter(([id])=>live(id)).sort((a,b)=>b[1].at-a[1].at);
+  const nm=Object.keys(ST.mist).filter(live).length,nu=Object.keys(ST.uns).filter(live).length;
+  const gk=MT==='mist'?Object.keys(grMist()):[];if(gk.length)grLoad();
+  if(MF==='gr'&&MT!=='mist')MF='all';
+  const list=MF==='gr'?[]:all.filter(([id])=>MF==='all'||IDX[id].s===MF);
+  let h=hdr('Səhvlərim',MT==='uns'?'Düz cavab verdikdə buradan avtomatik silinir':'Düz cavab verdikdə buradan avtomatik silinir','home()','rd')+'<div id="mlist-root"></div>';
+  h+=`<div class="mtabs"><button class="${MT==='mist'?'on':''}" onclick="MT='mist';MF='all';mistakes()">❌ Səhv cavablarım <b>${nm+Object.keys(grMist()).length}</b></button><button class="${MT==='uns'?'on un':''}" onclick="MT='uns';MF='all';mistakes()">🤔 Əmin olmadıqlarım <b>${nu}</b></button></div>`;
+  h+=`<div class="chips"><button class="chip ${MF==='all'?'on':''}" onclick="MF='all';mistakes()">Hamısı (${all.length+gk.length})</button>`;
+  for(const s in SECS){const n=all.filter(([id])=>IDX[id].s===s).length;if(n)h+=`<button class="chip ${MF===s?'on':''}" onclick="MF='${s}';mistakes()">${SECS[s].n} (${n})</button>`}
+  if(gk.length)h+=`<button class="chip ${MF==='gr'?'on':''}" onclick="MF='gr';mistakes()">Grammar (${gk.length})</button>`;
   h+='</div>';
-  if(!list.length){h+=`<div class="empty">Burada hələ heç nə yoxdur. Task işlədikcə səhv etdiklərin bura düşəcək.</div>`}
+  const showG=MT==='mist'&&(MF==='all'||MF==='gr')&&gk.length;
+  if(!list.length&&!showG){h+=`<div class="empty">${MT==='uns'?'Burada hələ heç nə yoxdur. Testdə «🤔 Əmin deyiləm» düyməsinə toxunduğun sözlər bura düşəcək.':'Burada hələ heç nə yoxdur. Task işlədikcə səhv etdiklərin bura düşəcək.'}</div>`}
   else{
-    h+=`<div style="${colorVars('rd')}"><button class="btn" style="margin:0 0 14px" onclick="practiceMist()">Səhvlərimi məşq et (${Math.min(20,list.length)} sual)</button></div>`;
-    h+=`<div class="mlist">`+list.map(([id])=>mItem(id,true)).join('')+'</div>';
+    h+=`<div style="${colorVars('rd')}">`;
+    if(list.length)h+=`<button class="btn" style="margin:0 0 10px" onclick="practiceMist()">${MT==='uns'?'Əmin olmadıqlarımı təkrar et':'Səhvlərimi məşq et'} (${Math.min(20,list.length)} sual)</button>`;
+    if(showG)h+=`<a class="btn${list.length?' ghost':''}" style="margin:0 0 14px;display:block;text-align:center;text-decoration:none" href="grammar/#mist">🧩 Grammar səhvlərini işlə (${Math.min(20,gk.length)} sual)</a>`;
+    h+=`</div><p class="mhint">«✓ Öyrəndim» düyməsi sözü siyahıdan çıxarır.</p><div class="mlist">`+list.map(([id])=>mItem(id,MT)).join('')+(showG?gk.map(grItem).join(''):'')+'</div>';
   }
   app.innerHTML=h;window.scrollTo(0,0);
 }
 function practiceMist(){
-  const list=Object.keys(ST.mist).filter(id=>live(id)&&(MF==='all'||IDX[id].s===MF));
-  if(!list.length)return;V={};run(shuf(list).slice(0,20),{mode:'mist',back:'mistakes()',s:IDX[list[0]].s});
+  const src=MT==='uns'?(ST.uns||{}):ST.mist;
+  const list=Object.keys(src).filter(id=>live(id)&&(MF==='all'||IDX[id].s===MF));
+  if(!list.length)return;V={};run(shuf(list).slice(0,20),{mode:MT==='uns'?'uns':'mist',back:'mistakes()',s:IDX[list[0]].s});
+}
+function learnt(id,kind){
+  if(kind==='gr'){const m=grMist();delete m[id];try{localStorage.setItem('gr_mist',JSON.stringify(m))}catch(e){}}
+  else{delete (kind==='uns'?ST.uns:ST.mist)[id];ST.known[id]=1;save()}
+  mistakes();
 }
 function delMist(id){delete ST.mist[id];save();mistakes()}
 let RCONF=false;

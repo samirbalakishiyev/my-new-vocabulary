@@ -435,6 +435,8 @@ function openMist(){
   show("s-mist");
 }
 $("#go-mist").addEventListener("click", openMist);
+/* My New Vocabulary → Səhvlərim → "Grammar səhvlərini işlə" */
+if (location.hash === "#mist"){ history.replaceState(null, "", location.pathname); setTimeout(() => { Object.keys(mist()).length ? start("", true) : openMist(); }, 0); }
 $("#mist-practice").addEventListener("click", () => start("", true));
 $("#mist-clear").addEventListener("click", async () => { if (await confirmBox("Siyahını təmizlə", "Bütün səhvlər silinəcək.", "Təmizlə", "Ləğv et")){ store.set("gr_mist", {}); openMist(); } });
 document.addEventListener("click", e => {
