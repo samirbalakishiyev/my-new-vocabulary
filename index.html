@@ -168,6 +168,7 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .rp{flex:none;width:58px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:900;color:#fff}.rp.ok{background:var(--ok)}.rp.mid{background:#E0A100}.rp.low{background:var(--rd)}
 .rx{min-width:0}.rx b{display:block;font-weight:800;line-height:1.25;overflow-wrap:anywhere}.rx small{display:block;color:var(--muted);font-weight:600;font-size:13px;margin-top:2px}
 .rs{display:inline-block;margin-top:4px;font-size:12px;font-weight:800;border-radius:999px;padding:2px 9px}.rs.y{background:var(--ok-s);color:var(--ok)}.rs.n{background:var(--rd-s);color:var(--rd)}
+.tgrp{font:inherit;font-size:14px;font-weight:800;padding:7px 10px;border-radius:10px;border:1.5px solid #0E7C86;background:var(--card);color:#0E5F66;max-width:100%}
 .mhint{margin:0 0 10px;color:var(--muted);font-size:13px;font-weight:600;text-align:center}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font-weight:800;font-size:14px}
@@ -8058,7 +8059,7 @@ function pdelYes(){PR={n:'',k:'',t:''};PEDITING=false;PFORM=false;PCONF=false;ps
 function grpKey(){const c=V.ctx;if(c.mode==='mist')return 'mist';if(c.s==='rq')return 'rq|'+c.l;return [c.s,c.l,c.c||'-',c.dir||''].join('|')}
 function secName(){
   const {ctx,qs}=V,s=ctx.s||qs[0].s,o=SECS[s];
-  if(ctx.mode==='mist')return 'Səhvlərimi məşq';
+  if(ctx.mode==='mist')return 'Səhvlərimi məşq';if(ctx.mode==='uns')return 'Əmin olmadıqlarımın təkrarı';
   if(ctx.mode==='read'||(ctx.mode==='retry'&&ctx.s==='rq'))return 'Reading '+ctx.l+' · '+READ[ctx.l][ctx.pi].t;
   return o.n+(s==='tv'&&ctx.l?' · '+TV[ctx.l].n:'')+(ctx.dir==='az'?' (AZ → EN)':'')+(s==='words'&&ctx.c?' · '+CATS.find(x=>x[0]===ctx.c)[1]:'')+(ctx.l&&s!=='tv'?' · '+lvName(ctx.l):'')+(ctx.t!=null?' · Task '+(ctx.t+1):'')+(ctx.mode==='retry'?' (səhvlərin təkrarı)':'');
 }
@@ -8967,7 +8968,7 @@ async function qFlush(){
     while(q.length){const o=q[0];
       const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)});
       if(!r.ok)break;q=lsGet('mnv-q',[]);q.shift();lsSet('mnv-q',q);
-      if(o.a==='ping'){let j=null;try{j=await r.json()}catch(e){}blokSet(j&&j.blok)}}
+      if(o.a==='ping'||o.a==='res'){let j=null;try{j=await r.json()}catch(e){}if(j&&typeof j.grp==='string')lsSet('mnv-grp',j.grp);if(o.a==='ping')blokSet(j&&j.blok)}}
   }catch(e){}FLUSHING=false;
 }
 function syncPing(){if(!REG)return;qPush({a:'ping',...regFields()});qFlush()}
@@ -8976,7 +8977,8 @@ let LASTPING=0;function pingSoon(){if(!REG||Date.now()-LASTPING<60000)return;LAS
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pingSoon()});
 window.addEventListener('focus',pingSoon);window.addEventListener('pageshow',e=>{if(e.persisted)pingSoon()});
 setInterval(()=>{if(document.visibilityState==='visible')pingSoon()},120000);
-function syncRes(e){}
+/* 📊 nəticə cədvələ: server yalnız müəllimin qrupa yazdığı şagirdin nəticəsini saxlayır (təkrarsız) */
+function syncRes(e){if(!REG||!REG.tel||!e)return;qPush({a:'res',tel:REG.tel,list:[{sec:e.sec,r:e.r,n:e.n,p:e.p,w:(e.w||[]).slice(0,30),at:e.at}]});qFlush()}
 
 /* ---------- blocked accounts ---------- */
 function blokSet(v){
@@ -9208,8 +9210,10 @@ async function tUsers(reload){
   if(TU.r)h+=`<div class="pbtns" style="margin-bottom:10px;align-items:center"><b>${TU.r==='Müəllim'?'Müəllimlər':'Tələbələr'}:</b>${[['Yeni','🆕 Yeni qoşulanlar ('+RL.filter(isNew).length+')'],['Pay','💳 Ödəniş edənlər ('+RL.filter(isPay).length+')'],['Blok','🚫 Bloklananlar ('+RL.filter(u=>u.blok).length+')'],['Prem','👑 Premium ('+RL.filter(isPrem).length+')'],['Slug','📚 PDF lüğət ('+RL.filter(u=>slN(u)>0).length+')']].map(([f,l])=>fb(TU.f===f,`TU.f='${f}';tUsers()`,l)).join('')}</div>`;
   h+=`<input class="tsearch" placeholder="Axtar: ad, soyad və ya nömrənin istənilən hissəsi (məs: 795 86)…" value="${esc(TU.q)}" oninput="TU.q=this.value;clearTimeout(window._tq);window._tq=setTimeout(()=>{window._tqKeep=1;tUsers();const i=document.querySelector('.tsearch');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},250)" style="width:100%;font:inherit;font-size:16px;font-weight:700;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin-bottom:10px">`;
   const okF=u=>!TU.r||!TU.f||(TU.f==='Blok'?u.blok:TU.f==='Yeni'?isNew(u):TU.f==='Pay'?isPay(u):TU.f==='Prem'?isPrem(u):TU.f==='Slug'?slN(u)>0:true);
-  const rows=L.filter(u=>q.trim()?uHit(u,q):((!TU.r||u.rol===TU.r)&&okF(u))).sort((a,b)=>(+b.son||0)-(+a.son||0));
-  h+=`<div id="tuRes"><p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Göstərilir: ${rows.length}${q.trim()?' · 🔎 bütün istifadəçilər arasında axtarılır':''}</p><div class="tlist" id="tuList">`+rows.map(u=>{const t=esc(u.tel),pr=isPrem(u);return `<div class="titem${u.blok?' blk':''}" style="flex-wrap:wrap;${u.blok?'border-color:var(--rd);background:var(--rd-s)':''}"><span style="flex:1 1 220px;min-width:0"><b${isPaid(u)?' style="color:#1E8E4E"':''}>${isPaid(u)?'💳 ':''}${esc(u.ad)} ${esc(u.soyad)}</b> <em class="tedit" style="color:var(--bl);background:var(--bl-s)">${esc(u.rol||'')}</em>${pr?' <em class="tedit" style="color:#5C4300;background:#FFD54A">👑 Premium</em>':''}${slN(u)?` <em class="tedit" style="color:#fff;background:#5B6CD9">📚 ${(u.slug||[]).map(x=>x.slice(1)).join(', ')}</em>`:''}${u.blok?' <em class="tedit" style="color:#fff;background:var(--rd)">🚫 Bloklanıb</em>':''}${isPaid(u)?` <em class="tedit" style="color:#fff;background:#1E8E4E;display:inline-block">💳 Ödəniş edib · ${dOnly(u.elaqe)}</em>`:''}<br><small style="color:var(--muted);font-weight:700">+994 ${telHL(u.tel,q)}</small><br><small style="color:var(--muted)">Qeydiyyat: ${dOnly(u.qeyd)} · Son giriş: ${dOnly(u.son)}</small></span><a class="tbtn ed" style="text-decoration:none" href="tel:+994${t}">📞</a><a class="tbtn undo" href="https://wa.me/994${t}" target="_blank" rel="noopener" onclick="tWa('${t}')">💬</a><button class="tbtn${isPaid(u)?'':' undo'}" style="${isPaid(u)?'background:var(--line)':''}" onclick="tSet('elaqe','${t}',${!isPaid(u)})">${isPaid(u)?'↺ Ödənişi geri al':'💳 Ödəniş edib'}</button><button class="tbtn" style="${pr?'background:#FFD54A;border-color:#C99A10;color:#5C4300':'background:var(--card);border:1.5px solid #C99A10;color:#8A6500'}" onclick="tSet('premium','${t}',${!pr})">${pr?'👑 Premiumu götür':'👑 Premium et'}</button><button class="tbtn" style="${slN(u)?'background:#5B6CD9;border-color:#5B6CD9;color:#fff':'background:var(--card);border:1.5px solid #5B6CD9;color:#3B4796'}" onclick="TU.sl=TU.sl==='${t}'?'':'${t}';tUsers()">📚 PDF lüğət${slN(u)?' ('+slN(u)+')':''}</button>${TU.sl===u.tel?`<div style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:4px"><b style="font-size:13px;color:#3B4796">Açıq kitablar:</b>${SLUG.map(f=>{const on=(u.slug||[]).includes(f.id);return `<button class="tbtn" style="${on?'background:#5B6CD9;color:#fff;border:1.5px solid #5B6CD9':'background:var(--card);color:#3B4796;border:1.5px solid #5B6CD9'}" onclick="tSlug('${t}','${f.id}',${!on})">${on?'✓ ':''}${esc(f.t.split(' sinif')[0])}</button>`}).join('')}</div>`:''}<button class="tbtn ${u.blok?'undo':'rm'}" onclick="tSet('block','${t}',${!u.blok})">${u.blok?'✅ Bloku aç':'🚫 Blokla'}</button></div>`}).join('')+(rows.length?'':'<div class="empty">Bu filtrdə heç kim yoxdur.</div>')+`</div></div></div>`;
+  h+=`<div class="pbtns" style="margin-bottom:10px;align-items:center"><b>👥 Qrup:</b><select class="tgrp" onchange="TU.g=this.value;tUsers()"><option value="">Hamısı</option><option value="-"${TU.g==='-'?' selected':''}>Qrupsuz (${L.filter(u=>!u.grp).length})</option>${SGRP.map(g=>`<option value="${g}"${TU.g===g?' selected':''}>${g} (${L.filter(u=>u.grp===g).length})</option>`).join('')}</select></div>`;
+  const okG=u=>!TU.g||(TU.g==='-'?!u.grp:u.grp===TU.g);
+  const rows=L.filter(u=>q.trim()?uHit(u,q):((!TU.r||u.rol===TU.r)&&okF(u)&&okG(u))).sort((a,b)=>(+b.son||0)-(+a.son||0));
+  h+=`<div id="tuRes"><p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Göstərilir: ${rows.length}${q.trim()?' · 🔎 bütün istifadəçilər arasında axtarılır':''}</p><div class="tlist" id="tuList">`+rows.map(u=>{const t=esc(u.tel),pr=isPrem(u);return `<div class="titem${u.blok?' blk':''}" style="flex-wrap:wrap;${u.blok?'border-color:var(--rd);background:var(--rd-s)':''}"><span style="flex:1 1 220px;min-width:0"><b${isPaid(u)?' style="color:#1E8E4E"':''}>${isPaid(u)?'💳 ':''}${esc(u.ad)} ${esc(u.soyad)}</b> <em class="tedit" style="color:var(--bl);background:var(--bl-s)">${esc(u.rol||'')}</em>${pr?' <em class="tedit" style="color:#5C4300;background:#FFD54A">👑 Premium</em>':''}${u.grp?` <em class="tedit" style="color:#fff;background:#0E7C86">👥 ${esc(u.grp)}</em>`:''}${slN(u)?` <em class="tedit" style="color:#fff;background:#5B6CD9">📚 ${(u.slug||[]).map(x=>x.slice(1)).join(', ')}</em>`:''}${u.blok?' <em class="tedit" style="color:#fff;background:var(--rd)">🚫 Bloklanıb</em>':''}${isPaid(u)?` <em class="tedit" style="color:#fff;background:#1E8E4E;display:inline-block">💳 Ödəniş edib · ${dOnly(u.elaqe)}</em>`:''}<br><small style="color:var(--muted);font-weight:700">+994 ${telHL(u.tel,q)}</small><br><small style="color:var(--muted)">Qeydiyyat: ${dOnly(u.qeyd)} · Son giriş: ${dOnly(u.son)}</small></span><a class="tbtn ed" style="text-decoration:none" href="tel:+994${t}">📞</a><a class="tbtn undo" href="https://wa.me/994${t}" target="_blank" rel="noopener" onclick="tWa('${t}')">💬</a><button class="tbtn${isPaid(u)?'':' undo'}" style="${isPaid(u)?'background:var(--line)':''}" onclick="tSet('elaqe','${t}',${!isPaid(u)})">${isPaid(u)?'↺ Ödənişi geri al':'💳 Ödəniş edib'}</button><button class="tbtn" style="${pr?'background:#FFD54A;border-color:#C99A10;color:#5C4300':'background:var(--card);border:1.5px solid #C99A10;color:#8A6500'}" onclick="tSet('premium','${t}',${!pr})">${pr?'👑 Premiumu götür':'👑 Premium et'}</button><button class="tbtn" style="${slN(u)?'background:#5B6CD9;border-color:#5B6CD9;color:#fff':'background:var(--card);border:1.5px solid #5B6CD9;color:#3B4796'}" onclick="TU.sl=TU.sl==='${t}'?'':'${t}';tUsers()">📚 PDF lüğət${slN(u)?' ('+slN(u)+')':''}</button>${TU.sl===u.tel?`<div style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:4px"><b style="font-size:13px;color:#3B4796">Açıq kitablar:</b>${SLUG.map(f=>{const on=(u.slug||[]).includes(f.id);return `<button class="tbtn" style="${on?'background:#5B6CD9;color:#fff;border:1.5px solid #5B6CD9':'background:var(--card);color:#3B4796;border:1.5px solid #5B6CD9'}" onclick="tSlug('${t}','${f.id}',${!on})">${on?'✓ ':''}${esc(f.t.split(' sinif')[0])}</button>`}).join('')}</div>`:''}<select class="tgrp" aria-label="Qrup" onchange="tGrp('${t}',this.value)"><option value="">👥 Qrup yoxdur</option>${SGRP.map(g=>`<option${u.grp===g?' selected':''}>${g}</option>`).join('')}</select><button class="tbtn ${u.blok?'undo':'rm'}" onclick="tSet('block','${t}',${!u.blok})">${u.blok?'✅ Bloku aç':'🚫 Blokla'}</button></div>`}).join('')+(rows.length?'':'<div class="empty">Bu filtrdə heç kim yoxdur.</div>')+`</div></div></div>`;
   if(window._tqKeep&&document.getElementById('tuRes')){window._tqKeep=0;const T=document.createElement('div');T.innerHTML=h;document.getElementById('tuRes').innerHTML=T.querySelector('#tuRes').innerHTML;return}window._tqKeep=0;app.innerHTML=h;window.scrollTo(0,same?y:0);
 }
 /* one click: changes at once on screen (no question, no jump), then saves to the sheet; undone if saving fails */
@@ -9226,6 +9230,14 @@ async function tSlug(tel,b,v){
   }catch(e){u.slug=old;tUsers();const m=String(e&&e.message);tToast(m==='key'?'Cədvəl açarı səhvdir.':'Alınmadı. Google Cədvəlin skriptini yeniləmisiniz?')}
   tUsers();
 }
+const SGRP=['A1','A2','B1','B2','C1','C2','L 11','L 14','N 16.1','N 16.2','N 18.1','N 18.2'];
+async function tGrp(tel,g){
+  const key=lsGet('mnv-tkey','');if(!key){tToast('Əvvəlcə daxil olun.');return}
+  const u=(TU.list||[]).find(x=>String(x.tel)===String(tel));if(!u)return;const old=u.grp||'';u.grp=g;tUsers();
+  try{const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'grp',key,tel,v:g})});const o=await r.json();if(!o.ok)throw new Error(o.error||'x');
+    tToast(g?'👥 Qrupa yazıldı: '+g:'👥 Qrupdan çıxarıldı')}
+  catch(e){u.grp=old;tUsers();const m=String(e&&e.message);tToast(m==='key'?'Cədvəl açarı səhvdir.':'Alınmadı. Google Cədvəlin skriptini yeniləmisiniz?')}
+}
 async function tSet(a,tel,v){
   const key=lsGet('mnv-tkey','');
   if(!key){tToast('Əvvəlcə "Cədvəl açarı"nı daxil edin.');return}
@@ -9240,15 +9252,43 @@ async function tSet(a,tel,v){
   }catch(e){u[F]=old;if(oldX)TU.px.add(String(tel));tUsers();const m=String(e&&e.message);
     tToast(m==='key'?'Cədvəl açarı səhvdir.':'Alınmadı. Google Cədvəlin skriptini yeniləmisiniz?')}
 }
+/* 📊 Şagird Nəticələri: yalnız qrupa yazılmış şagirdlərin nəticələri (Google Cədvəl → "Nəticələr" və "Qrup …" vərəqləri) */
+const resKind=x=>/^Grammar/.test(x)?'Grammar':/^Reading/.test(x)?'Reading':/^Səhvlər|^Əmin olmadıq/.test(x)?'Səhvlər':'Vocabulary';
+function tResFilter(){
+  const L=(TU.res||[]).slice().sort((a,b)=>(+b.at||0)-(+a.at||0)),q=(TU.rq||'').toLowerCase().trim(),now=Date.now(),day=864e5;
+  const from=TU.rd==='1'?new Date(new Date().setHours(0,0,0,0)).getTime():TU.rd==='7'?now-7*day:TU.rd==='30'?now-30*day:0;
+  return L.filter(x=>(!TU.rg||x.grp===TU.rg)&&(!TU.rk||resKind(x.sec)===TU.rk)&&(+x.at||0)>=from&&(!q||[x.ad,x.soyad,x.tel,x.sec].join(' ').toLowerCase().includes(q)));
+}
 async function tResults(reload){
-  if(!TU.res||reload){app.innerHTML=hdr('Nəticələr','Yüklənir…','tHome()','bl');await tFetch('results')}
-  const L=(TU.res||[]).slice().sort((a,b)=>(+b.at||0)-(+a.at||0)),q=TU.q.toLowerCase();
-  let h=hdr('Nəticələr',L.length+' nəticə','tHome()','bl')+`<div style="${colorVars('bl')}">`;
+  if(!TU.res||reload){app.innerHTML=hdr('Şagird Nəticələri','Yüklənir…','tHome()','bl');await tFetch('res')}
+  const all=TU.res||[],rows=tResFilter();
+  let h=hdr('Şagird Nəticələri',all.length+' nəticə · yalnız qrupdakı şagirdlər','tHome()','bl')+`<div style="${colorVars('bl')}">`;
   if(TU.err)h+=`<p class="tmsg" style="color:var(--rd)">${esc(TU.err)}</p>`;
-  h+=`<div class="pbtns" style="margin-bottom:10px"><button class="pbtn" style="background:var(--bl)" onclick="tResults(true)">↻ Yenilə</button></div><input class="tsearch" placeholder="Axtar: ad, soyad, bölmə…" value="${esc(TU.q)}" oninput="TU.q=this.value;clearTimeout(window._tq);window._tq=setTimeout(()=>{tResults();const i=document.querySelector('.tsearch');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},250)" style="width:100%;font:inherit;font-size:16px;font-weight:700;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin-bottom:10px">`;
-  const rows=L.filter(x=>!q||[x.ad,x.soyad,x.sec].join(' ').toLowerCase().includes(q)).slice(0,400);
-  h+=`<div class="tlist">`+rows.map(x=>`<div class="titem"><span><b>${esc(x.ad)} ${esc(x.soyad)}</b><br><small style="color:var(--muted);font-weight:700">${esc(x.sec)} · ${dOnly(x.at)}</small></span><span class="badge" style="flex:none;background:${(+x.p)>=80?'var(--ok-s)':(+x.p)>=50?'var(--or-s)':'var(--rd-s)'};color:${(+x.p)>=80?'var(--ok)':(+x.p)>=50?'var(--or)':'var(--rd)'}">${esc(x.p)}%</span></div>`).join('')+(rows.length?'':'<div class="empty">Hələ nəticə yoxdur.</div>')+`</div></div>`;
-  app.innerHTML=h;
+  const sel=(v,js,opts)=>`<select class="tgrp" onchange="${js}">`+opts.map(([k,l])=>`<option value="${k}"${v===k?' selected':''}>${l}</option>`).join('')+`</select>`;
+  h+=`<div class="pbtns" style="margin-bottom:8px;align-items:center"><button class="pbtn" style="background:var(--bl)" onclick="tResults(true)">↻ Yenilə</button><button class="pbtn" style="background:#1E8E4E" onclick="tXlsx()">⬇ Excel</button></div>`;
+  h+=`<div class="pbtns" style="margin-bottom:8px;align-items:center">`+sel(TU.rg||'',"TU.rg=this.value;tResults()",[['','👥 Bütün qruplar'],...SGRP.map(g=>[g,g+' ('+all.filter(x=>x.grp===g).length+')'])])+sel(TU.rk||'',"TU.rk=this.value;tResults()",[['','📚 Bütün bölmələr'],['Vocabulary','Vocabulary'],['Grammar','Grammar'],['Reading','Reading'],['Səhvlər','Səhvlər / təkrar']])+sel(TU.rd||'',"TU.rd=this.value;tResults()",[['','📅 Bütün vaxt'],['1','Bu gün'],['7','Son 7 gün'],['30','Son 30 gün']])+`</div>`;
+  h+=`<input class="tsearch" placeholder="Axtar: ad, soyad, nömrə, bölmə…" value="${esc(TU.rq||'')}" oninput="TU.rq=this.value;clearTimeout(window._tq);window._tq=setTimeout(()=>{tResults();const i=document.querySelector('.tsearch');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},250)" style="width:100%;font:inherit;font-size:16px;font-weight:700;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin-bottom:10px">`;
+  h+=`<div class="pbtns" style="margin-bottom:10px">${[['list','📋 Siyahı'],['stu','🎓 Şagirdlər üzrə']].map(([k,l])=>`<button class="pbtn${(TU.rv||'list')===k?'':' gh'}" style="${(TU.rv||'list')===k?'background:var(--bl)':''}" onclick="TU.rv='${k}';tResults()">${l}</button>`).join('')}</div>`;
+  const pc=p=>(+p)>=80?['var(--ok-s)','var(--ok)']:(+p)>=50?['var(--or-s)','var(--or)']:['var(--rd-s)','var(--rd)'];
+  if((TU.rv||'list')==='stu'){
+    const M={};rows.forEach(x=>{const k=x.tel;(M[k]||(M[k]={ad:x.ad,soyad:x.soyad,grp:x.grp,n:0,s:0,last:0})).n++;M[k].s+=+x.p||0;M[k].last=Math.max(M[k].last,+x.at||0)});
+    const S=Object.values(M).sort((a,b)=>(a.grp+a.ad).localeCompare(b.grp+b.ad,'az'));
+    h+=`<p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Şagird: ${S.length}</p><div class="tlist">`+S.map(x=>{const av=Math.round(x.s/x.n),[bg,fg]=pc(av);return `<div class="titem"><span><b>${esc(x.ad)} ${esc(x.soyad)}</b> <em class="tedit" style="color:#fff;background:#0E7C86">👥 ${esc(x.grp)}</em><br><small style="color:var(--muted);font-weight:700">${x.n} test · son: ${dOnly(x.last)}</small></span><span class="badge" style="flex:none;background:${bg};color:${fg}">orta ${av}%</span></div>`}).join('')+(S.length?'':'<div class="empty">Bu filtrdə nəticə yoxdur.</div>')+`</div>`;
+  }else{
+    h+=`<p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Göstərilir: ${Math.min(rows.length,400)}${rows.length>400?' / '+rows.length+' (hamısı Excel-dədir)':''}</p><div class="tlist">`+rows.slice(0,400).map(x=>{const [bg,fg]=pc(x.p);return `<div class="titem"><span><b>${esc(x.ad)} ${esc(x.soyad)}</b> <em class="tedit" style="color:#fff;background:#0E7C86">👥 ${esc(x.grp)}</em><br><small style="color:var(--muted);font-weight:700">${esc(x.sec)} · ${dOnly(x.at)} · ${esc(x.r)}/${esc(x.n)}</small>${x.w?`<br><small style="color:var(--rd);font-weight:700">Səhvlər: ${esc(x.w)}</small>`:''}</span><span class="badge" style="flex:none;background:${bg};color:${fg}">${esc(x.p)}%</span></div>`}).join('')+(rows.length?'':`<div class="empty">${all.length?'Bu filtrdə nəticə yoxdur.':'Hələ nəticə yoxdur. Şagirdi «İstifadəçilər» bölməsində qrupa yazın — bundan sonrakı nəticələri bura avtomatik düşəcək.'}</div>`)+`</div>`;
+  }
+  app.innerHTML=h+'</div>';
+}
+/* ⬇ Excel: "Ümumi" vərəqi + hər qrup ayrıca vərəqdə (seçilmiş filtrlərlə) */
+function xlsxLib(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';sc.onload=()=>ok(window.XLSX);sc.onerror=no;document.head.appendChild(sc)})}
+async function tXlsx(){
+  const rows=tResFilter();if(!rows.length){tToast('Excel üçün nəticə yoxdur.');return}
+  tToast('Excel hazırlanır…');let X;try{X=await xlsxLib()}catch(e){tToast('Excel alınmadı. İnterneti yoxlayın.');return}
+  const H=['Tarix','Qrup','Ad','Soyad','Telefon','Bölmə','Düz','Sual','Faiz %','Səhvlər'];
+  const conv=L=>[H,...L.slice().sort((a,b)=>(+a.at||0)-(+b.at||0)).map(x=>[dOnly(x.at),x.grp,x.ad,x.soyad,'+994'+x.tel,x.sec,+x.r||0,+x.n||0,+x.p||0,x.w||''])];
+  const wb=X.utils.book_new(),add=(L,n)=>{const ws=X.utils.aoa_to_sheet(conv(L));ws['!cols']=[{wch:17},{wch:8},{wch:14},{wch:16},{wch:15},{wch:46},{wch:6},{wch:6},{wch:7},{wch:40}];X.utils.book_append_sheet(wb,ws,n)};
+  add(rows,'Ümumi');SGRP.forEach(g=>{const L=rows.filter(x=>x.grp===g);if(L.length)add(L,'Qrup '+g.replace(/[\\\/?*\[\]:]/g,'-'))});
+  const d=new Date();X.writeFile(wb,`Sagird-neticeleri-${z2(d.getDate())}.${z2(d.getMonth()+1)}.${d.getFullYear()}.xlsx`);
 }
 
 /* ---------- boot ---------- */
@@ -9307,7 +9347,7 @@ const pendN=()=>{let n=0;for(const x of PEND)if(!DEL.has(x))n++;for(const x of D
 function tBar(){const n=pendN();return `<div class="tbar" style="${colorVars('bl')}"><span>${n?`Saxlanmamış dəyişiklik: <b>${n}</b>`:'Dəyişiklik yoxdur'}</span><button class="btn sm" ${n?'':'disabled'} onclick="tSave()">Yadda saxla</button></div>${TMSG?`<p class="tmsg">${esc(TMSG)}</p>`:''}`}
 function tNote(){app.innerHTML=hdr('💡 Bilirdinizmi?','Yazdığınız qeyd hamının ana səhifəsində, yuxarı sağ küncdə görünür','tHome()','bl')+dnEditorHTML();dnBind();window.scrollTo(0,0)}
 function tHome(){
-  let h=hdr('Müəllim paneli','Bölməni seçin','home()','bl')+tBar()+`<div class="list" style="${colorVars('bl')};margin-bottom:14px"><button class="row" onclick="TU.q='';tUsers()"><div><div class="t">👥 İstifadəçilər</div><div class="s">Qeydiyyatdan keçənlər · zəng və WhatsApp</div></div></button><button class="row" onclick="tFb()"><div><div class="t">✍️ Rəy və təkliflər</div><div class="s">İstifadəçilərin yazdıqları · nömrə ilə</div></div></button><button class="row" onclick="tNote()"><div><div class="t">💡 Bilirdinizmi? · Günün qeydi</div><div class="s">${dnOn(DNOTE)?'Hamıda göstərilir ✓':'Hazırda gizlidir — yazın və göstərin'}</div></div></button><button class="row" onclick="tLogout()"><div><div class="t">🚪 Bu cihazdan çıxış</div><div class="s">Paneli bu telefonda bağla · yenidən girmək üçün şifrə lazım olacaq</div></div></button></div><p class="tnote">Sildiyiniz sual bütün şagirdlərdən gizlədilir. Növbəti dəfə söz əlavə olunanda həmin task yenidən tam doldurulur və əvvəl onu bitirmiş şagirdlərdə qırmızı görünür.</p><div class="list" style="${colorVars('bl')}">`;
+  let h=hdr('Müəllim paneli','Bölməni seçin','home()','bl')+tBar()+`<div class="list" style="${colorVars('bl')};margin-bottom:14px"><button class="row" onclick="TU.q='';tUsers()"><div><div class="t">👥 İstifadəçilər</div><div class="s">Qeydiyyatdan keçənlər · zəng və WhatsApp</div></div></button><button class="row" onclick="TU.rq='';tResults()"><div><div class="t">📊 Şagird Nəticələri</div><div class="s">Qruplar üzrə · filtrlər · Excel</div></div></button><button class="row" onclick="tFb()"><div><div class="t">✍️ Rəy və təkliflər</div><div class="s">İstifadəçilərin yazdıqları · nömrə ilə</div></div></button><button class="row" onclick="tNote()"><div><div class="t">💡 Bilirdinizmi? · Günün qeydi</div><div class="s">${dnOn(DNOTE)?'Hamıda göstərilir ✓':'Hazırda gizlidir — yazın və göstərin'}</div></div></button><button class="row" onclick="tLogout()"><div><div class="t">🚪 Bu cihazdan çıxış</div><div class="s">Paneli bu telefonda bağla · yenidən girmək üçün şifrə lazım olacaq</div></div></button></div><p class="tnote">Sildiyiniz sual bütün şagirdlərdən gizlədilir. Növbəti dəfə söz əlavə olunanda həmin task yenidən tam doldurulur və əvvəl onu bitirmiş şagirdlərdə qırmızı görünür.</p><div class="list" style="${colorVars('bl')}">`;
   for(const s in SECS){if(s==='rq'||s==='tv')continue;const o=SECS[s];let d=0;for(const x of PEND)if(IDX[x]&&IDX[x].s===s)d++;h+=`<button class="row" onclick="tLevels('${s}')"><div><div class="t" style="color:var(--${o.c})">${o.n}</div><div class="s">${esc(o.az)}</div></div><span class="badge">${d} silinib</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }

@@ -1,6 +1,6 @@
 /* My New Vocabulary · Google Cədvəl skripti (Apps Script)
    Bu cədvəldə yalnız istifadəçilər (qeydiyyat, son giriş, blok, ödəniş, 👑 premium) və müəllim düzəlişləri saxlanılır.
-   Nəticələr cədvələ YAZILMIR. Premium yalnız bu saytındır (English 5–11-dən asılı deyil).
+   Nəticələr yalnız QRUPA yazılmış şagirdlər üçün yazılır: "Nəticələr" (ümumi) və "Qrup A1" kimi qrup vərəqləri. Premium yalnız bu saytındır (English 5–11-dən asılı deyil).
    Köhnə "Qeydiyyat" vərəqindəki istifadəçilər avtomatik "Users" vərəqinə köçürülür; köhnə vərəqlər silinmir.
    Yeniləmək: Deploy → Manage deployments → ✏️ → Version: New version → Deploy (link dəyişmir). */
 const KEY = 'BURAYA-OZ-ACARINIZI-YAZIN';
@@ -24,7 +24,9 @@ function out(o) {
 }
 
 /* ---------- Users vərəqi (oxunaqlı başlıqlar, tarixlər, blok qutucuqları) ---------- */
-const UL = ['Telefon', 'Ad', 'Soyad', 'Rol', 'Qeydiyyat tarixi', 'Son giriş', 'Bloklanıb', 'Sayt', 'Əlaqə saxlanılıb', 'Premium', 'PDF lüğət'];
+const UL = ['Telefon', 'Ad', 'Soyad', 'Rol', 'Qeydiyyat tarixi', 'Son giriş', 'Bloklanıb', 'Sayt', 'Əlaqə saxlanılıb', 'Premium', 'PDF lüğət', 'Qrup'];
+/* 👥 qruplar (müəllim panelində şagirdə verilir) */
+const GROUPS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'L 11', 'L 14', 'N 16.1', 'N 16.2', 'N 18.1', 'N 18.2'];
 const DF = 'dd.mm.yyyy hh:mm';
 const isTrue = x => x === true || /^(true|bəli|beli|yes|1|blok)$/i.test(String(x).trim());
 const ms = x => x instanceof Date ? x.getTime() : (+x || '');
@@ -44,7 +46,8 @@ function colMap(hv) {
     k => k === 'sayt' || k === 'site',
     k => k === 'elaqe' || k.startsWith('əlaqə') || k.startsWith('elaqe'),
     k => k === 'prem' || k.startsWith('premium'),
-    k => k === 'slug' || k.startsWith('pdf')];
+    k => k === 'slug' || k.startsWith('pdf'),
+    k => k === 'qrup' || k === 'group' || k === 'grp'];
   return T.map(f => h.findIndex(f));
 }
 /* başqa vərəqlərdə qalmış köhnə istifadəçiləri Users-ə köçürür (təkrarlamadan) */
@@ -54,7 +57,7 @@ function usersImport(s) {
   const add = [];
   ss.getSheets().forEach(sh => {
     const nm = sh.getName();
-    if (/^users/i.test(nm) || /config|results/i.test(nm) || sh.getLastRow() < 2 || sh.getLastColumn() < 1) return;
+    if (/^users/i.test(nm) || /config|results|nəticə|qrup|rəy/i.test(nm) || sh.getLastRow() < 2 || sh.getLastColumn() < 1) return;
     const v = sh.getDataRange().getValues(), idx = colMap(v[0]);
     if (idx[0] < 0 || idx[1] < 0) return;
     v.slice(1).forEach(r => {
@@ -101,13 +104,13 @@ function usersFix(s) {
   s.getRange(2, 9, n, 1).setNumberFormat(DF);
   s.getRange(2, 7, n, 1).insertCheckboxes();
   s.getRange(2, 10, n, 1).insertCheckboxes();
-  s.getRange(2, 11, n, 1).removeCheckboxes().setNumberFormat('@');
+  s.getRange(2, 11, n, 2).removeCheckboxes().setNumberFormat('@');
 }
 function usersRows(s) {
   usersImport(s);
   usersFix(s);
   const v = s.getDataRange().getValues(); v.shift();
-  return v.filter(r => r[0] !== '').map(r => ({ tel: String(r[0]), ad: r[1], soyad: r[2], rol: r[3], qeyd: ms(r[4]), son: ms(r[5]), blok: isTrue(r[6]), sayt: r[7], elaqe: ms(r[8]), prem: isTrue(r[9]), slug: slugList(r[10]) }));
+  return v.filter(r => r[0] !== '').map(r => ({ tel: String(r[0]), ad: r[1], soyad: r[2], rol: r[3], qeyd: ms(r[4]), son: ms(r[5]), blok: isTrue(r[6]), sayt: r[7], elaqe: ms(r[8]), prem: isTrue(r[9]), slug: slugList(r[10]), grp: String(r[11] || '') }));
 }
 function userRow(s, tel) {
   const n = s.getLastRow();
@@ -120,17 +123,17 @@ function userPing(o, now) {
   const s = usersSheet();
   const r = userRow(s, o.tel);
   if (!r) {
-    s.appendRow(["'" + (o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', new Date(+o.qeyd || now), new Date(now), false, o.sayt || '', '', false, '']);
+    s.appendRow(["'" + (o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', new Date(+o.qeyd || now), new Date(now), false, o.sayt || '', '', false, '', '']);
     const lr = s.getLastRow();
     s.getRange(lr, 5, 1, 2).setNumberFormat(DF);
     s.getRange(lr, 7).insertCheckboxes();
     s.getRange(lr, 10).insertCheckboxes();
     return { ok: true, blok: false, prem: false };
   }
-  const val = s.getRange(r, 1, 1, 11).getValues()[0];
+  const val = s.getRange(r, 1, 1, 12).getValues()[0];
   s.getRange(r, 2, 1, 3).setValues([[o.ad || val[1], o.soyad || val[2], o.rol || val[3]]]);
   s.getRange(r, 6).setValue(new Date(now)).setNumberFormat(DF);
-  return { ok: true, blok: isTrue(val[6]), prem: isTrue(val[9]) };
+  return { ok: true, blok: isTrue(val[6]), prem: isTrue(val[9]), grp: String(val[11] || '') };
 }
 function userSet(o, now) {
   const s = usersSheet();
@@ -138,6 +141,12 @@ function userSet(o, now) {
   if (!r) return { ok: false, error: 'tel' };
   if (o.a === 'block') { s.getRange(r, 7).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
   if (o.a === 'premium') { s.getRange(r, 10).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
+  if (o.a === 'grp') { /* 👥 qrup: '' = qrupsuz */
+    const g = String(o.v || '');
+    if (g && !GROUPS.includes(g)) return { ok: false, error: 'g' };
+    s.getRange(r, 12).setNumberFormat('@').setValue(g);
+    return { ok: true, grp: g };
+  }
   if (o.a === 'slug') { /* 📚 hər kitab ayrıca: "g5,g8" */
     const c = s.getRange(r, 11), set = new Set(slugList(c.getValue()));
     const b = String(o.b || '');
@@ -149,6 +158,39 @@ function userSet(o, now) {
   }
   s.getRange(r, 9).setValue(o.v ? new Date(now) : '').setNumberFormat(DF);
   return { ok: true, t: o.v ? now : '' };
+}
+
+/* 📊 Şagird nəticələri: "Nəticələr" (hamısı) + "Qrup …" (hər qrup ayrıca). Açar sütunu (telefon|vaxt) təkrarı önləyir. */
+const RL = ['Tarix', 'Qrup', 'Telefon', 'Ad', 'Soyad', 'Bölmə', 'Düz', 'Sual', 'Faiz', 'Səhvlər', 'Açar'];
+function resSheet(name) {
+  const ss = SpreadsheetApp.getActive();
+  let s = ss.getSheetByName(name);
+  if (!s) { s = ss.insertSheet(name); s.appendRow(RL); s.getRange(1, 1, 1, RL.length).setFontWeight('bold'); s.setFrozenRows(1); s.setColumnWidth(6, 320); s.setColumnWidth(10, 260); }
+  return s;
+}
+function resAdd(o, now) {
+  const us = usersSheet(), r = userRow(us, o.tel);
+  if (!r) return { ok: true, grp: '' };
+  const v = us.getRange(r, 1, 1, 12).getValues()[0], g = String(v[11] || '');
+  if (!g || isTrue(v[6])) return { ok: true, grp: g }; /* qrupsuz və ya bloklanmış: yazılmır */
+  const all = resSheet('Nəticələr'), gs = resSheet('Qrup ' + g);
+  const list = (Array.isArray(o.list) ? o.list : []).slice(0, 50);
+  const rows = [];
+  list.forEach(e => {
+    const at = +e.at || now, key = String(o.tel) + '|' + at;
+    if (all.getLastRow() > 1 && all.getRange(2, 11, all.getLastRow() - 1, 1).createTextFinder(key).matchEntireCell(true).findNext()) return;
+    rows.push([new Date(at), g, "'" + String(o.tel), v[1], v[2], String(e.sec || '').slice(0, 200), +e.r || 0, +e.n || 0, +e.p || 0, (Array.isArray(e.w) ? e.w : []).slice(0, 30).join(', '), key]);
+  });
+  if (rows.length) {
+    [all, gs].forEach(s => { const lr = s.getLastRow() + 1; s.getRange(lr, 1, rows.length, RL.length).setValues(rows); s.getRange(lr, 1, rows.length, 1).setNumberFormat(DF); });
+  }
+  return { ok: true, grp: g, added: rows.length };
+}
+function resRows() {
+  const s = SpreadsheetApp.getActive().getSheetByName('Nəticələr');
+  if (!s || s.getLastRow() < 2) return [];
+  const n = s.getLastRow() - 1, from = Math.max(0, n - 5000);
+  return s.getRange(2 + from, 1, n - from, RL.length).getValues().map(r => ({ at: ms(r[0]), grp: String(r[1]), tel: String(r[2]), ad: r[3], soyad: r[4], sec: String(r[5]), r: r[6], n: r[7], p: r[8], w: String(r[9] || '') }));
 }
 
 /* Müəllim düzəlişləri (silinən / düzəldilən tapşırıqlar): Config vərəqinin A1 xanasında bir JSON */
@@ -178,6 +220,7 @@ function doGet(e) {
   if (p.key !== KEY) return out({ error: 'key' });
   if (p.a === 'users') return out({ rows: usersRows(usersSheet()) });
   if (p.a === 'fbs') return out({ rows: fbRows() });
+  if (p.a === 'res') return out({ rows: resRows() });
   if (p.a === 'plist') return out({ tels: usersRows(usersSheet()).filter(u => u.prem).map(u => u.tel) });
   return out({ error: 'a' });
 }
@@ -198,6 +241,7 @@ function doPost(e) {
       return out({ ok: true, key: KEY });
     }
     if (o.a === 'ping') return out(userPing(o, now));
+    if (o.a === 'res') return out(resAdd(o, now)); /* 📊 nəticə: yalnız qrupa yazılmış şagirdin nəticəsi saxlanılır */
     if (o.a === 'pq') { /* şagirdin premium yoxlaması (Missions) */
       const s = usersSheet(), r = userRow(s, o.tel);
       return out({ ok: true, prem: r ? isTrue(s.getRange(r, 10).getValue()) : false });
@@ -217,7 +261,7 @@ function doPost(e) {
       return out({ ok: true, keys: slugKeys(slugList(s.getRange(r, 11).getValue())) });
     }
     if (o.key !== KEY) return out({ ok: false, error: 'key' });
-    if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium' || o.a === 'slug') return out(userSet(o, now));
+    if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium' || o.a === 'slug' || o.a === 'grp') return out(userSet(o, now));
     if (o.a === 'cfg') { cfgSheet().getRange('A1').setNumberFormat('@').setValue(JSON.stringify(o.state || {})); return out({ ok: true }); }
     return out({ ok: false, error: 'a' });
   } finally {
