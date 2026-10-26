@@ -8122,7 +8122,7 @@ function home(){
   h+=mb('📚','Vocabulary','Sözlər, testlər, kartlar',wN+' söz','tq','vocabHome()');
   h+=mb('📖','Reading','Mətnlər və suallar',RLV.reduce((u,L)=>u+(READ[L]||[]).length,0)+' mətn','in','readHome()');
   h+=mb('✍️','Paragraph','Nümunə paraqraflar',Object.keys(ST.pa||{}).length+'/'+PARA.length,'te','paraHome()');
-  h+=mb('🧩','Grammar','Qrammatika testləri',typeof GRAM!=='undefined'&&GRAM.blocks?GRAM.blocks.length+' blok':'Tezliklə','pu','grammarHome()');
+  h+=mb('🧩','Grammar','10 mövzu · 2437 test','130 blok','pu','grammarHome()');
   h+=mb('❗','Səhvlərim','Səhv cavab verdiklərin',String(m),'rd','mistakes()');
   h+=mb('🏆','Ümumi Sınaqlar','Siniflər üzrə sınaqlar','Tezliklə','am','examsHome()');
   h+=`</div>`;
@@ -8149,7 +8149,7 @@ function vocabHome(){
 const VSECS=['words','syn','ant','def','gap','mk'];
 /* ---------- 🧩 Grammar (müvəqqəti: testlər Mərhələ 3-də əlavə olunur) ---------- */
 function grammarHome(){
-  if(typeof gHome==='function')return gHome();
+  location.href='grammar/';return;
   V={};app.innerHTML=hdr('Grammar','Qrammatika testləri','home()','pu')+`<div style="${colorVars('pu')}"><div class="empty">🧩 Qrammatika testləri tezliklə burada olacaq.</div></div>`;window.scrollTo(0,0);
 }
 /* ---------- 🏆 Ümumi Sınaqlar ---------- */
