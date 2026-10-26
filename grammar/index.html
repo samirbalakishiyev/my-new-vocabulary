@@ -310,6 +310,7 @@ function mvLog(r, topic){ const o = MV.st(); if (o.log.some(e => e.at === r.ts))
 }
 function mvSendBox(r){
   const el = document.getElementById('res-send'); if (!el) return; if (!r || r.mist){ el.innerHTML = ''; return; }
+  if (MV.get('mnv-grp', '')){ el.innerHTML = '<p class="muted small" style="text-align:center;font-weight:700;color:#0E7C86">✓ Nəticən yadda saxlanılır və müəllimə avtomatik çatır</p>'; return; }
   const P = MV.pr(), o = MV.st(), cur = o.log.find(e => e.at === r.ts);
   if (!cur){ el.innerHTML = ''; return; }
   if (!P){ el.innerHTML = '<p class="muted small" style="text-align:center">Nəticəni müəllimə göndərmək üçün My New Vocabulary-nin ana səhifəsində «Nəticəni müəllimə göndər» bölməsini doldur.</p>'; return; }
