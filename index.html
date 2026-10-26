@@ -9076,6 +9076,22 @@ function meSave(){
   REG={...REG,ad,soyad};lsSet('mnv-reg2',REG);LASTPING=0;syncPing();home();
   try{tToast('✅ Adın yadda saxlandı')}catch(e){}
 }
+/* 📱 qeydiyyatda müəllimin nömrəsini yazan şagird öz nömrəsini yazır (adı və nəticələri telefonda qalır) */
+let TFERR='';
+function telFix(){
+  V={};const t='My New Vocabulary'.split('').map((ch,i)=>ch===' '?' ':`<span class="c${i%5}">${ch}</span>`).join('');
+  let h=`<header class="brand"><h1 class="logo">${t}</h1></header><section class="prof" style="${colorVars('rd')};border-color:var(--rd)"><h3 style="color:var(--rd)">📱 Öz nömrənizi yazın</h3><p class="info"><b>${esc((REG.ad||'')+' '+(REG.soyad||''))}</b>, qeydiyyatda <b>Samir müəllimin nömrəsini</b> yazmısınız. Müəllim sizi tanısın deyə öz telefon nömrənizi yazın. Nəticələriniz və öyrəndikləriniz itməyəcək.</p><div class="pf">`;
+  h+=`<label>Sizin telefon nömrəniz<div class="tel"><span>+994</span><input id="tf_tel" inputmode="numeric" maxlength="12" placeholder="55 123 45 67" oninput="regTel(this)"></div></label>`;
+  h+=`<p class="perr">${esc(TFERR)}</p><button class="btn" style="background:var(--tq);margin-top:0" onclick="telFixSave()">Yadda saxla və davam et →</button></div><p class="info" style="text-align:center;margin-top:10px"><button class="pbtn gh" onclick="teacher()">Mən Samir müəlliməm</button></p></section>`;
+  TFERR='';app.innerHTML=h;window.scrollTo(0,0);
+}
+function telFixSave(){
+  const tel=normTel((document.getElementById('tf_tel')||{}).value||'');
+  if(!telOK(tel)){TFERR='Telefon nömrəsi düzgün deyil. Nümunə: 55 123 45 67';return telFix()}
+  if(tel===SAMIR_TEL){TFERR='Bu, Samir müəllimin nömrəsidir. Öz nömrənizi yazın.';return telFix()}
+  REG={...REG,tel,at:Date.now()};lsSet('mnv-reg2',REG);lsSet('mnv-grp','');lsSet('mnv-nm','');lsSet('mnv-blok',0);lsSet('mnv-fbs',null);
+  LASTPING=0;boot();
+}
 function regTel(el){let d=el.value.replace(/\D/g,'');if(d.startsWith('994'))d=d.slice(3);if(d.startsWith('0'))d=d.slice(1);d=d.slice(0,9);el.value=[d.slice(0,2),d.slice(2,5),d.slice(5,7),d.slice(7,9)].filter(Boolean).join(' ')}
 function regRead(){['rg_ad','rg_soyad','rg_tel'].forEach(k=>{const e=document.getElementById(k);if(e)RG[k]=e.value})}
 function regSubmit(){
@@ -9085,6 +9101,7 @@ function regSubmit(){
   if(!ad)err='Adınızı yazın.';else if(!soyad)err='Soyadınızı yazın.';
   else if(!RG.rol)err='Tələbə və ya Müəllim düyməsini seçin.';
   else if(!telOK(tel))err='Telefon nömrəsi düzgün deyil. Nümunə: 55 123 45 67';
+  else if(tel===SAMIR_TEL&&!lsGet('mnv-tkey',''))err='Bu, Samir müəllimin nömrəsidir. Öz telefon nömrənizi yazın.';
   if(err){RG.err=err;regScreen();return}
   REG={ad,soyad,tel,rol:RG.rol,at:Date.now()};
   lsSet('mnv-reg2',REG);
@@ -9447,6 +9464,7 @@ async function tXlsx(){
 /* ---------- boot ---------- */
 function boot(){
   if(!REG){regScreen();cfgPull();return}
+  if(String(REG.tel)===SAMIR_TEL&&!lsGet('mnv-tkey','')){telFix();cfgPull();return} /* şagird səhvən müəllimin nömrəsini yazıb */
   if(lsGet('mnv-blok',0)){blockScreen();syncPing();return}
   lsSet('mnv-visits',lsGet('mnv-visits',0)+1);
   home();LASTPING=Date.now();syncPing();cfgPull();setTimeout(fbSync,1500);
