@@ -324,6 +324,23 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .wexp{margin:12px 0 0;padding:14px 16px;border-radius:16px;background:var(--card);border:2px solid var(--rd,#E5484D);display:grid;gap:10px}.wexr{display:grid;gap:3px}.wexr>b{font-size:13px;color:var(--muted);text-transform:none}.wexr>span{font-size:17px}.wnext{width:100%;margin-top:4px}
 .credit{flex-wrap:wrap!important;row-gap:6px}.dn-x{overflow-wrap:anywhere}.dn-a{color:inherit;font-weight:900;text-decoration:underline;text-underline-offset:3px;word-break:break-all}.dn-cp{display:inline-flex;align-items:center;gap:4px;margin:2px 0;padding:3px 10px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:inherit;font:inherit;font-size:13px;font-weight:900;cursor:pointer;vertical-align:middle}.applink{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font:inherit;font-weight:800;font-size:14px;cursor:pointer;border:1.5px solid #3B7DD8;background:#E3EDFB;color:#2A63B5}
+.mgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+@media (min-width:640px){.mgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+.mtile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-height:118px;padding:14px;border-radius:20px;background:var(--s);border:2px solid transparent;color:var(--ink);font:inherit;cursor:pointer;transition:transform .12s,border-color .12s;min-width:0}
+.mtile:hover{border-color:var(--c)}.mtile:active{transform:scale(.98)}
+.mtile .mic{font-size:28px;line-height:1;margin-bottom:6px}
+.mtile .mt{font-size:19px;font-weight:900;color:var(--c);line-height:1.15}
+.mtile .ms{font-size:13px;font-weight:700;color:var(--muted);line-height:1.3}
+.mtile .mb{margin-top:auto;padding-top:6px;font-size:13px;font-weight:900;color:var(--c)}
+.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:640px){.vgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.vtile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-height:92px;padding:12px;border-radius:16px;background:var(--s);border:2px solid transparent;color:var(--ink);font:inherit;cursor:pointer;min-width:0}
+.vtile:hover{border-color:var(--c)}.vtile:disabled{opacity:.6;cursor:default}
+.vtile .vt{font-size:16.5px;font-weight:900;color:var(--c);line-height:1.15}
+.vtile .vs{font-size:12.5px;font-weight:700;color:var(--muted);line-height:1.3}
+.vtile .vb{margin-top:auto;padding-top:4px;font-size:12.5px;font-weight:900;color:var(--c)}
+.soon{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:16px;border-radius:18px;background:var(--s);border:2px dashed var(--c);text-align:left;font:inherit;color:var(--ink);cursor:pointer;min-width:0}
+.soon b{font-size:20px;font-weight:900;color:var(--c)}.soon em{font-style:normal;font-size:12px;font-weight:900;color:#fff;background:var(--c);border-radius:999px;padding:2px 10px}
 </style>
 </head>
 <body>
@@ -8095,23 +8112,59 @@ const lvName=l=>(LV.find(x=>x[0]===l)||[0,(TV[l]&&TV[l].n)||l])[1];
 function home(){
   V={};const k=Object.keys(ST.known).filter(live).length,m=Object.keys(ST.mist).filter(live).length;
   const t='My New Vocabulary'.split('').map((ch,i)=>ch===' '?' ':`<span class="c${i%5}">${ch}</span>`).join('');
-  let h=`<div class="dn-host topbar${dnOn(DNOTE)?' has-note':''}"><div class="tb-l"><header class="brand"><h1 class="logo">${t}</h1></header><div class="credit"><span>Created by <b>Samir Balakishiyev</b></span><a class="wa" href="https://wa.me/994557958625" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>055 795 86 25</a><button type="button" class="applink" data-cp="https://samirbalakishiyev.github.io/my-new-vocabulary/">🔗 Proqramın linki</button></div></div><div class="dnote-slot">${dnHTML()}</div></div>`+a2hsTip()+profHTML()+`<button class="fbbtn" onclick="fbHome()">✍️ Rəy və təklifləriniz <span>— yazın, oxuyuruq</span></button><div class="grid hgrid">`;
+  let h=`<div class="dn-host topbar${dnOn(DNOTE)?' has-note':''}"><div class="tb-l"><header class="brand"><h1 class="logo">${t}</h1></header><div class="credit"><span>Created by <b><span onclick="teacher()">S</span>amir Balakishiyev</b></span><a class="wa" href="https://wa.me/994557958625" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>055 795 86 25</a><button type="button" class="applink" data-cp="https://samirbalakishiyev.github.io/my-new-vocabulary/">🔗 Proqramın linki</button></div></div><div class="dnote-slot">${dnHTML()}</div></div>`+a2hsTip()+profHTML()+`<button class="fbbtn" onclick="fbHome()">✍️ Rəy və təklifləriniz <span>— yazın, oxuyuruq</span></button><div class="grid hgrid">`;
   const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0);
   h+=`<a class="tile wide" href="links/" style="${colorVars('tq')};text-decoration:none"><div><h2>🔗 Faydalı linklər</h2><p>YouTube videoları və kanallar</p></div><span class="badge" style="margin-left:auto">YouTube</span></a>`;
   h+=`<a class="tile wide" href="missions/" style="background:linear-gradient(135deg,#FFE680,#FFC22E);border-color:#C99A10;color:#3B2A00;text-decoration:none"><div><h2 style="color:#3B2A00">👑 Mr. Samir's Missions</h2><p style="color:#5C4300">A2–B1 · Task 1 pulsuz</p></div><span class="badge" style="margin-left:auto;background:#3B2A00;color:#FFD54A">PREMIUM</span></a>`;
-  h+=`<button class="tile wide" style="${colorVars('bl')}" onclick="learnHome()"><div><h2>Sözləri öyrən</h2><p>Bax, öyrən, sonra imtahan ver</p></div><span class="badge" style="margin-left:auto">${lk}/${lt}</span></button>`;
-  for(const s in SECS){if(s==='rq'||s==='tv')continue;const o=SECS[s];h+=`<button class="tile wide" style="${colorVars(o.c)}" onclick="levels('${s}')"><div><h2>${exName(s)}</h2><p>${esc(o.az)}</p></div><span class="badge" style="margin-left:auto">${count(s)} ${o.unit}</span></button>`}
-  h+=`<button class="tile wide" style="${colorVars('am')}" onclick="topicHome()"><div><h2>Topic Vocabulary</h2><p>Mövzular üzrə sözlər · ${TOPS.length} mövzu</p></div><span class="badge" style="margin-left:auto">${TOPS.length*60} söz</span></button>`;
-  h+=`<button class="tile wide" style="${colorVars('or')}" onclick="pdfHome()"><div><h2>📕 PDF Lüğət</h2><p>Nitq hissələri · sinonim və antonimlər</p></div><span class="badge" style="margin-left:auto">PDF</span></button>`;
-  h+=`<button class="tile wide" style="${colorVars('te')}" onclick="paraHome()"><div><h2>Paragraph</h2><p>Nümunə paraqraflar · ${PARA.length} mövzu</p></div><span class="badge" style="margin-left:auto">${Object.keys(ST.pa||{}).length}/${PARA.length}</span></button>`;
-  h+=`<button class="tile wide" style="${colorVars('in')}" onclick="readHome()"><div><h2>Reading Passages</h2><p>A1–C2 · vacib sözlər və suallar</p></div><span class="badge" style="margin-left:auto">${RLV.reduce((u,L)=>u+(READ[L]||[]).length,0)} mətn</span></button>`;
-  h+=`<button class="tile wide" style="${colorVars('rd')}" onclick="mistakes()"><div><h2>Səhvlərim</h2><p>Səhv cavab verdiyin sözlər burada toplanır</p></div><span class="badge" style="margin-left:auto">${m}</span></button></div>`;
+  h+=`</div><div class="mgrid">`;
+  const wN=LV.reduce((u,[l])=>u+CATS.reduce((v,[c])=>v+liveCount('words',l,c),0),0);
+  const mb=(ic,t,sub,badge,c,js)=>`<button class="mtile" style="${colorVars(c)}" onclick="${js}"><span class="mic" aria-hidden="true">${ic}</span><span class="mt">${t}</span><span class="ms">${sub}</span><span class="mb">${badge}</span></button>`;
+  h+=mb('📚','Vocabulary','Sözlər, testlər, kartlar',wN+' söz','tq','vocabHome()');
+  h+=mb('📖','Reading','Mətnlər və suallar',RLV.reduce((u,L)=>u+(READ[L]||[]).length,0)+' mətn','in','readHome()');
+  h+=mb('✍️','Paragraph','Nümunə paraqraflar',Object.keys(ST.pa||{}).length+'/'+PARA.length,'te','paraHome()');
+  h+=mb('🧩','Grammar','Qrammatika testləri',typeof GRAM!=='undefined'&&GRAM.blocks?GRAM.blocks.length+' blok':'Tezliklə','pu','grammarHome()');
+  h+=mb('❗','Səhvlərim','Səhv cavab verdiklərin',String(m),'rd','mistakes()');
+  h+=mb('🏆','Ümumi Sınaqlar','Siniflər üzrə sınaqlar','Tezliklə','am','examsHome()');
+  h+=`</div>`;
   h+=RCONF?`<div class="foot"><p class="perr" style="color:var(--rd);font-weight:800;margin:0 0 8px">Bütün nəticələr, bildiyin sözlər və səhvlər silinsin?</p><div class="pbtns" style="justify-content:center"><button class="pbtn dl" style="text-decoration:none;color:var(--rd);font-size:15px" onclick="resetYes()">Bəli, sıfırla</button><button class="pbtn gh" style="text-decoration:none;font-size:15px" onclick="resetNo()">Xeyr</button></div></div>`:`<div class="foot"><button onclick="resetAll()">Bütün nəticələri sıfırla</button></div>`;
   app.innerHTML=h;window.scrollTo(0,0);
 }
+/* ---------- 📚 Vocabulary bölməsi (ana səhifədəki tək blokun içi) ---------- */
+function vocabHome(){
+  V={vh:1};const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0);
+  const vb=(t,sub,badge,c,js,dis)=>`<button class="vtile" style="${colorVars(c)}" ${dis?'disabled':`onclick="${js}"`}><span class="vt">${t}</span><span class="vs">${sub}</span><span class="vb">${badge}</span></button>`;
+  let h=hdr('Vocabulary','Bölməni seçin','home()','tq')+`<div class="vgrid">`;
+  h+=vb('Synonym','Sinonimlər',count('syn')+' söz','gr',"levels('syn')");
+  h+=vb('Antonym','Antonimlər',count('ant')+' söz','pk',"levels('ant')");
+  h+=vb('Definition','Təriflər',count('def')+' söz','or',"levels('def')");
+  h+=vb('Make Up Sentences','Cümlə qur',count('mk')+' cümlə','pu',"levels('mk')");
+  h+=vb('Sözləri öyrən','Bax, öyrən, imtahan ver',lk+'/'+lt,'bl','learnHome()');
+  h+=typeof fcHome==='function'?vb('Sözləri kartlarla öyrən','Flashcards','Kartlar','in','fcHome()'):vb('Sözləri kartlarla öyrən','Flashcards','Tezliklə','in','',1);
+  h+=vb('Words Exam','Sözlərin tərcüməsi',count('words')+' söz','tq',"levels('words')");
+  h+=vb('Sentences','Boşluğu doldur',count('gap')+' sual','bl',"levels('gap')");
+  h+=vb('Topic Vocabulary','Mövzular üzrə sözlər',TOPS.length+' mövzu','am','topicHome()');
+  h+=vb('📕 PDF Lüğət','Yüklə · məktəb lüğətləri','PDF','or','pdfHome()');
+  app.innerHTML=h+`</div>`;window.scrollTo(0,0);
+}
+const VSECS=['words','syn','ant','def','gap','mk'];
+/* ---------- 🧩 Grammar (müvəqqəti: testlər Mərhələ 3-də əlavə olunur) ---------- */
+function grammarHome(){
+  if(typeof gHome==='function')return gHome();
+  V={};app.innerHTML=hdr('Grammar','Qrammatika testləri','home()','pu')+`<div style="${colorVars('pu')}"><div class="empty">🧩 Qrammatika testləri tezliklə burada olacaq.</div></div>`;window.scrollTo(0,0);
+}
+/* ---------- 🏆 Ümumi Sınaqlar ---------- */
+const EXAMS=[['5–6','5–6-cı siniflər'],['7–8','7–8-ci siniflər'],['9','9-cu sinif'],['10–11','10–11-ci siniflər']];
+function examsHome(){
+  V={};let h=hdr('Ümumi Sınaqlar','Siniflər üzrə','home()','am')+`<div style="${colorVars('am')}">`;
+  h+=`<div class="vgrid">`+EXAMS.map(([n,az])=>`<button class="soon" style="${colorVars('am')}" onclick="examSoon('${n}')"><b>${n}</b><span class="vs" style="font-weight:700;color:var(--muted)">${az}</span><em>Tezliklə</em></button>`).join('')+`</div>`;
+  app.innerHTML=h+`</div>`;window.scrollTo(0,0);
+}
+function examSoon(n){
+  V={};app.innerHTML=hdr(n+' · Ümumi Sınaqlar','Tezliklə','examsHome()','am')+`<div style="${colorVars('am')}"><div class="empty">⏳ Bu sınaqlar hələ hazırlanır və tezliklə istifadəyə veriləcək.<br>Yenilikləri "Bilirdinizmi?" qeydində elan edəcəyik.</div></div>`;window.scrollTo(0,0);
+}
 function levels(s){
   V={s};const o=SECS[s];
-  let h=hdr(exName(s),o.az+' · səviyyəni seçin','home()',o.c)+`<div class="list" style="${colorVars(o.c)}">`;
+  let h=hdr(exName(s),o.az+' · səviyyəni seçin',VSECS.includes(s)?'vocabHome()':'home()',o.c)+`<div class="list" style="${colorVars(o.c)}">`;
   for(const [l,name,az] of LV){
     h+=`<button class="row" onclick="${s==='words'?`cats('${l}')`:`tasks('${s}','${l}','')`}"><div><div class="lvl">${name}</div><div class="s">${az}</div></div><span class="badge">${levelCount(s,l)} ${o.unit}</span></button>`;
   }
@@ -8278,7 +8331,7 @@ const WTR={};for(const l in D.words)for(const c in D.words[l])D.words[l][c].forE
 const lCount=(s,l,c)=>Object.keys(ST.learned).filter(id=>live(id)&&IDX[id].s===s&&(l==null||IDX[id].l===l)&&(c==null||IDX[id].c===c)).length;
 let LQ={};
 function learnHome(){
-  V={};let h=hdr('Sözləri öyrən','Bölməni seçin','home()','bl')+`<p class="tnote">Hər taskda imtahandakı eyni sözlər var. Sözə bax, öyrəndinsə "Öyrəndim" bas. Hamısı mavi olanda imtahana keç.</p><div class="list">`;
+  V={};let h=hdr('Sözləri öyrən','Bölməni seçin','vocabHome()','bl')+`<p class="tnote">Hər taskda imtahandakı eyni sözlər var. Sözə bax, öyrəndinsə "Öyrəndim" bas. Hamısı mavi olanda imtahana keç.</p><div class="list">`;
   for(const s of LSECS){const o=SECS[s];h+=`<button class="row" style="${colorVars(o.c)}" onclick="lLevels('${s}')"><div><div class="t" style="color:var(--c)">${o.n}</div><div class="s">${esc(o.az)}</div></div><span class="badge">${lCount(s)}/${count(s)}</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
@@ -8365,7 +8418,7 @@ function readQuiz(){const {L,i}=RP;const ids=D.rq[L].filter(e=>RQP[e._id].pi===i
 
 /* ---------- topic vocabulary ---------- */
 function topicHome(){
-  V={};let h=hdr('Topic Vocabulary','Mövzunu seçin · hər mövzuda 60 söz, 3 task','home()','am')+`<div style="${colorVars(dirC(DIR,'am'))}">${dirBar('topicHome()')}</div><div class="tgrid" style="${colorVars('am')}">`;
+  V={};let h=hdr('Topic Vocabulary','Mövzunu seçin · hər mövzuda 60 söz, 3 task','vocabHome()','am')+`<div style="${colorVars(dirC(DIR,'am'))}">${dirBar('topicHome()')}</div><div class="tgrid" style="${colorVars('am')}">`;
   for(const k of TOPS){const T=TV[k],n=nTasks('tv',k,'');let d=0;for(let t=0;t<n;t++)if(taskState('tv',k,'',t,DIR).status==='done')d++;
     h+=`<button class="topic${d===n?' done':''}" onclick="tasks('tv','${k}','')"><span class="te">${T.e}</span><b>${esc(T.n)}</b><small>${esc(T.az)}</small><span class="tp">Task: ${d}/${n} bitib</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
@@ -8606,7 +8659,7 @@ async function slugGet(i){
 }
 function pdfHome(keep){
   if(!keep&&!PDFBUSY)PDFMSG='';V={pdf:1};
-  let h=hdr('PDF Lüğət','Yüklə · nitq hissələrinə görə, sadədən mürəkkəbə','home()','or')+`<p class="tnote">PDF hər dəfə saytdakı ən son sözlərdən hazırlanır – yeni söz əlavə olunanda PDF də avtomatik yenilənir. Sözlər sadədən mürəkkəbə düzülüb (A1–A2 → B1–B2 → C1–C2), hər səviyyədə A–Z; hər sözün transkripsiyası, Azərbaycanca və rusca tərcüməsi var.</p>${PDFMSG?`<p class="tmsg" style="color:var(--or)">${esc(PDFMSG)}</p>`:''}<div class="list" style="${colorVars('or')}">`;
+  let h=hdr('PDF Lüğət','Yüklə · nitq hissələrinə görə, sadədən mürəkkəbə','vocabHome()','or')+`<p class="tnote">PDF hər dəfə saytdakı ən son sözlərdən hazırlanır – yeni söz əlavə olunanda PDF də avtomatik yenilənir. Sözlər sadədən mürəkkəbə düzülüb (A1–A2 → B1–B2 → C1–C2), hər səviyyədə A–Z; hər sözün transkripsiyası, Azərbaycanca və rusca tərcüməsi var.</p>${PDFMSG?`<p class="tmsg" style="color:var(--or)">${esc(PDFMSG)}</p>`:''}<div class="list" style="${colorVars('or')}">`;
   const tot=PDFCATS.reduce((u,[c])=>u+LV.reduce((v,[l])=>v+liveCount('words',l,c),0),0),dis=PDFBUSY?'disabled':'';
   if(SLUG.length)h+=`<button class="row" onclick="slugHome()" style="border:2px solid #C99A10;background:#FFF8DC"><div><div class="t">📚 Məktəb dərsliklərinin lüğətləri</div><div class="s">Siniflər üzrə PDF · ${SLUG.some(f=>slugOpen(f.id))?'açıq kitablarınız var ✅':'👑 hər kitab '+SLUG_PRICE}</div></div><span class="badge">${SLUG.length} PDF</span></button>`;
   h+=`<button class="row" ${dis} onclick="pdfView('all')"><div><div class="t">📕 Bütün lüğət</div><div class="s">Bütün nitq hissələri + sinonimlər və antonimlər, bir PDF-də</div></div><span class="badge">${tot} söz</span></button>`;
@@ -9056,21 +9109,32 @@ function pdfView(w,keep){
 }
 
 /* ---------- teacher panel ---------- */
-const TCODE='25890';let TEA=false,PEND=null,TMSG='';
+let TEA=false,PEND=null,TMSG='';
 const LOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7zm2 10a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2z"/></svg>';
-(function(){const b=document.createElement('button');b.className='lockbtn';b.setAttribute('aria-label','Müəllim paneli');b.innerHTML=LOCK;b.onclick=()=>teacher();document.body.appendChild(b)})();
+/* 🔐 müəllim girişi: şifrə serverdə yoxlanılır (saytın kodunda şifrə yoxdur); bu cihazda bir dəfə daxil olduqdan sonra yadda qalır */
+function tEnter(){TEA=true;PEND=new Set(DEL);PEDIT=JSON.parse(JSON.stringify(TS.edit));tHome()}
 function teacher(){
   V={};if(TEA)return tHome();
-  app.innerHTML=hdr('Müəllim paneli','Kodu daxil edin','home()','bl')+`<form class="tlogin" onsubmit="event.preventDefault();tLogin()" style="${colorVars('bl')}"><input id="tcode" type="password" inputmode="numeric" autocomplete="off" placeholder="Kod" aria-label="Kod"><button class="btn" type="submit">Daxil ol</button><p class="terr" id="terr"></p></form>`;
+  if(lsGet('mnv-tkey',''))return tEnter();
+  app.innerHTML=hdr('Giriş','','home()','bl')+`<form class="tlogin" onsubmit="event.preventDefault();tLogin()" style="${colorVars('bl')}"><input id="tcode" type="password" autocomplete="current-password" placeholder="Şifrə" aria-label="Şifrə" style="letter-spacing:.05em"><button class="btn" type="submit" id="tgo">Daxil ol</button><p class="terr" id="terr"></p></form>`;
   const i=document.getElementById('tcode');if(i)i.focus();window.scrollTo(0,0);
 }
 let PEDIT={};
-function tLogin(){const v=(document.getElementById('tcode')||{}).value;if(v===TCODE){TEA=true;PEND=new Set(DEL);PEDIT=JSON.parse(JSON.stringify(TS.edit));tHome()}else{const e=document.getElementById('terr');if(e)e.textContent='Kod səhvdir.'}}
+async function tLogin(){
+  const v=((document.getElementById('tcode')||{}).value||'').trim(),e=document.getElementById('terr'),b=document.getElementById('tgo');
+  if(!v)return;if(b)b.disabled=true;if(e)e.textContent='Yoxlanılır…';
+  try{const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'tlogin',p:v})});const o=await r.json();
+    if(o&&o.ok&&o.key){lsSet('mnv-tkey',o.key);TU.list=null;return tEnter()}
+    if(e)e.textContent=o&&o.error==='wait'?'Çox səhv cəhd. 15 dəqiqə sonra yenidən yoxlayın.':o&&o.error==='nopass'?'Şifrə hələ Google Cədvəlin skriptində yazılmayıb.':o&&o.error==='pass'?'Şifrə səhvdir.':'Alınmadı. Google Cədvəlin skriptini yeniləyin.';
+  }catch(x){if(e)e.textContent='İnternet bağlantısını yoxlayın.'}
+  if(b)b.disabled=false;
+}
+function tLogout(){lsSet('mnv-tkey','');lsSet('mnv-slugk2',{});TEA=false;home()}
 const pendN=()=>{let n=0;for(const x of PEND)if(!DEL.has(x))n++;for(const x of DEL)if(!PEND.has(x))n++;const ks=new Set([...Object.keys(PEDIT),...Object.keys(TS.edit)]);for(const k of ks)if(JSON.stringify(PEDIT[k]||null)!==JSON.stringify(TS.edit[k]||null))n++;return n};
 function tBar(){const n=pendN();return `<div class="tbar" style="${colorVars('bl')}"><span>${n?`Saxlanmamış dəyişiklik: <b>${n}</b>`:'Dəyişiklik yoxdur'}</span><button class="btn sm" ${n?'':'disabled'} onclick="tSave()">Yadda saxla</button></div>${TMSG?`<p class="tmsg">${esc(TMSG)}</p>`:''}`}
 function tNote(){app.innerHTML=hdr('💡 Bilirdinizmi?','Yazdığınız qeyd hamının ana səhifəsində, yuxarı sağ küncdə görünür','tHome()','bl')+dnEditorHTML();dnBind();window.scrollTo(0,0)}
 function tHome(){
-  let h=hdr('Müəllim paneli','Bölməni seçin','home()','bl')+tBar()+`<div class="list" style="${colorVars('bl')};margin-bottom:14px"><button class="row" onclick="TU.q='';tUsers()"><div><div class="t">👥 İstifadəçilər</div><div class="s">Qeydiyyatdan keçənlər · zəng və WhatsApp</div></div></button><button class="row" onclick="tFb()"><div><div class="t">✍️ Rəy və təkliflər</div><div class="s">İstifadəçilərin yazdıqları · nömrə ilə</div></div></button><button class="row" onclick="tNote()"><div><div class="t">💡 Bilirdinizmi? · Günün qeydi</div><div class="s">${dnOn(DNOTE)?'Hamıda göstərilir ✓':'Hazırda gizlidir — yazın və göstərin'}</div></div></button><button class="row" onclick="tKey()"><div><div class="t">🔑 Cədvəl açarı</div><div class="s">${lsGet('mnv-tkey','')?'Daxil edilib ✓':'Daxil edilməyib'}</div></div></button></div><p class="tnote">Sildiyiniz sual bütün şagirdlərdən gizlədilir. Növbəti dəfə söz əlavə olunanda həmin task yenidən tam doldurulur və əvvəl onu bitirmiş şagirdlərdə qırmızı görünür.</p><div class="list" style="${colorVars('bl')}">`;
+  let h=hdr('Müəllim paneli','Bölməni seçin','home()','bl')+tBar()+`<div class="list" style="${colorVars('bl')};margin-bottom:14px"><button class="row" onclick="TU.q='';tUsers()"><div><div class="t">👥 İstifadəçilər</div><div class="s">Qeydiyyatdan keçənlər · zəng və WhatsApp</div></div></button><button class="row" onclick="tFb()"><div><div class="t">✍️ Rəy və təkliflər</div><div class="s">İstifadəçilərin yazdıqları · nömrə ilə</div></div></button><button class="row" onclick="tNote()"><div><div class="t">💡 Bilirdinizmi? · Günün qeydi</div><div class="s">${dnOn(DNOTE)?'Hamıda göstərilir ✓':'Hazırda gizlidir — yazın və göstərin'}</div></div></button><button class="row" onclick="tLogout()"><div><div class="t">🚪 Bu cihazdan çıxış</div><div class="s">Paneli bu telefonda bağla · yenidən girmək üçün şifrə lazım olacaq</div></div></button></div><p class="tnote">Sildiyiniz sual bütün şagirdlərdən gizlədilir. Növbəti dəfə söz əlavə olunanda həmin task yenidən tam doldurulur və əvvəl onu bitirmiş şagirdlərdə qırmızı görünür.</p><div class="list" style="${colorVars('bl')}">`;
   for(const s in SECS){if(s==='rq'||s==='tv')continue;const o=SECS[s];let d=0;for(const x of PEND)if(IDX[x]&&IDX[x].s===s)d++;h+=`<button class="row" onclick="tLevels('${s}')"><div><div class="t" style="color:var(--${o.c})">${o.n}</div><div class="s">${esc(o.az)}</div></div><span class="badge">${d} silinib</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }

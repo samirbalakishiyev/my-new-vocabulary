@@ -4,6 +4,7 @@
    Köhnə "Qeydiyyat" vərəqindəki istifadəçilər avtomatik "Users" vərəqinə köçürülür; köhnə vərəqlər silinmir.
    Yeniləmək: Deploy → Manage deployments → ✏️ → Version: New version → Deploy (link dəyişmir). */
 const KEY = 'BURAYA-OZ-ACARINIZI-YAZIN';
+const ADMIN_PASS = 'BURAYA-PANEL-SIFRESI'; /* 🔐 Müəllim panelinin şifrəsi — özünüz yazın, heç kimə deməyin */
 const SKEY = 'BURAYA-LUGET-SIFRESI'; /* 📚 PDF lüğətlərin şifrəsi — heç kimə verməyin */
 const SLUG_IDS = ['g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11'];
 /* "g5,g8" → ['g5','g8'] (köhnə TRUE = hamısı) */
@@ -188,6 +189,14 @@ function doPost(e) {
   try {
     const o = JSON.parse(e.postData.contents || '{}');
     const now = Date.now();
+    if (o.a === 'tlogin') { /* 🔐 müəllim girişi: 5 səhv cəhddən sonra 15 dəqiqə bağlanır */
+      const c = CacheService.getScriptCache(), n = +(c.get('tl_fail') || 0);
+      if (ADMIN_PASS === 'BURAYA-PANEL-SIFRESI' || !ADMIN_PASS) return out({ ok: false, error: 'nopass' });
+      if (n >= 5) return out({ ok: false, error: 'wait' });
+      if (String(o.p || '') !== ADMIN_PASS) { c.put('tl_fail', String(n + 1), 900); return out({ ok: false, error: 'pass', left: 4 - n }); }
+      c.remove('tl_fail');
+      return out({ ok: true, key: KEY });
+    }
     if (o.a === 'ping') return out(userPing(o, now));
     if (o.a === 'pq') { /* şagirdin premium yoxlaması (Missions) */
       const s = usersSheet(), r = userRow(s, o.tel);
