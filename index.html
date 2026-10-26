@@ -177,6 +177,7 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .tfbr{flex-basis:100%;display:grid;gap:6px;margin-top:4px}.tfbr textarea{width:100%;font:inherit;font-size:15px;font-weight:600;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);resize:vertical}
 .autonote{margin:6px 0 4px;text-align:center;font-weight:800;color:#0E7C86}.autonote.big{background:#E0F4F5;border:1.5px solid #0E7C86;border-radius:14px;padding:10px 12px;margin:0 0 12px}
 .autoprof{border-color:#0E7C86}.autoprof h3{color:#0E7C86}
+#edbar{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:min(640px,calc(100% - 20px));background:#FFF4F4;border:2.5px solid #7F0000;border-radius:16px;padding:8px 10px;box-shadow:0 10px 30px -12px rgba(0,0,0,.45);font-weight:700;font-size:14px;color:#3A0000}#edbar .pbtn{margin:0}#edbar .pbtn:disabled{opacity:.45}body.edm{padding-bottom:90px}body.edm #ttoast{bottom:100px!important}
 .mhint{margin:0 0 10px;color:var(--muted);font-size:13px;font-weight:600;text-align:center}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font-weight:800;font-size:14px}
@@ -8240,6 +8241,7 @@ function fcTasks(s,l,c){
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
 function fcStart(s,l,c,t){
+  if(EDM)return FLD[s]?tTask(s,l,c,t):tToast('Bu bölmə buradan redaktə olunmur.');
   const F=ST.fc||(ST.fc={}),now=Date.now(),ids=taskIds(s,l,c,t);if(!ids.length)return;
   const rank=id=>{const f=F[id];if(!f)return 1;if(f.b===0)return 0;if(f.d<=now)return 2;return 3};/* təkrar → yeni → vaxtı çatan → bilinən */
   const deck=shuf(ids).sort((a,b)=>rank(a)-rank(b));
@@ -8356,6 +8358,7 @@ function tasks(s,l,c){
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
 function startTask(t){
+  if(EDM){const {s,l,c}=V;if(FLD[s])return tTask(s,l,c,t);return tToast('Bu bölmə buradan redaktə olunmur.')}
   const {s,l,c}=V,dir=isW(s)?DIR:'',st=taskState(s,l,c,t,dir);if(st.empty)return;
   const ids=st.status==='new'?st.fresh:st.cur;
   run(shuf(ids),{mode:'task',t,partial:st.status==='new',back:`tasks('${s}','${l}','${c}')`,s,l,c,dir});
@@ -8562,6 +8565,7 @@ function lTasks(s,l,c){
 }
 function lFirstOpen(q){const i=q.findIndex(id=>!ST.learned[id]);if(i>0)q.push(...q.splice(0,i))}
 function lTask(s,l,c,t){
+  if(EDM)return FLD[s]?tTask(s,l,c,t):tToast('Bu bölmə buradan redaktə olunmur.');
   const key=TK(s,l,c,t),ids=taskIds(s,l,c,t);if(!ids.length)return;
   let q=(LQ[key]||[]).filter(id=>ids.includes(id));ids.forEach(id=>{if(!q.includes(id))q.push(id)});LQ[key]=q;lFirstOpen(q);
   V={L:{s,l,c,t,key}};lShow();window.scrollTo(0,0);
@@ -8992,7 +8996,7 @@ function stats(){
   const top=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0]||'';
   return {known:k,mist:m,tasks:d,avg,top,visits:lsGet('mnv-visits',0),dev:devName()+(isStandalone()?' · ana ekran':'')};
 }
-function regFields(){const r=REG||{},p=(typeof hasPR==='function'&&hasPR())?{pn:PR.n,pk:PR.k}:{};return {ad:r.ad,soyad:r.soyad,tel:r.tel,rol:r.rol,qeyd:r.at,...p}}
+function regFields(){const r=REG||{};return {ad:r.ad,soyad:r.soyad,tel:r.tel,rol:r.rol,qeyd:r.at}}
 /* 👥 müəllim şagirdi qrupa yazıbsa: nəticələr avtomatik gedir, WhatsApp düymələri gizlənir */
 const AUTO=()=>false; /* Samir müəllimin istəyi ilə: hamı nəticəni WhatsApp ilə göndərir (qrup yalnız panel üçündür) */
 const AUTONOTE='<p class="autonote">✓ Nəticən yadda saxlanılır və müəllimə avtomatik çatır</p>';
@@ -9013,8 +9017,7 @@ let LASTPING=0;function pingSoon(){if(!REG||Date.now()-LASTPING<60000)return;LAS
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pingSoon()});
 window.addEventListener('focus',pingSoon);window.addEventListener('pageshow',e=>{if(e.persisted)pingSoon()});
 setInterval(()=>{if(document.visibilityState==='visible')pingSoon()},120000);
-/* 📊 nəticə cədvələ: server yalnız müəllimin qrupa yazdığı şagirdin nəticəsini saxlayır (təkrarsız) */
-function syncRes(e){if(!REG||!REG.tel||!e)return;qPush({a:'res',tel:REG.tel,list:[{sec:e.sec,r:e.r,n:e.n,p:e.p,w:(e.w||[]).slice(0,30),at:e.at}]});qFlush()}
+function syncRes(e){} /* qruplar ləğv edilib: nəticələr yalnız WhatsApp ilə gedir */
 
 /* ---------- blocked accounts ---------- */
 function blokSet(v){
@@ -9111,9 +9114,8 @@ const lc=s=>String(s||'').toLocaleLowerCase('az');
 function telSpan(t,q){const d=telD(q);if(!d)return [-1,-1];const a=qTel(q);let i=t.indexOf(a);if(a&&i>=0)return [i,i+a.length];
   i=('0'+t).indexOf(d);if(i>=0)return [Math.max(0,i-1),i-1+d.length];i=('994'+t).indexOf(d);if(i>=0)return [Math.max(0,i-3),i-3+d.length];return [-1,-1]}
 function uHit(u,q){q=lc(q).trim();if(!q)return true;const t=telD(u.tel);
-  {const cq=q.replace(/,/g,'.').replace(/\s/g,''),ex=lc([u.pn,u.pk,u.grp,u.nm].join(' | '));if(ex.includes(q)||lc([u.pk,u.grp].join('|')).replace(/[\s]/g,'').replace(/,/g,'.').includes(cq.replace(/,/g,'.')))return true}
   if(telD(q)&&telSpan(t,q)[0]<0)return false;
-  const words=q.replace(/[\d+()\-.]/g,' ').split(/\s+/).filter(Boolean),nm=lc([u.ad,u.soyad,u.rol,u.sayt,u.pn,u.nm].join(' '));
+  const words=q.replace(/[\d+()\-.]/g,' ').split(/\s+/).filter(Boolean),nm=lc([u.ad,u.soyad,u.rol,u.sayt].join(' '));
   return words.every(w=>nm.includes(w))}
 function telHL(tel,q){const t=telD(tel),[s,e]=telSpan(t,q||''),G=t.length===9?[2,5,7]:[];let h='',on=false;
   [...t].forEach((c,j)=>{const m=j>=s&&j<e;if(G.includes(j)){if(on){h+='</mark>';on=false}h+=' '}if(m&&!on){h+='<mark class="thl">';on=true}if(!m&&on){h+='</mark>';on=false}h+=c});
@@ -9169,7 +9171,7 @@ async function tSave(){
   try{const ed={};for(const k in PEDIT)if(IDX[k])ed[k]=PEDIT[k];const state={del:[...PEND],edit:ed,note:DNOTE};
     const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'cfg',key,state})});
     const o=await r.json();if(!o.ok)throw new Error(o.error||'x');
-    lsSet('mnv-cfg',state);TMSG='Saxlanıldı. Səhifə yenilənir…';tHome();setTimeout(()=>location.reload(),600);
+    lsSet('mnv-cfg',state);TMSG='Saxlanıldı. Səhifə yenilənir…';EDM=false;edBar();tHome();setTimeout(()=>location.reload(),600);
   }catch(e){TMSG=String(e&&e.message)==='key'?'Cədvəl açarı səhvdir.':'Saxlamaq alınmadı. İnterneti yoxlayıb yenidən cəhd edin.';tHome()}
 }
 
@@ -9265,7 +9267,7 @@ async function tPremX(){
     if(o&&Array.isArray(o.tels)){TU.px=new Set(o.tels.map(String));TU.pxOk=true}}catch(e){}
 }
 const isPrem=u=>!!u.prem; /* premium hər saytda ayrıca */
-function tToast(m){let t=document.getElementById('ttoast');if(!t){t=document.createElement('div');t.id='ttoast';t.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;background:#1F2547;color:#fff;padding:12px 18px;border-radius:14px;font-weight:800;font-size:15px;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);max-width:calc(100% - 32px);text-align:center;transition:opacity .3s';document.body.appendChild(t)}
+function tToast(m){let t=document.getElementById('ttoast');if(!t){t=document.createElement('div');t.id='ttoast';t.style.cssText='pointer-events:none;position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:99;background:#1F2547;color:#fff;padding:12px 18px;border-radius:14px;font-weight:800;font-size:15px;box-shadow:0 10px 30px -10px rgba(0,0,0,.5);max-width:calc(100% - 32px);text-align:center;transition:opacity .3s';document.body.appendChild(t)}
   t.textContent=m;t.style.opacity='1';clearTimeout(window._tt);window._tt=setTimeout(()=>{t.style.opacity='0'},2600)}
 /* 💳 Ödəniş: "elaqe" sütunu indi ödəniş tarixini saxlayır; bu tarixdən əvvəlki köhnə "Əlaqə saxlanılıb" işarələri sayılmır */
 const PAY_FROM=1792436563700;
@@ -9284,10 +9286,8 @@ async function tUsers(reload){
   if(TU.r)h+=`<div class="pbtns" style="margin-bottom:10px;align-items:center"><b>${TU.r==='Müəllim'?'Müəllimlər':'Tələbələr'}:</b>${[['Yeni','🆕 Yeni qoşulanlar ('+RL.filter(isNew).length+')'],['Pay','💳 Ödəniş edənlər ('+RL.filter(isPay).length+')'],['Blok','🚫 Bloklananlar ('+RL.filter(u=>u.blok).length+')'],['Prem','👑 Premium ('+RL.filter(isPrem).length+')'],['Slug','📚 PDF lüğət ('+RL.filter(u=>slN(u)>0).length+')']].map(([f,l])=>fb(TU.f===f,`TU.f='${f}';tUsers()`,l)).join('')}</div>`;
   h+=`<input class="tsearch" placeholder="Axtar: ad, soyad və ya nömrənin istənilən hissəsi (məs: 795 86)…" value="${esc(TU.q)}" oninput="TU.q=this.value;clearTimeout(window._tq);window._tq=setTimeout(()=>{window._tqKeep=1;tUsers();const i=document.querySelector('.tsearch');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},250)" style="width:100%;font:inherit;font-size:16px;font-weight:700;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin-bottom:10px">`;
   const okF=u=>!TU.r||!TU.f||(TU.f==='Blok'?u.blok:TU.f==='Yeni'?isNew(u):TU.f==='Pay'?isPay(u):TU.f==='Prem'?isPrem(u):TU.f==='Slug'?slN(u)>0:true);
-  h+=`<div class="pbtns" style="margin-bottom:10px;align-items:center"><b>👥 Qrup:</b><select class="tgrp" onchange="TU.g=this.value;tUsers()"><option value="">Hamısı</option><option value="-"${TU.g==='-'?' selected':''}>Qrupsuz (${L.filter(u=>!u.grp).length})</option>${SGRP.map(g=>`<option value="${g}"${TU.g===g?' selected':''}>${g} (${L.filter(u=>u.grp===g).length})</option>`).join('')}</select></div>`;
-  const okG=u=>!TU.g||(TU.g==='-'?!u.grp:u.grp===TU.g);
-  const rows=L.filter(u=>q.trim()?uHit(u,q):((!TU.r||u.rol===TU.r)&&okF(u)&&okG(u))).sort((a,b)=>(+b.son||0)-(+a.son||0));
-  h+=`<div id="tuRes"><p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Göstərilir: ${rows.length}${q.trim()?' · 🔎 bütün istifadəçilər arasında axtarılır':''}</p><div class="tlist" id="tuList">`+rows.map(u=>{const t=esc(u.tel),pr=isPrem(u);return `<div class="titem${u.blok?' blk':''}" style="flex-wrap:wrap;${u.blok?'border-color:var(--rd);background:var(--rd-s)':''}"><span style="flex:1 1 220px;min-width:0"><b${isPaid(u)?' style="color:#1E8E4E"':''}>${isPaid(u)?'💳 ':''}${esc(u.nm||(u.ad+' '+u.soyad))}</b>${u.nm?` <small style="color:var(--muted)">(qeydiyyat: ${esc(u.ad)} ${esc(u.soyad)})</small>`:''} <em class="tedit" style="color:var(--bl);background:var(--bl-s)">${esc(u.rol||'')}</em>${pr?' <em class="tedit" style="color:#5C4300;background:#FFD54A">👑 Premium</em>':''}${u.grp?` <em class="tedit" style="color:#fff;background:#0E7C86">👥 ${esc(u.grp)}</em>`:''}${slN(u)?` <em class="tedit" style="color:#fff;background:#5B6CD9">📚 ${(u.slug||[]).map(x=>x.slice(1)).join(', ')}</em>`:''}${u.blok?' <em class="tedit" style="color:#fff;background:var(--rd)">🚫 Bloklanıb</em>':''}${isPaid(u)?` <em class="tedit" style="color:#fff;background:#1E8E4E;display:inline-block">💳 Ödəniş edib · ${dOnly(u.elaqe)}</em>`:''}${u.pn||u.pk?`<br><small style="color:#0E5F66;font-weight:800">📋 Profil: ${esc(u.pn||'—')} · ${esc(u.pk||'—')}</small>`:''}${(()=>{const g=grpGuess(u.pk);return g&&g!==u.grp?` <button class="tbtn" style="background:#0E7C86;color:#fff;border-color:#0E7C86;padding:3px 9px;font-size:13px" onclick="tGrp('${t}','${g}')">👥 ${g} qrupuna yaz</button>`:''})()}${TU.ren===u.tel?`<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><input id="ren-${t}" value="${esc(u.nm||(u.ad+' '+u.soyad))}" style="flex:1 1 160px;font:inherit;font-weight:700;padding:6px 9px;border:1.5px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink)"><button class="tbtn undo" onclick="tRen('${t}')">Yadda saxla</button>${u.nm?`<button class="tbtn" onclick="tRen('${t}',1)">Qeydiyyat adına qaytar</button>`:''}<button class="tbtn" onclick="TU.ren='';tUsers()">Ləğv</button></div>`:''}<br><small style="color:var(--muted);font-weight:700">+994 ${telHL(u.tel,q)}</small><br><small style="color:var(--muted)">Qeydiyyat: ${dOnly(u.qeyd)} · Son giriş: ${dOnly(u.son)}</small></span><a class="tbtn ed" style="text-decoration:none" href="tel:+994${t}">📞</a><a class="tbtn undo" href="https://wa.me/994${t}" target="_blank" rel="noopener" onclick="tWa('${t}')">💬</a><button class="tbtn" title="Adı düzəlt" onclick="TU.ren=TU.ren==='${t}'?'':'${t}';tUsers()">✏️</button><button class="tbtn${isPaid(u)?'':' undo'}" style="${isPaid(u)?'background:var(--line)':''}" onclick="tSet('elaqe','${t}',${!isPaid(u)})">${isPaid(u)?'↺ Ödənişi geri al':'💳 Ödəniş edib'}</button><button class="tbtn" style="${pr?'background:#FFD54A;border-color:#C99A10;color:#5C4300':'background:var(--card);border:1.5px solid #C99A10;color:#8A6500'}" onclick="tSet('premium','${t}',${!pr})">${pr?'👑 Premiumu götür':'👑 Premium et'}</button><button class="tbtn" style="${slN(u)?'background:#5B6CD9;border-color:#5B6CD9;color:#fff':'background:var(--card);border:1.5px solid #5B6CD9;color:#3B4796'}" onclick="TU.sl=TU.sl==='${t}'?'':'${t}';tUsers()">📚 PDF lüğət${slN(u)?' ('+slN(u)+')':''}</button>${TU.sl===u.tel?`<div style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:4px"><b style="font-size:13px;color:#3B4796">Açıq kitablar:</b>${SLUG.map(f=>{const on=(u.slug||[]).includes(f.id);return `<button class="tbtn" style="${on?'background:#5B6CD9;color:#fff;border:1.5px solid #5B6CD9':'background:var(--card);color:#3B4796;border:1.5px solid #5B6CD9'}" onclick="tSlug('${t}','${f.id}',${!on})">${on?'✓ ':''}${esc(f.t.split(' sinif')[0])}</button>`}).join('')}</div>`:''}<select class="tgrp" aria-label="Qrup" onchange="tGrp('${t}',this.value)"><option value="">👥 Qrup yoxdur</option>${SGRP.map(g=>`<option${u.grp===g?' selected':''}>${g}</option>`).join('')}</select><button class="tbtn ${u.blok?'undo':'rm'}" onclick="tSet('block','${t}',${!u.blok})">${u.blok?'✅ Bloku aç':'🚫 Blokla'}</button></div>`}).join('')+(rows.length?'':'<div class="empty">Bu filtrdə heç kim yoxdur.</div>')+`</div></div></div>`;
+  const rows=L.filter(u=>q.trim()?uHit(u,q):((!TU.r||u.rol===TU.r)&&okF(u))).sort((a,b)=>(+b.son||0)-(+a.son||0));
+  h+=`<div id="tuRes"><p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Göstərilir: ${rows.length}${q.trim()?' · 🔎 bütün istifadəçilər arasında axtarılır':''}</p><div class="tlist" id="tuList">`+rows.map(u=>{const t=esc(u.tel),pr=isPrem(u);return `<div class="titem${u.blok?' blk':''}" style="flex-wrap:wrap;${u.blok?'border-color:var(--rd);background:var(--rd-s)':''}"><span style="flex:1 1 220px;min-width:0"><b${isPaid(u)?' style="color:#1E8E4E"':''}>${isPaid(u)?'💳 ':''}${esc(u.ad)} ${esc(u.soyad)}</b> <em class="tedit" style="color:var(--bl);background:var(--bl-s)">${esc(u.rol||'')}</em>${pr?' <em class="tedit" style="color:#5C4300;background:#FFD54A">👑 Premium</em>':''}${slN(u)?` <em class="tedit" style="color:#fff;background:#5B6CD9">📚 ${(u.slug||[]).map(x=>x.slice(1)).join(', ')}</em>`:''}${u.blok?' <em class="tedit" style="color:#fff;background:var(--rd)">🚫 Bloklanıb</em>':''}${isPaid(u)?` <em class="tedit" style="color:#fff;background:#1E8E4E;display:inline-block">💳 Ödəniş edib · ${dOnly(u.elaqe)}</em>`:''}<br><small style="color:var(--muted);font-weight:700">+994 ${telHL(u.tel,q)}</small><br><small style="color:var(--muted)">Qeydiyyat: ${dOnly(u.qeyd)} · Son giriş: ${dOnly(u.son)}</small></span><a class="tbtn ed" style="text-decoration:none" href="tel:+994${t}">📞</a><a class="tbtn undo" href="https://wa.me/994${t}" target="_blank" rel="noopener" onclick="tWa('${t}')">💬</a><button class="tbtn${isPaid(u)?'':' undo'}" style="${isPaid(u)?'background:var(--line)':''}" onclick="tSet('elaqe','${t}',${!isPaid(u)})">${isPaid(u)?'↺ Ödənişi geri al':'💳 Ödəniş edib'}</button><button class="tbtn" style="${pr?'background:#FFD54A;border-color:#C99A10;color:#5C4300':'background:var(--card);border:1.5px solid #C99A10;color:#8A6500'}" onclick="tSet('premium','${t}',${!pr})">${pr?'👑 Premiumu götür':'👑 Premium et'}</button><button class="tbtn" style="${slN(u)?'background:#5B6CD9;border-color:#5B6CD9;color:#fff':'background:var(--card);border:1.5px solid #5B6CD9;color:#3B4796'}" onclick="TU.sl=TU.sl==='${t}'?'':'${t}';tUsers()">📚 PDF lüğət${slN(u)?' ('+slN(u)+')':''}</button>${TU.sl===u.tel?`<div style="flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:4px"><b style="font-size:13px;color:#3B4796">Açıq kitablar:</b>${SLUG.map(f=>{const on=(u.slug||[]).includes(f.id);return `<button class="tbtn" style="${on?'background:#5B6CD9;color:#fff;border:1.5px solid #5B6CD9':'background:var(--card);color:#3B4796;border:1.5px solid #5B6CD9'}" onclick="tSlug('${t}','${f.id}',${!on})">${on?'✓ ':''}${esc(f.t.split(' sinif')[0])}</button>`}).join('')}</div>`:''}<button class="tbtn ${u.blok?'undo':'rm'}" onclick="tSet('block','${t}',${!u.blok})">${u.blok?'✅ Bloku aç':'🚫 Blokla'}</button></div>`}).join('')+(rows.length?'':'<div class="empty">Bu filtrdə heç kim yoxdur.</div>')+`</div></div></div>`;
   if(window._tqKeep&&document.getElementById('tuRes')){window._tqKeep=0;const T=document.createElement('div');T.innerHTML=h;document.getElementById('tuRes').innerHTML=T.querySelector('#tuRes').innerHTML;return}window._tqKeep=0;app.innerHTML=h;window.scrollTo(0,same?y:0);
 }
 /* one click: changes at once on screen (no question, no jump), then saves to the sheet; undone if saving fails */
@@ -9412,6 +9412,15 @@ function pdfView(w,keep){
 let TEA=false,PEND=null,TMSG='';
 const LOCK='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 9h-1V7a4 4 0 0 0-8 0v2H7a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2zm-7-2a2 2 0 0 1 4 0v2h-4V7zm2 10a1.6 1.6 0 1 1 0-3.2 1.6 1.6 0 0 1 0 3.2z"/></svg>';
 /* 🔐 müəllim girişi: şifrə serverdə yoxlanılır (saytın kodunda şifrə yoxdur); bu cihazda bir dəfə daxil olduqdan sonra yadda qalır */
+/* ✏️ Redaktə rejimi: müəllim adi menyularla gəzir; taska toxunanda o taskın sualları düzəliş üçün açılır */
+let EDM=false;
+function edStart(){EDM=true;edBar();home()}
+function edStop(){EDM=false;edBar();tHome()}
+function edBar(){let b=document.getElementById('edbar');if(!EDM){if(b)b.remove();document.body.classList.remove('edm');return}
+  if(!b){b=document.createElement('div');b.id='edbar';document.body.appendChild(b);new MutationObserver(()=>edBar()).observe(app,{childList:true})}
+  document.body.classList.add('edm');const n=pendN();
+  const html=`<span>✏️ <b>Redaktə rejimi</b> · taskı seç${n?` · saxlanmamış: <b>${n}</b>`:''}</span><button class="pbtn" style="background:#1E8E4E" ${n?'':'disabled'} onclick="tSave()">Yadda saxla</button><button class="pbtn gh" onclick="edStop()">Çıx</button>`;
+  if(b.innerHTML!==html)b.innerHTML=html}
 function tEnter(){TEA=true;PEND=new Set(DEL);PEDIT=JSON.parse(JSON.stringify(TS.edit));tHome()}
 function teacher(){
   V={};if(TEA)return tHome();
@@ -9434,7 +9443,7 @@ const pendN=()=>{let n=0;for(const x of PEND)if(!DEL.has(x))n++;for(const x of D
 function tBar(){const n=pendN();return `<div class="tbar" style="${colorVars('bl')}"><span>${n?`Saxlanmamış dəyişiklik: <b>${n}</b>`:'Dəyişiklik yoxdur'}</span><button class="btn sm" ${n?'':'disabled'} onclick="tSave()">Yadda saxla</button></div>${TMSG?`<p class="tmsg">${esc(TMSG)}</p>`:''}`}
 function tNote(){app.innerHTML=hdr('💡 Bilirdinizmi?','Yazdığınız qeyd hamının ana səhifəsində, yuxarı sağ küncdə görünür','tHome()','bl')+dnEditorHTML();dnBind();window.scrollTo(0,0)}
 function tHome(){
-  let h=hdr('Müəllim paneli','Bölməni seçin','home()','bl')+tBar()+`<div class="list" style="${colorVars('bl')};margin-bottom:14px"><button class="row" onclick="TU.q='';tUsers()"><div><div class="t">👥 İstifadəçilər</div><div class="s">Qeydiyyatdan keçənlər · zəng və WhatsApp</div></div></button><button class="row" onclick="TU.rq='';tResults()"><div><div class="t">📊 Şagird Nəticələri</div><div class="s">Qruplar üzrə · filtrlər · Excel</div></div></button><button class="row" onclick="tFb()"><div><div class="t">✍️ Rəy və təkliflər</div><div class="s">İstifadəçilərin yazdıqları · nömrə ilə</div></div></button><button class="row" onclick="tNote()"><div><div class="t">💡 Bilirdinizmi? · Günün qeydi</div><div class="s">${dnOn(DNOTE)?'Hamıda göstərilir ✓':'Hazırda gizlidir — yazın və göstərin'}</div></div></button><button class="row" onclick="tLogout()"><div><div class="t">🚪 Bu cihazdan çıxış</div><div class="s">Paneli bu telefonda bağla · yenidən girmək üçün şifrə lazım olacaq</div></div></button></div><p class="tnote">Sildiyiniz sual bütün şagirdlərdən gizlədilir. Növbəti dəfə söz əlavə olunanda həmin task yenidən tam doldurulur və əvvəl onu bitirmiş şagirdlərdə qırmızı görünür.</p><div class="list" style="${colorVars('bl')}">`;
+  let h=hdr('Müəllim paneli','Bölməni seçin','home()','bl')+tBar()+`<div class="list" style="${colorVars('bl')};margin-bottom:14px"><button class="row" onclick="TU.q='';tUsers()"><div><div class="t">👥 İstifadəçilər</div><div class="s">Qeydiyyatdan keçənlər · zəng və WhatsApp</div></div></button><button class="row" style="border:2.5px solid #7F0000" onclick="edStart()"><div><div class="t">✏️ Redaktə et</div><div class="s">Ana ekranda menyulara gir, taskı aç, sözü düzəlt və ya sil, sonra yadda saxla</div></div></button><button class="row" onclick="tFb()"><div><div class="t">✍️ Rəy və təkliflər</div><div class="s">İstifadəçilərin yazdıqları · nömrə ilə</div></div></button><button class="row" onclick="tNote()"><div><div class="t">💡 Bilirdinizmi? · Günün qeydi</div><div class="s">${dnOn(DNOTE)?'Hamıda göstərilir ✓':'Hazırda gizlidir — yazın və göstərin'}</div></div></button><button class="row" onclick="tLogout()"><div><div class="t">🚪 Bu cihazdan çıxış</div><div class="s">Paneli bu telefonda bağla · yenidən girmək üçün şifrə lazım olacaq</div></div></button></div><p class="tnote">Sildiyiniz sual bütün şagirdlərdən gizlədilir. Növbəti dəfə söz əlavə olunanda həmin task yenidən tam doldurulur və əvvəl onu bitirmiş şagirdlərdə qırmızı görünür.</p><div class="list" style="${colorVars('bl')}">`;
   for(const s in SECS){if(s==='rq'||s==='tv')continue;const o=SECS[s];let d=0;for(const x of PEND)if(IDX[x]&&IDX[x].s===s)d++;h+=`<button class="row" onclick="tLevels('${s}')"><div><div class="t" style="color:var(--${o.c})">${o.n}</div><div class="s">${esc(o.az)}</div></div><span class="badge">${d} silinib</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
@@ -9459,7 +9468,7 @@ function tTasks(s,l,c){
 }
 function tTask(s,l,c,t){
   const p=pool(s,l,c),n=SZ(s);
-  let h=hdr('Task '+(t+1),(s==='words'?CATS.find(x=>x[0]===c)[1]+' · ':'')+lvName(l),`tTasks('${s}','${l}','${c}')`,'bl')+tBar()+`<div class="tlist">`;
+  let h=hdr('Task '+(t+1),(s==='words'?CATS.find(x=>x[0]===c)[1]+' · ':'')+lvName(l),EDM?`tasks('${s}','${l}','${c}')`:`tTasks('${s}','${l}','${c}')`,'bl')+tBar()+`<div class="tlist">`;
   for(let i=t*n;i<Math.min(p.length,(t+1)*n);i++){
     const e=p[i],id=ID(s,l,c,e),gone=PEND.has(id);
     const main=s==='gap'?gapHTML(e[0],e[1]):s==='def'?`<b>${esc(e[0])}</b> — ${esc(e[1])}`:s==='words'?`<b>${esc(e[0])}</b> — ${esc(e[1])}`:`<b>${esc(e[0])}</b> — ${esc(e[1])}`;
