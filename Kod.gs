@@ -83,7 +83,7 @@ function usersSheet() {
     /* köhnə başlıqlar (tel, ad, soyad, rol, qeyd, son, blok, sayt, elaqe) → yeni düzülüş */
     const idx = colMap(hv);
     const n = s.getLastRow() - 1;
-    if (n > 0 && !ss.getSheetByName('Users yedək')) s.copyTo(ss).setName('Users yedək');
+    if (n > 0) { /* 🛟 sütunları düzməzdən əvvəl HƏR DƏFƏ tarixli nüsxə */ const nm = 'Users yedək ' + Utilities.formatDate(new Date(), 'Asia/Baku', 'dd.MM HH:mm:ss'); if (!ss.getSheetByName(nm)) s.copyTo(ss).setName(nm); }
     if (n > 0 && idx[0] < 0) return s; /* tanınmayan format: heç nəyə toxunma */
     if (n > 0 && idx.some((i, j) => i !== j)) {
       const all = s.getRange(2, 1, n, w).getValues();
@@ -102,8 +102,11 @@ function usersFix(s) {
   if (n < 1) return;
   const rg = s.getRange(2, 1, n, UL.length), v = rg.getValues();
   let ch = false;
-  v.forEach(r => { [4, 5, 8].forEach(j => { const d = asDate(r[j]); if (d !== r[j]) { r[j] = d; ch = true; } }); const b = isTrue(r[6]); if (r[6] !== b) { r[6] = b; ch = true; } const p = isTrue(r[9]); if (r[9] !== p) { r[9] = p; ch = true; } });
-  if (ch) rg.setValues(v);
+  /* yalnız dəyişən xanaları yazır (bütün cədvəli yenidən yazmır — eyni anda edilən blok/ödəniş itməsin) */
+  v.forEach((r, i) => {
+    [4, 5, 8].forEach(j => { const d = asDate(r[j]); if (d !== r[j]) s.getRange(i + 2, j + 1).setValue(d); });
+    [6, 9].forEach(j => { const b = isTrue(r[j]); if (r[j] !== b && r[j] !== '') s.getRange(i + 2, j + 1).setValue(b); });
+  });
   s.getRange(2, 5, n, 2).setNumberFormat(DF);
   s.getRange(2, 9, n, 1).setNumberFormat(DF);
   s.getRange(2, 7, n, 1).insertCheckboxes();
@@ -258,6 +261,11 @@ function fbSet(o, now) {
 
 /* Oxu: ?a=cfg (hamı üçün) · ?a=users&key=… · ?a=plist&key=… (müəllim) */
 function doGet(e) {
+  const lock = LockService.getScriptLock(); /* oxuma da növbə ilə: eyni anda iki sorğu cədvəli düzəndə qarışıqlıq olmasın */
+  lock.waitLock(10000);
+  try { return doGet_(e); } finally { lock.releaseLock(); }
+}
+function doGet_(e) {
   const p = e.parameter || {};
   if (p.a === 'cfg') { const v = cfgSheet().getRange('A1').getValue(); let st = null; try { st = v ? JSON.parse(v) : null; } catch (e) {} return out({ state: st }); }
   if (p.key !== KEY) return out({ error: 'key' });
