@@ -305,9 +305,12 @@ const MV = {
   pr(){ const p = MV.get('myvocab-prof', null); return p && p.n && p.k && String(p.t || '').replace(/\D/g, '').length === 9 ? p : null; }
 };
 function mvLog(r, topic){ const o = MV.st(); if (o.log.some(e => e.at === r.ts)) return; o.log.push({ sec: 'Grammar · ' + r.title, g: 'gram|' + topic, r: r.score, n: r.total, p: Math.round(r.score / r.total * 100), w: [], at: r.ts, sent: 0 }); MV.save(o);
+  /* 👥 qrupdakı şagirdin nəticəsi müəllimə: ana səhifə açılanda avtomatik göndərilir */
+  try{ const reg = MV.get('mnv-reg2', null); if (reg && reg.tel){ const q = MV.get('mnv-q', []); q.push({ a: 'res', tel: reg.tel, list: [{ sec: 'Grammar · ' + r.title, r: r.score, n: r.total, p: Math.round(r.score / r.total * 100), w: [], at: r.ts }] }); localStorage.setItem('mnv-q', JSON.stringify(q.slice(-200))); } }catch(e){}
 }
 function mvSendBox(r){
   const el = document.getElementById('res-send'); if (!el) return; if (!r || r.mist){ el.innerHTML = ''; return; }
+  if (MV.get('mnv-grp', '')){ el.innerHTML = '<p class="muted small" style="text-align:center;font-weight:800;color:#0E7C86">✓ Nəticə avtomatik müəllimə göndərildi</p>'; return; }
   const P = MV.pr(), o = MV.st(), cur = o.log.find(e => e.at === r.ts);
   if (!cur){ el.innerHTML = ''; return; }
   if (!P){ el.innerHTML = '<p class="muted small" style="text-align:center">Nəticəni müəllimə göndərmək üçün My New Vocabulary-nin ana səhifəsində «Nəticəni müəllimə göndər» bölməsini doldur.</p>'; return; }
