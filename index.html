@@ -141,6 +141,23 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .mtabs button{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:11px 8px;font:inherit;font-weight:800;font-size:14px;color:var(--ink)}
 .mtabs button b{display:inline-block;margin-left:4px;padding:1px 8px;border-radius:999px;background:var(--line)}
 .mtabs button.on{border-color:var(--rd);background:var(--rd-s)}.mtabs button.on.un{border-color:#E0A100;background:#FFF4CC;color:#5C4300}
+.fcl{margin:4px 0 8px;font-weight:900;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.05em}
+.fcch .chip small{font-weight:700;opacity:.8}.fcch .chip.on{background:var(--c);border-color:var(--c)}
+.fcard{perspective:1200px;margin:6px 0 14px;cursor:pointer;outline:none}
+.fcin{position:relative;min-height:330px;transition:transform .45s;transform-style:preserve-3d}
+.fcard.flip .fcin{transform:rotateY(180deg)}
+.fcf,.fcb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:24px;border:2px solid var(--c);background:var(--s);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px 18px;text-align:center;gap:6px}
+.fcb{transform:rotateY(180deg);background:var(--card)}
+.fpos{position:absolute;top:14px;left:16px;font-size:12px;font-weight:900;color:var(--c);background:var(--card);border-radius:999px;padding:3px 10px}
+.fcb .fpos{background:var(--s)}
+.fbox{position:absolute;top:14px;right:16px;font-size:12px;font-weight:800;color:var(--muted)}.fbox.new{color:var(--ok)}
+.fw{font-size:clamp(32px,10vw,46px);font-weight:900;color:var(--c);line-height:1.1;overflow-wrap:anywhere}
+.fw.sm{font-size:24px}
+.ftr{font-size:22px;font-weight:900;color:var(--ink)}.ftr.ru{font-size:18px;color:var(--muted);font-weight:800}
+.fhint{margin:10px 0 0;color:var(--muted);font-size:13px;font-weight:700}
+.fcbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fcbtns .btn,.fcnav .btn{margin:0}
+.fcrep{background:#E0A100!important;color:#fff}.fcok{background:var(--ok)!important;color:#fff}
+.fcnav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.fcnav .btn:disabled{opacity:.4}
 .mhint{margin:0 0 10px;color:var(--muted);font-size:13px;font-weight:600;text-align:center}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font-weight:800;font-size:14px}
@@ -7982,7 +7999,7 @@ const count=s=>LV.reduce((t,[l])=>t+levelCount(s,l),0);
 const SKEY='myvocab-v2';
 let ST={known:{},mist:{},done:{},learned:{},rd:{},dl:{},log:[],uns:{}};
 function load(){
-  try{const r=localStorage.getItem(SKEY);if(r){const o=JSON.parse(r);ST={known:o.known||{},mist:o.mist||{},done:o.done||{},learned:o.learned||{},rd:o.rd||{},dl:o.dl||{},log:Array.isArray(o.log)?o.log:[],pa:o.pa||{},uns:o.uns||{}};return}}catch(e){}
+  try{const r=localStorage.getItem(SKEY);if(r){const o=JSON.parse(r);ST={known:o.known||{},mist:o.mist||{},done:o.done||{},learned:o.learned||{},rd:o.rd||{},dl:o.dl||{},log:Array.isArray(o.log)?o.log:[],pa:o.pa||{},uns:o.uns||{},fc:o.fc||{}};return}}catch(e){}
   try{const r=localStorage.getItem('myvocab-v1');if(!r)return;const o=JSON.parse(r);
     const conv=k=>{const [s,l,c,i]=k.split(':');const p=pool(s,l,c==='-'?'':c);const e=p[+i];return e?ID(s,l,c==='-'?'':c,e):null};
     for(const k in o.known||{}){const id=conv(k);if(id)ST.known[id]=1}
@@ -8168,6 +8185,63 @@ function vocabHome(){
   app.innerHTML=h+`</div>`;window.scrollTo(0,0);
 }
 const VSECS=['words','syn','ant','def','gap','mk'];
+/* ---------- 🃏 Sözləri kartlarla öyrən (Flashcards) ----------
+   Leitner qutuları: «Bildim» → kart növbəti qutuya keçir və sonra (1, 3, 7, 14, 30 gün) yenidən çıxır;
+   «Təkrar etməliyəm» → kart 1-ci qutuya qayıdır və bu dəstdə 3 kartdan sonra yenə göstərilir. */
+const FCDAY=86400000,FCGAP=[0,1,3,7,14,30];
+let FCL='A',FCC='all';
+function fcIds(l,c){const out=[];for(const [cc] of CATS){if(c!=='all'&&cc!==c)continue;(D.words[l][cc]||[]).forEach(e=>{const id=ID('words',l,cc,e);if(!DEL.has(id))out.push(id)})}return out}
+function fcStat(ids){const F=ST.fc||{},now=Date.now();let kn=0,due=0,nw=0;ids.forEach(id=>{const f=F[id];if(!f)nw++;else{if(f.b>=1)kn++;if(f.d<=now)due++}});return {kn,due,nw,n:ids.length}}
+function fcHome(){
+  V={};if(!ST.fc)ST.fc={};
+  let h=hdr('Sözləri kartlarla öyrən','Flashcards · səviyyə və nitq hissəsini seçin','vocabHome()','in')+`<div style="${colorVars('in')}">`;
+  h+=`<p class="fcl">Səviyyə</p><div class="chips fcch">`+LV.map(([l,n,az])=>`<button class="chip ${FCL===l?'on':''}" onclick="FCL='${l}';fcHome()">${n} <small>${az}</small></button>`).join('')+`</div>`;
+  h+=`<p class="fcl">Nitq hissəsi</p><div class="list">`;
+  const row=(c,n,az)=>{const ids=fcIds(FCL,c);if(!ids.length)return '';const st=fcStat(ids);
+    return `<button class="row" onclick="FCC='${c}';fcStart()"><div><div class="t">${n}</div><div class="s">${az} · ${st.n} söz${st.due?` · <b style="color:var(--rd)">${st.due} təkrar gözləyir</b>`:''}</div></div><span class="badge">${st.kn}/${st.n}</span></button>`};
+  h+=row('all','Hamısı','Bütün nitq hissələri');
+  for(const [c,n,az] of CATS)h+=row(c,n,az);
+  h+=`</div><p class="mhint" style="margin-top:12px">Sağdakı rəqəm: «Bildim» dediyin kartlar / hamısı</p>`;
+  app.innerHTML=h+'</div>';window.scrollTo(0,0);
+}
+function fcStart(){
+  const F=ST.fc||(ST.fc={}),now=Date.now(),ids=fcIds(FCL,FCC);
+  const due=shuf(ids.filter(id=>F[id]&&F[id].d<=now)).sort((a,b)=>F[a].b-F[b].b);
+  const fresh=shuf(ids.filter(id=>!F[id]));
+  let deck=due.concat(fresh).slice(0,20);
+  if(!deck.length)deck=shuf(ids).sort((a,b)=>(F[a]?F[a].d:0)-(F[b]?F[b].d:0)).slice(0,20);/* hamısı öyrənilib: ən tez vaxtı çatacaqlar */
+  V={fc:{deck,i:0,flip:false,ok:0,rep:0,seen:{}}};fcShow();
+}
+function fcShow(){
+  const S=V.fc,id=S.deck[S.i];if(!id)return fcEnd();
+  const r=IDX[id],e=entry(r),cat=CATS.find(x=>x[0]===r.c)||['','',''];
+  const f=(ST.fc||{})[id];
+  let h=hdr('Kartlar · '+lvName(FCL),FCC==='all'?'Bütün nitq hissələri':(CATS.find(x=>x[0]===FCC)||[0,''])[1],'fcHome()','in')+`<div style="${colorVars('in')}">`;
+  h+=`<div class="bar"><i style="width:${S.i/S.deck.length*100}%"></i></div><div class="qmeta"><span>Kart ${S.i+1} / ${S.deck.length}</span><span>Bildim: ${S.ok}</span></div>`;
+  h+=`<div class="fcard${S.flip?' flip':''}" role="button" tabindex="0" aria-label="Kartı çevir" onclick="fcFlip()"><div class="fcin">`;
+  h+=`<div class="fcf"><span class="fpos">${esc(cat[1])} · ${esc(cat[2])}</span><div class="fw">${esc(e[0])}</div>${e[4]?`<p class="ipa">/${esc(e[4])}/</p>`:''}<button class="say" aria-label="Dinlə" onclick="event.stopPropagation();say('${esc(jsq(e[0]))}',.8)">${SPK}</button><p class="fhint">Tərcüməni görmək üçün karta toxun</p>${f?`<span class="fbox">${f.b?'Qutu '+f.b:'Təkrar'}</span>`:'<span class="fbox new">Yeni</span>'}</div>`;
+  h+=`<div class="fcb"><span class="fpos">${esc(cat[1])}</span><div class="fw sm">${esc(e[0])}</div><div class="ftr">🇦🇿 ${esc(e[1])}</div>${e[2]?`<div class="ftr ru">🇷🇺 ${esc(e[2])}</div>`:''}${e[3]?`<div class="exrow" style="margin-top:12px"><p class="ex">${exHTML(e[3])}</p><button class="say sm" aria-label="Cümləni dinlə" onclick="event.stopPropagation();say('${esc(jsq(e[3]))}',.92)">${SPK}</button></div>`:''}</div>`;
+  h+=`</div></div>`;
+  h+=`<div class="fcbtns"><button class="btn fcrep" onclick="fcMark(0)">↻ Təkrar etməliyəm</button><button class="btn fcok" onclick="fcMark(1)">✓ Bildim</button></div>`;
+  h+=`<div class="fcnav"><button class="btn ghost" ${S.i?'':'disabled'} onclick="fcGo(-1)">‹ Əvvəlki</button><button class="btn ghost" onclick="fcGo(1)">Növbəti ›</button></div>`;
+  app.innerHTML=h+'</div>';
+  if(!S.flip&&S.spoke!==S.i){S.spoke=S.i;setTimeout(()=>say(e[0],.8),250)}
+}
+function fcFlip(){V.fc.flip=!V.fc.flip;const c=document.querySelector('.fcard');if(c)c.classList.toggle('flip',V.fc.flip)}
+function fcGo(d){const S=V.fc;S.i=Math.max(0,S.i+d);S.flip=false;if(S.i>=S.deck.length)return fcEnd();fcShow()}
+function fcMark(ok){
+  const S=V.fc,id=S.deck[S.i],F=ST.fc||(ST.fc={}),now=Date.now(),f=F[id]||{b:0,d:0};
+  if(ok){f.b=Math.min(5,(f.b||0)+1);f.d=now+FCGAP[f.b]*FCDAY;if(!S.okd)S.okd={};if(!S.okd[id]){S.okd[id]=1;S.ok++}}
+  else{f.b=0;f.d=now;S.rep++;const at=Math.min(S.deck.length,S.i+4);S.deck.splice(at,0,id)}
+  S.seen[id]=1;F[id]=f;save();fcGo(1);
+}
+function fcEnd(){
+  const S=V.fc,st=fcStat(fcIds(FCL,FCC));
+  let h=hdr('Kartlar bitdi',lvName(FCL),'fcHome()','in')+`<div style="${colorVars('in')}"><div class="res"><div class="big">🃏 ${S.ok}</div><p>Bu dəstdə «Bildim» dediyin kartlar.${S.rep?`<br>${S.rep} dəfə «Təkrar etməliyəm» dedin — onlar tez-tez qarşına çıxacaq.`:''}</p><p class="mhint">Bu bölmədə: ${st.kn}/${st.n} söz bilinir${st.due?` · ${st.due} təkrar gözləyir`:''}</p></div>`;
+  h+=`<button class="btn" onclick="fcStart()">Yenə 20 kart</button><button class="btn ghost" onclick="fcHome()">Geri qayıt</button></div>`;
+  app.innerHTML=h;window.scrollTo(0,0);if(S.ok>=15)fireworks();
+}
+document.addEventListener('keydown',e=>{if(!V.fc||!document.querySelector('.fcard'))return;if(e.key===' '||e.key==='Enter'){e.preventDefault();fcFlip()}else if(e.key==='ArrowRight')fcGo(1);else if(e.key==='ArrowLeft'&&V.fc.i)fcGo(-1)});
 /* ---------- 🧩 Grammar (müvəqqəti: testlər Mərhələ 3-də əlavə olunur) ---------- */
 function grammarHome(){
   location.href='grammar/';return;
@@ -8368,7 +8442,7 @@ function delMist(id){delete ST.mist[id];save();mistakes()}
 let RCONF=false;
 function resetAll(){RCONF=true;home()}
 function resetNo(){RCONF=false;home()}
-function resetYes(){RCONF=false;ST={known:{},mist:{},done:{},learned:{},rd:{},dl:{},log:[],pa:{},uns:{}};save();home()}
+function resetYes(){RCONF=false;ST={known:{},mist:{},done:{},learned:{},rd:{},dl:{},log:[],pa:{},uns:{},fc:{}};save();home()}
 
 /* ---------- make up sentences ---------- */
 function mkHTML(q){
