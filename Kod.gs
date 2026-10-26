@@ -24,9 +24,9 @@ function out(o) {
 }
 
 /* ---------- Users vərəqi (oxunaqlı başlıqlar, tarixlər, blok qutucuqları) ---------- */
-const UL = ['Telefon', 'Ad', 'Soyad', 'Rol', 'Qeydiyyat tarixi', 'Son giriş', 'Bloklanıb', 'Sayt', 'Əlaqə saxlanılıb', 'Premium', 'PDF lüğət', 'Qrup', 'Profil adı', 'Profil sinfi', 'Düzəldilmiş ad'];
+const UL = ['Telefon', 'Ad', 'Soyad', 'Rol', 'Qeydiyyat tarixi', 'Son giriş', 'Bloklanıb', 'Sayt', 'Əlaqə saxlanılıb', 'Premium', 'PDF lüğət', 'Qrup', 'Profil adı', 'Profil sinfi', 'Düzəldilmiş ad', 'Düzgün nömrə'];
 /* 👥 qruplar (müəllim panelində şagirdə verilir) */
-const GROUPS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'L 11', 'L 14', 'N 16.1', 'N 16.2', 'N 18.1', 'N 18.2'];
+const GROUPS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'N 11', 'N 14', 'N 16.1', 'N 16.2', 'N 18.1', 'N 18.2'];
 const DF = 'dd.mm.yyyy hh:mm';
 const isTrue = x => x === true || /^(true|bəli|beli|yes|1|blok)$/i.test(String(x).trim());
 const ms = x => x instanceof Date ? x.getTime() : (+x || '');
@@ -50,7 +50,8 @@ function colMap(hv) {
     k => k === 'qrup' || k === 'group' || k === 'grp',
     k => k === 'profil adı' || k === 'pn',
     k => k === 'profil sinfi' || k === 'pk',
-    k => k.startsWith('düzəldilmiş') || k === 'nm'];
+    k => k.startsWith('düzəldilmiş') || k === 'nm',
+    k => k.startsWith('düzgün nömrə') || k === 'tel2'];
   return T.map(f => h.findIndex(f));
 }
 /* başqa vərəqlərdə qalmış köhnə istifadəçiləri Users-ə köçürür (təkrarlamadan) */
@@ -107,13 +108,17 @@ function usersFix(s) {
   s.getRange(2, 9, n, 1).setNumberFormat(DF);
   s.getRange(2, 7, n, 1).insertCheckboxes();
   s.getRange(2, 10, n, 1).insertCheckboxes();
-  s.getRange(2, 11, n, 5).removeCheckboxes().setNumberFormat('@');
+  s.getRange(2, 11, n, 6).removeCheckboxes().setNumberFormat('@');
+  /* köhnə qrup adları: L 11 → N 11, L 14 → N 14 */
+  const gr = s.getRange(2, 12, n, 1), gv = gr.getValues(); let gch = false;
+  gv.forEach(r => { const m = String(r[0]).match(/^L (11|14)$/); if (m) { r[0] = 'N ' + m[1]; gch = true; } });
+  if (gch) gr.setValues(gv);
 }
 function usersRows(s) {
   usersImport(s);
   usersFix(s);
   const v = s.getDataRange().getValues(); v.shift();
-  return v.filter(r => r[0] !== '').map(r => ({ tel: String(r[0]), ad: r[1], soyad: r[2], rol: r[3], qeyd: ms(r[4]), son: ms(r[5]), blok: isTrue(r[6]), sayt: r[7], elaqe: ms(r[8]), prem: isTrue(r[9]), slug: slugList(r[10]), grp: String(r[11] || ''), pn: String(r[12] || ''), pk: String(r[13] || ''), nm: String(r[14] || '') }));
+  return v.filter(r => r[0] !== '').map(r => ({ tel: String(r[0]), ad: r[1], soyad: r[2], rol: r[3], qeyd: ms(r[4]), son: ms(r[5]), blok: isTrue(r[6]), sayt: r[7], elaqe: ms(r[8]), prem: isTrue(r[9]), slug: slugList(r[10]), grp: String(r[11] || ''), pn: String(r[12] || ''), pk: String(r[13] || ''), nm: String(r[14] || ''), tel2: String(r[15] || '') }));
 }
 function userRow(s, tel) {
   const n = s.getLastRow();
@@ -126,8 +131,8 @@ function userPing(o, now) {
   const s = usersSheet();
   const r = userRow(s, o.tel);
   if (!r) {
-    s.appendRow(["'" + (o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', new Date(+o.qeyd || now), new Date(now), false, o.sayt || '', '', false, '', '', String(o.pn || '').slice(0, 80), String(o.pk || '').slice(0, 40), '']);
-    s.getRange(s.getLastRow(), 11, 1, 5).setNumberFormat('@');
+    s.appendRow(["'" + (o.tel || ''), o.ad || '', o.soyad || '', o.rol || '', new Date(+o.qeyd || now), new Date(now), false, o.sayt || '', '', false, '', '', String(o.pn || '').slice(0, 80), String(o.pk || '').slice(0, 40), '', '']);
+    s.getRange(s.getLastRow(), 11, 1, 6).setNumberFormat('@');
     const lr = s.getLastRow();
     s.getRange(lr, 5, 1, 2).setNumberFormat(DF);
     s.getRange(lr, 7).insertCheckboxes();
@@ -147,10 +152,11 @@ function userSet(o, now) {
   if (!r) return { ok: false, error: 'tel' };
   if (o.a === 'block') { s.getRange(r, 7).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
   if (o.a === 'premium') { s.getRange(r, 10).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
-  if (o.a === 'ren') { /* ✏️ müəllimin düzəltdiyi ad ('' = qeydiyyatdakı ad) */
+  if (o.a === 'ren') { /* ✏️ müəllimin düzəltdiyi ad və nömrə ('' = qeydiyyatdakı) — şagirdin girişi dəyişmir */
     const t = String(o.v || '').trim().replace(/\s+/g, ' ').slice(0, 80);
-    s.getRange(r, 15).setNumberFormat('@').setValue(t);
-    return { ok: true, nm: t };
+    const t2 = String(o.t2 || '').replace(/\D/g, '').replace(/^994/, '').replace(/^0/, '').slice(0, 9);
+    s.getRange(r, 15, 1, 2).setNumberFormat('@').setValues([[t, t2]]);
+    return { ok: true, nm: t, tel2: t2 };
   }
   if (o.a === 'grp') { /* 👥 qrup: '' = qrupsuz */
     const g = String(o.v || '');
