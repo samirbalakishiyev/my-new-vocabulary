@@ -158,6 +158,16 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .fcbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fcbtns .btn,.fcnav .btn{margin:0}
 .fcrep{background:#E0A100!important;color:#fff}.fcok{background:var(--ok)!important;color:#fff}
 .fcnav{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.fcnav .btn:disabled{opacity:.4}
+.resrow{display:flex;align-items:center;gap:12px;width:100%;margin-top:10px;padding:12px 14px;border-radius:18px;border:2px solid var(--gr);background:var(--card);text-align:left;font:inherit;color:var(--ink)}
+.resrow .mic{font-size:26px}.resrow b{display:block;font-size:17px;font-weight:900;color:var(--gr)}.resrow small{display:block;color:var(--muted);font-weight:700;font-size:13px}.resrow em{font-style:normal;color:var(--rd)}.resrow .go{margin-left:auto;font-size:26px;font-weight:900;color:var(--gr)}
+.rstat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}.rstat>div{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px;text-align:center}.rstat b{display:block;font-size:22px;font-weight:900;color:var(--c)}.rstat span{font-size:12px;font-weight:700;color:var(--muted)}.rstat .u b{color:var(--rd)}
+.rch{margin-top:12px}.rch .chip.on{background:var(--c);border-color:var(--c)}
+.rday{margin:14px 0 6px;font-weight:900;color:var(--muted);font-size:13px}
+.rlist{display:grid;gap:8px}
+.ritem{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px}
+.rp{flex:none;width:58px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:900;color:#fff}.rp.ok{background:var(--ok)}.rp.mid{background:#E0A100}.rp.low{background:var(--rd)}
+.rx{min-width:0}.rx b{display:block;font-weight:800;line-height:1.25;overflow-wrap:anywhere}.rx small{display:block;color:var(--muted);font-weight:600;font-size:13px;margin-top:2px}
+.rs{display:inline-block;margin-top:4px;font-size:12px;font-weight:800;border-radius:999px;padding:2px 9px}.rs.y{background:var(--ok-s);color:var(--ok)}.rs.n{background:var(--rd-s);color:var(--rd)}
 .mhint{margin:0 0 10px;color:var(--muted);font-size:13px;font-weight:600;text-align:center}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font-weight:800;font-size:14px}
@@ -8164,6 +8174,7 @@ function home(){
   {const nu=Object.keys(ST.uns||{}).filter(live).length,ng=Object.keys(grMist()).length;h+=mb('❗','Səhvlərim','Səhv cavablar · Əmin olmadıqlarım',String(m+ng)+(nu?' · 🤔 '+nu:''),'rd','mistakes()');}
   h+=mb('🏆','Ümumi Sınaqlar','Siniflər üzrə sınaqlar','Tezliklə','am','examsHome()');
   h+=`</div>`;
+  {const nU=ST.log.filter(e=>!e.sent).length;h+=`<button class="resrow" onclick="resHome()"><span class="mic" aria-hidden="true">📊</span><span><b>Nəticələrim</b><small>${ST.log.length} nəticə${nU?` · <em>${nU} göndərilməyib</em>`:''}</small></span><span class="go">›</span></button>`;}
   h+=RCONF?`<div class="foot"><p class="perr" style="color:var(--rd);font-weight:800;margin:0 0 8px">Bütün nəticələr, bildiyin sözlər və səhvlər silinsin?</p><div class="pbtns" style="justify-content:center"><button class="pbtn dl" style="text-decoration:none;color:var(--rd);font-size:15px" onclick="resetYes()">Bəli, sıfırla</button><button class="pbtn gh" style="text-decoration:none;font-size:15px" onclick="resetNo()">Xeyr</button></div></div>`:`<div class="foot"><button onclick="resetAll()">Bütün nəticələri sıfırla</button></div>`;
   app.innerHTML=h;window.scrollTo(0,0);
 }
@@ -8242,6 +8253,29 @@ function fcEnd(){
   app.innerHTML=h;window.scrollTo(0,0);if(S.ok>=15)fireworks();
 }
 document.addEventListener('keydown',e=>{if(!V.fc||!document.querySelector('.fcard'))return;if(e.key===' '||e.key==='Enter'){e.preventDefault();fcFlip()}else if(e.key==='ArrowRight')fcGo(1);else if(e.key==='ArrowLeft'&&V.fc.i)fcGo(-1)});
+/* ---------- 📊 Nəticələrim: bütün nəticələr; göndərilməyənlər bir düymə ilə müəllimə gedir, göndərilən bir daha getmir ---------- */
+let RF='all';
+function resHome(){
+  V={rh:1};const L=ST.log.slice().sort((a,b)=>b.at-a.at),un=L.filter(e=>!e.sent);
+  const ps=L.map(e=>e.p).filter(x=>typeof x==='number'),avg=ps.length?Math.round(ps.reduce((a,b)=>a+b,0)/ps.length):0;
+  let h=hdr('Nəticələrim','Test nəticələrin və müəllimə göndərmə','home()','gr')+`<div style="${colorVars('gr')}">`;
+  h+=`<div class="rstat"><div><b>${L.length}</b><span>nəticə</span></div><div><b>${avg}%</b><span>orta bal</span></div><div class="${un.length?'u':''}"><b>${un.length}</b><span>göndərilməyib</span></div></div>`;
+  if(un.length){
+    if(hasPR()){const batch=un.slice().reverse().slice(0,20);
+      h+=`<a class="btn send" style="margin:0 0 6px" href="${esc(waHref(batch))}" target="_blank" rel="noopener" onclick="markSent([${batch.map(e=>e.at).join(',')}]);setTimeout(resHome,500)">${WAI}Müəllimə göndər (${batch.length} nəticə)</a><p class="sendnote">${un.length>20?`Bir dəfəyə 20 nəticə gedir, qalan ${un.length-20} nəticə üçün düyməni yenə bas. `:''}Göndərilən nəticələr «✓ göndərilib» olur və bir daha getmir. Müəllim: ${fmtTel(PR.t)}</p>`}
+    else h+=`<p class="sendnote" style="margin:0 0 12px">Nəticələri müəllimə göndərmək üçün ana səhifədə «Nəticəni müəllimə göndər» bölməsini doldur.</p>`;
+  }
+  if(RF==='un'&&!un.length)RF='all';
+  h+=`<div class="chips rch"><button class="chip ${RF==='all'?'on':''}" onclick="RF='all';resHome()">Hamısı (${L.length})</button><button class="chip ${RF==='un'?'on':''}" onclick="RF='un';resHome()">Göndərilməyənlər (${un.length})</button><button class="chip ${RF==='sent'?'on':''}" onclick="RF='sent';resHome()">Göndərilənlər (${L.length-un.length})</button></div>`;
+  const list=L.filter(e=>RF==='all'||(RF==='un'?!e.sent:!!e.sent));
+  if(!list.length)h+=`<div class="empty">${L.length?'Bu filtrdə nəticə yoxdur.':'Hələ nəticə yoxdur. Test işlədikcə nəticələrin burada toplanacaq.'}</div>`;
+  else{let day='';h+=`<div class="rlist">`;
+    for(const e of list){const d=fmtD(e.at),dd=d.slice(0,10);if(dd!==day){day=dd;h+=`<p class="rday">${dd}</p>`}
+      const pc=e.p>=80?'ok':e.p>=50?'mid':'low';
+      h+=`<div class="ritem"><div class="rp ${pc}">${e.p}%</div><div class="rx"><b>${esc(e.sec||'')}</b><small>${d.slice(11)} · ${e.r}/${e.n} düz${e.w&&e.w.length?` · səhvlər: ${esc(e.w.slice(0,6).join(', '))}${e.w.length>6?'…':''}`:''}</small><span class="rs ${e.sent?'y':'n'}">${e.sent?'✓ göndərilib '+fmtD(e.sent).slice(0,5):'⏳ göndərilməyib'}</span></div></div>`}
+    h+=`</div>`}
+  app.innerHTML=h+'</div>';window.scrollTo(0,0);
+}
 /* ---------- 🧩 Grammar (müvəqqəti: testlər Mərhələ 3-də əlavə olunur) ---------- */
 function grammarHome(){
   location.href='grammar/';return;
@@ -8369,7 +8403,7 @@ function result(){
   const pct=Math.round(right/qs.length*100);
   const msg=pct===100?'Əla! Hamısını bildin.':pct>=80?'Çox yaxşı nəticə!':pct>=50?'Pis deyil, səhvləri təkrar et.':'Bunları bir daha işləmək lazımdır.';
   let h=hdr('Nəticə','',ctx.back,c)+`<div style="${colorVars(c)}"><div class="res"><div class="big">${right}/${qs.length}</div><p>${msg}</p></div>`;
-  {const ws=qs.filter(q=>wrong.includes(q.id)).map(q=>q.s==='def'||q.s==='gap'||q.s==='rq'?q.ans.a:q.prompt);const at=Date.now();ST.log.push({sec:secName(),g:grpKey(),r:right,n:qs.length,p:pct,w:ws,at,sent:0});if(ST.log.length>60)ST.log=ST.log.slice(-60);V.logAt=at;save();try{syncRes(ST.log[ST.log.length-1])}catch(e){}}
+  {const ws=qs.filter(q=>wrong.includes(q.id)).map(q=>q.s==='def'||q.s==='gap'||q.s==='rq'?q.ans.a:q.prompt);const at=Date.now();ST.log.push({sec:secName(),g:grpKey(),r:right,n:qs.length,p:pct,w:ws,at,sent:0});if(ST.log.length>300)ST.log=ST.log.slice(-300);V.logAt=at;save();try{syncRes(ST.log[ST.log.length-1])}catch(e){}}
   if(hasPR())h+=`<div id="sendbox">${sendBox()}</div>`;
   if(ctx.mode==='task'){
     for(let t=ctx.t+1;t<nTasks(ctx.s,ctx.l,ctx.c);t++){if(!taskState(ctx.s,ctx.l,ctx.c,t,ctx.dir).empty){h+=`<button class="btn" onclick="V.s='${ctx.s}';V.l='${ctx.l}';V.c='${ctx.c}';startTask(${t})">Növbəti task</button>`;break}}
