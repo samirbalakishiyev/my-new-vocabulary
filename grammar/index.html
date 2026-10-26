@@ -403,6 +403,8 @@ $("#opts").addEventListener("click", e => {
   cur.chosen = +b.dataset.k;
   if (cur.chosen !== cur.q.a) setMist(cur.id, true); else if (G.mist) setMist(cur.id, false);
   render();
+  /* düz cavab → 0.7 san. sonra avtomatik növbəti suala */
+  if (cur.chosen === cur.q.a && G.i < G.qs.length - 1){ const g = G, i = G.i; setTimeout(() => { if (G === g && G.i === i && !$("#s-test").hidden){ G.i++; render(); } }, 700); }
 });
 $("#prev").addEventListener("click", () => { if (G.i > 0){ G.i--; render(); } });
 $("#next").addEventListener("click", () => { if (G.i < G.qs.length - 1){ G.i++; render(); } else finish(); });

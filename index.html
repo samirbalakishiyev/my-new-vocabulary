@@ -236,6 +236,10 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .credit .wa{padding:3px 9px;font-size:inherit;gap:5px}.credit .wa svg{width:14px;height:14px}
 .btn.send{padding:9px 14px;font-size:16px;min-height:0}
 .fbbtn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin:-4px 0 8px;padding:7px 10px;border:2.5px solid #7F0000;border-radius:12px;background:#D32F2F;color:#fff;box-shadow:0 6px 16px -10px #7F0000;font:inherit;font-weight:800;font-size:13.5px;cursor:pointer;white-space:nowrap;overflow:hidden}
+.thin4{display:grid;gap:6px;margin-top:12px}.thin4 .hgrid{margin:0;gap:6px}
+.thin4 .resrow{margin:0;padding:4px 12px;min-height:38px;border-radius:12px;gap:8px;box-sizing:border-box}.thin4 .resrow .mic{font-size:19px}.thin4 .resrow>span:nth-child(2){display:flex;align-items:baseline;gap:7px;min-width:0;overflow:hidden;white-space:nowrap}.thin4 .resrow b{font-size:15.5px;display:inline}.thin4 .resrow small{font-size:11.5px;display:inline;overflow:hidden;text-overflow:ellipsis}.thin4 .resrow .go{font-size:20px}
+.thin4 .fbbtn{margin:0;min-height:38px}
+.thin4 .hgrid .tile.wide:last-child{padding-right:12px}
 .fbbtn span{color:#FFE3E3;font-weight:700;font-size:12.5px}
 .fbta{width:100%;box-sizing:border-box;font:inherit;font-size:16px;font-weight:700;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);resize:vertical}
 .fbh{margin:18px 0 8px;font-size:17px;font-weight:900}
@@ -8184,11 +8188,12 @@ const lvName=l=>(LV.find(x=>x[0]===l)||[0,(TV[l]&&TV[l].n)||l])[1];
 function home(){
   V={};const k=Object.keys(ST.known).filter(live).length,m=Object.keys(ST.mist).filter(live).length;
   const t='My New Vocabulary'.split('').map((ch,i)=>ch===' '?' ':`<span class="c${i%5}">${ch}</span>`).join('');
-  let h=`<div class="dn-host topbar${dnOn(DNOTE)?' has-note':''}"><div class="tb-l"><header class="brand"><h1 class="logo">${t}</h1></header><div class="credit"><span>Created by <b><span onclick="teacher()">S</span>amir Balakishiyev</b></span><a class="wa" href="https://wa.me/994557958625" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>055 795 86 25</a><button type="button" class="applink" data-cp="https://samirbalakishiyev.github.io/my-new-vocabulary/">🔗 Proqramın linki</button>${REG&&REG.ad?`<button type="button" class="applink me" onclick="meEdit()">👤 ${esc(REG.ad+' '+(REG.soyad||''))} ✏️</button>`:''}</div></div><div class="dnote-slot">${dnHTML()}</div></div>`+a2hsTip()+profHTML()+`<button class="fbbtn" onclick="fbHome()">✍️ Rəy və təklifləriniz <span>— yazın, oxuyuruq</span></button><div class="grid hgrid">`;
+  let h=`<div class="dn-host topbar${dnOn(DNOTE)?' has-note':''}"><div class="tb-l"><header class="brand"><h1 class="logo">${t}</h1></header><div class="credit"><span>Created by <b><span onclick="teacher()">S</span>amir Balakishiyev</b></span><a class="wa" href="https://wa.me/994557958625" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.4-.3z"/></svg>055 795 86 25</a><button type="button" class="applink" data-cp="https://samirbalakishiyev.github.io/my-new-vocabulary/">🔗 Proqramın linki</button>${REG&&REG.ad?`<button type="button" class="applink me" onclick="meEdit()">👤 ${esc(REG.ad+' '+(REG.soyad||''))} ✏️</button>`:''}</div></div><div class="dnote-slot" data-v="tq">${dnHTML(DNOTE,'tq')}</div></div>`+a2hsTip()+profHTML();
+  const fbB=`<button class="fbbtn" onclick="fbHome()">✍️ Rəy və təklifləriniz <span>— yazın, oxuyuruq</span></button>`;let th='';
   const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0);
-  h+=`<a class="tile wide" href="links/" style="${colorVars('bl')};background:var(--bl-s);border-color:var(--bl);text-decoration:none"><div><h2>🔗 Faydalı linklər</h2><p>YouTube videoları və kanallar</p></div><span class="badge" style="margin-left:auto">YouTube</span></a>`;
-  h+=`<a class="tile wide" href="missions/" style="background:linear-gradient(135deg,#FFE680,#FFC22E);border-color:#C99A10;color:#3B2A00;text-decoration:none"><div><h2 style="color:#3B2A00">👑 Mr. Samir's Missions</h2><p style="color:#5C4300">A2–B1 · Task 1 pulsuz</p></div><span class="badge" style="margin-left:auto;background:#3B2A00;color:#FFD54A">PREMIUM</span></a>`;
-  h+=`</div><div class="mgrid">`;
+  th+=`<a class="tile wide" href="links/" style="${colorVars('bl')};background:var(--bl-s);border-color:var(--bl);text-decoration:none"><div><h2>🔗 Faydalı linklər</h2><p>YouTube videoları və kanallar</p></div><span class="badge" style="margin-left:auto">YouTube</span></a>`;
+  th+=`<a class="tile wide" href="missions/" style="background:linear-gradient(135deg,#FFE680,#FFC22E);border-color:#C99A10;color:#3B2A00;text-decoration:none"><div><h2 style="color:#3B2A00">👑 Mr. Samir's Missions</h2><p style="color:#5C4300">A2–B1 · Task 1 pulsuz</p></div><span class="badge" style="margin-left:auto;background:#3B2A00;color:#FFD54A">PREMIUM</span></a>`;
+  h+=`<div class="mgrid">`;
   const wN=LV.reduce((u,[l])=>u+CATS.reduce((v,[c])=>v+liveCount('words',l,c),0),0);
   const mb=(ic,t,sub,badge,c,js)=>`<button class="mtile" style="${colorVars(c)}" onclick="${js}"><span class="mic" aria-hidden="true">${ic}</span><span class="mt">${t}</span><span class="ms">${sub}</span><span class="mb">${badge}</span></button>`;
   h+=mb('📚','Vocabulary','Sözlər, testlər, kartlar',wN+' söz','tq','vocabHome()');
@@ -8199,6 +8204,7 @@ function home(){
   h+=mb('🏆','Ümumi Sınaqlar','Siniflər üzrə sınaqlar','Tezliklə','am','examsHome()');
   h+=`</div>`;
   {const nU=AUTO()?0:ST.log.filter(e=>!e.sent).length;h+=`<button class="resrow" onclick="resHome()"><span class="mic" aria-hidden="true">📊</span><span><b>Nəticələrim</b><small>${ST.log.length} nəticə${nU?` · <em>${nU} göndərilməyib</em>`:''}</small></span><span class="go">›</span></button>`;}
+  h=h.replace(/(<button class="resrow"[\s\S]*<\/button>)$/,'<div class="thin4">$1'+fbB+'<div class="grid hgrid">'+th+'</div></div>');
   h+=RCONF?`<div class="foot"><p class="perr" style="color:var(--rd);font-weight:800;margin:0 0 8px">Bütün nəticələr, bildiyin sözlər və səhvlər silinsin?</p><div class="pbtns" style="justify-content:center"><button class="pbtn dl" style="text-decoration:none;color:var(--rd);font-size:15px" onclick="resetYes()">Bəli, sıfırla</button><button class="pbtn gh" style="text-decoration:none;font-size:15px" onclick="resetNo()">Xeyr</button></div></div>`:`<div class="foot"><button onclick="resetAll()">Bütün nəticələri sıfırla</button></div>`;
   app.innerHTML=h;window.scrollTo(0,0);fbBadge();
 }
@@ -9116,7 +9122,7 @@ function a2hsTip(){
   return `<section class="prof" style="border-color:var(--tq)"><h3 style="color:var(--tq)">📲 Ana ekrana əlavə et</h3><p class="info" style="margin:0 0 10px">${ios?'Safari-də aşağıdakı <b>Paylaş</b> (□↑) düyməsinə bas → <b>"Ana ekrana əlavə et"</b>.':'Brauzerdə sağ yuxarıdakı <b>⋮</b> menyusuna bas → <b>"Ana ekrana əlavə et"</b> / <b>"Tətbiqi quraşdır"</b>.'} Sonra həmişə ikondan gir – nəticələrin yadda qalacaq.</p><button class="pbtn gh" onclick="lsSet('mnv-tip',1);home()">Bağla</button></section>`;
 }
 
-const DN_LS='mnv-note',DN_V='';
+const DN_LS='mnv-note',DN_V='tq';
 /* qeyd Config vərəqindəki eyni JSON-da (state.note) saxlanılır: silinən/düzəldilən tapşırıqlar toxunulmaz qalır */
 async function DN_SET(n){const key=lsGet('mnv-tkey','');if(!SHEET_URL)throw new Error('nosheet');if(!key)throw new Error('nokey');
   let st={};const r0=await fetch(SHEET_URL+'?a=cfg&_='+Date.now());const o0=await r0.json();if(o0&&o0.state&&typeof o0.state==='object')st=o0.state;
@@ -9185,6 +9191,10 @@ function telHL(tel,q){const t=telD(tel),[s,e]=telSpan(t,q||''),G=t.length===9?[2
 .dn-hl{background:#fff;color:#C2261B;padding:0 5px;border-radius:6px;font-weight:900;box-shadow:0 1px 0 rgba(0,0,0,.08)}
 .dnote.dn-night{color:#fff;border:1.5px solid rgba(255,255,255,.35);box-shadow:0 18px 36px -20px rgba(30,20,120,.9);
  background:radial-gradient(circle at 88% 12%,rgba(255,255,255,.28) 0 9%,transparent 10%),radial-gradient(circle at 12% 110%,rgba(255,210,90,.35),transparent 45%),repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0 1px,transparent 1px 27px),linear-gradient(135deg,#7A5BF2 0%,#4D5CF0 55%,#2A3FB8 100%)}
+.dnote.dn-tq{color:#0E4A45;border:1.5px solid #1C9F95;box-shadow:0 14px 28px -20px rgba(20,120,110,.8),inset 0 1px 0 #fff;
+ background:radial-gradient(circle at 1px 1px,rgba(20,140,130,.14) 1.2px,transparent 0) 0 0/15px 15px,linear-gradient(140deg,#E9FBF8 0%,#C4EEE8 100%)}
+.dnote.dn-tq::after{background:radial-gradient(circle,rgba(28,159,149,.25),transparent 70%)}
+.dn-tq .dn-t{background:#0F6F68;color:#fff}.dn-tq .dn-d{color:#0F6F68;opacity:.85}.dn-tq .dn-hl{color:#0F6F68}
 .dnote.dn-night::after{background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%)}
 .dn-night .dn-t{background:#fff;color:#3B2FB8}.dn-night .dn-d{color:#E4E1FF;opacity:.9}
 .dn-night .dn-x{font-size:16px;max-height:260px;overflow:auto;text-shadow:0 1px 1px rgba(0,0,0,.15)}
