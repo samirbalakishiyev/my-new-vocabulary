@@ -260,6 +260,210 @@ function fbSet(o, now) {
 }
 
 /* Oxu: ?a=cfg (hamı üçün) · ?a=users&key=… · ?a=plist&key=… (müəllim) */
+/* ================= 📝 PARAGRAPH WRITING: süni intellektlə yoxlama =================
+   API açarı kodda YOXDUR: Apps Script → ⚙️ Layihə ayarları → Skript xüsusiyyətləri → CLAUDE_KEY.
+   Qaydalar: hər şagirdə 1 pulsuz yoxlama; sonra müəllim "✍️ Aktiv et" basır → 30 gün, 50 yoxlama.
+   Hər kəs üçün gündə ən çox 2 yoxlama. Müəllim (panel açarı ilə) limitsizdir. */
+const AI_MODEL = 'claude-opus-5-5';
+const W_FREE = 1, W_DAY = 2, W_PAID = 50, W_DAYS = 30;
+const WL = ['Telefon', 'Ad', 'Soyad', 'Pulsuz istifadə', 'Aktiv başlanğıc', 'Aktiv bitmə', 'Dövrdə istifadə', 'Son gün', 'Gün sayı'];
+const WRL = ['Tarix', 'Telefon', 'Ad', 'Soyad', 'Mövzu', 'Söz', 'A', 'B', 'C', 'D', 'Səhv', 'Cərimə', 'Bal', 'Mətn'];
+const PXL = ['Tarix', 'Mövzu', 'Paraqraf', 'Açar sözlər', 'Telefon', 'Açar'];
+function wSheet_(name, head) {
+  const ss = SpreadsheetApp.getActive();
+  let s = ss.getSheetByName(name);
+  if (!s) { s = ss.insertSheet(name); s.appendRow(head); s.getRange(1, 1, 1, head.length).setFontWeight('bold'); s.setFrozenRows(1); }
+  return s;
+}
+const wqSheet = () => wSheet_('Writing', WL);
+const wrSheet = () => wSheet_('Writing nəticələri', WRL);
+const pxSheet = () => wSheet_('Paraqraflar', PXL);
+const wDay = t => Utilities.formatDate(new Date(t), 'Asia/Baku', 'yyyy-MM-dd');
+const wKey = q => String(q || '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9 ]+/g, ' ').replace(/\b(why|do you think|in your opinion)\b/g, ' ').replace(/\s+/g, ' ').trim();
+const wWords = x => (String(x || '').match(/[A-Za-z0-9]+(?:['’\-][A-Za-z0-9]+)*/g) || []).length;
+function wRow_(s, tel) {
+  const n = s.getLastRow(); if (n < 2) return 0;
+  const v = s.getRange(2, 1, n - 1, 1).getValues();
+  for (let i = 0; i < v.length; i++) if (String(v[i][0]).replace(/^'/, '') === String(tel)) return i + 2;
+  return 0;
+}
+/* şagirdin vəziyyəti: {free, paid, end, used, today} */
+function wState_(r, now) {
+  const end = ms(r[5]) || 0, paid = end > now, day = wDay(now);
+  return { freeLeft: Math.max(0, W_FREE - (+r[3] || 0)), paid, end: paid ? end : (end || 0), used: +r[6] || 0, left: paid ? Math.max(0, W_PAID - (+r[6] || 0)) : 0, today: String(r[7]) === day ? (+r[8] || 0) : 0 };
+}
+function wGet_(tel) {
+  const s = wqSheet(), r = wRow_(s, tel);
+  return { s, r, v: r ? s.getRange(r, 1, 1, WL.length).getValues()[0] : ["'" + tel, '', '', 0, '', '', 0, '', 0] };
+}
+function wStatus(o, now) {
+  const tel = String(o.tel || ''); if (!tel) return { ok: false, error: 'tel' };
+  const st = wState_(wGet_(tel).v, now);
+  return { ok: true, w: st, dayMax: W_DAY, paidMax: W_PAID };
+}
+/* müəllim: aktiv et (30 gün, 50 yoxlama) və ya söndür */
+function wAct(o, now) {
+  const tel = String(o.tel || ''); if (!tel) return { ok: false, error: 'tel' };
+  const us = usersSheet(), ur = userRow(us, tel), u = ur ? us.getRange(ur, 1, 1, 3).getValues()[0] : ['', '', ''];
+  const { s, r, v } = wGet_(tel), row = r || s.getLastRow() + 1;
+  v[0] = "'" + tel; v[1] = u[1]; v[2] = u[2];
+  if (o.v) { v[4] = new Date(now); v[5] = new Date(now + W_DAYS * 864e5); v[6] = 0; } else { v[5] = new Date(now - 1000); }
+  s.getRange(row, 1, 1, WL.length).setValues([v]); s.getRange(row, 5, 1, 2).setNumberFormat(DF);
+  return { ok: true, w: wState_(v, now) };
+}
+function wMap_(now) { /* istifadəçilər siyahısı üçün: tel → vəziyyət */
+  const s = SpreadsheetApp.getActive().getSheetByName('Writing'), m = {};
+  if (!s || s.getLastRow() < 2) return m;
+  s.getRange(2, 1, s.getLastRow() - 1, WL.length).getValues().forEach(r => { if (r[0] !== '') m[String(r[0]).replace(/^'/, '')] = wState_(r, now); });
+  return m;
+}
+function pxList() {
+  const s = SpreadsheetApp.getActive().getSheetByName('Paraqraflar');
+  if (!s || s.getLastRow() < 2) return [];
+  return s.getRange(2, 1, s.getLastRow() - 1, PXL.length).getValues().filter(r => r[1] && r[2]).map(r => { let kw = []; try { kw = JSON.parse(r[3]); } catch (e) {} return { q: String(r[1]), p: String(r[2]), kw: Array.isArray(kw) ? kw : [], at: ms(r[0]), k: String(r[5]) }; });
+}
+function pxDel(o) {
+  const s = pxSheet(), n = s.getLastRow(); if (n < 2) return { ok: true };
+  const v = s.getRange(2, 2, n - 1, 1).getValues();
+  for (let i = v.length - 1; i >= 0; i--) if (String(v[i][0]) === String(o.q)) s.deleteRow(i + 2);
+  return { ok: true, xp: pxList() };
+}
+function wResRows() {
+  const s = SpreadsheetApp.getActive().getSheetByName('Writing nəticələri');
+  if (!s || s.getLastRow() < 2) return [];
+  const n = s.getLastRow() - 1, from = Math.max(0, n - 500);
+  return s.getRange(2 + from, 1, n - from, WRL.length).getValues().map(r => ({ at: ms(r[0]), tel: String(r[1]).replace(/^'/, ''), ad: r[2], soyad: r[3], q: String(r[4]), wc: r[5], A: r[6], B: r[7], C: r[8], D: r[9], er: r[10], pen: r[11], t: r[12], x: String(r[13] || '') }));
+}
+
+/* ---- Claude API ---- */
+function claude_(system, user, maxTok) {
+  const key = PropertiesService.getScriptProperties().getProperty('CLAUDE_KEY');
+  if (!key) throw new Error('nokey');
+  const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+    payload: JSON.stringify({ model: AI_MODEL, max_tokens: maxTok, system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }], messages: [{ role: 'user', content: user }] })
+  });
+  const code = res.getResponseCode(), body = res.getContentText();
+  if (code !== 200) { console.error('Claude API ' + code + ': ' + body.slice(0, 500)); throw new Error(code === 401 ? 'badkey' : code === 400 && /credit/i.test(body) ? 'credit' : 'api' + code); }
+  const j = JSON.parse(body), t = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('');
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a < 0 || b < a) throw new Error('json');
+  return JSON.parse(t.slice(a, b + 1));
+}
+const W_RUBRIC = `Sən ingilis dili üzrə esse/paraqraf yoxlayan təcrübəli müəllimsən. Azərbaycan məktəb şagirdinin "opinion paragraph" yazısını YALNIZ aşağıdakı rəsmi meyarlarla qiymətləndir. Ədalətli ol: kiçik səhvə görə həddindən artıq bal azaltma, əlavə bal da vermə. Xətti diqqətlə oxu, xırdalığa getmə.
+
+Yazı başqa mövzudadırsa → topic_ok=false. Başqa dildədirsə və ya oxunmursa → lang_ok=false.
+Söz sayı sənə verilir (serverdə dəqiq hesablanıb) — onu dəyişmə, meyarlarda onu istifadə et.
+
+A. Tapşırığın yerinə yetirilməsi (maks. 1)
+• 1: mövzuya uyğun, ≥100 söz, topic sentence + dəstəkləyici fikirlər + yekun, əlaqəli və axıcı.
+• 0.5: mövzu qismən əhatə olunub, 70–99 söz, struktur qismən var.
+• 0: anlaşılmır və ya mövzuya uyğun deyil, <70 söz, struktur yoxdur, şablon/əzbər cümlələr.
+
+B. Mövzunun əhatəsi və məntiqi ardıcıllıq (maks. 2)
+• 2: ≥2 arqument, nümunə/izah, birləşdiricilər, həm lehinə, həm əleyhinə tərəf, məntiqi rabitə.
+• 1: arqumentlər məhduddur, ≥1 nümunə var, birləşdiricilər azdır, yalnız bir tərəf var və ya kənaraçıxma var.
+• 0: 1 balın tələbinə cavab vermir.
+
+C. Qrammatika (maks. 1)
+• 1: müxtəlif formalar, sadə və mürəkkəb cümlələr düzgün işlənib.
+• 0.5: əsasən sadə, qısa, şablon və ya yarımçıq cümlələr; səhvlər bəzən mənaya mane olur.
+• 0: söz yığını.
+
+D. Söz ehtiyatı (maks. 1)
+• 1: zəngin, düzgün işlənib, gərəksiz təkrar yoxdur, sinonim/parafraz var.
+• 0.5: kifayət qədər müxtəlif deyil, bəzən təkrar var.
+• 0: həddindən artıq təkrar.
+• Hərf təkrarı leksik təkrar sayılmır. Mümkün formanı səhv sayma (məs. "get a good experience").
+
+Səhvlərin sayı (errors): qrammatik, leksik və orfoqrafik səhvlər. Eyni tip səhv (eyni qaydanın təkrarı) 1 dəfə sayılır.
+
+Cavabı YALNIZ bu JSON formatında ver, başqa heç nə yazma:
+{"topic_ok":true,"lang_ok":true,"A":1,"B":2,"C":1,"D":0.5,"errors":3}
+A: 0, 0.5 və ya 1. B: 0, 1 və ya 2. C və D: 0, 0.5 və ya 1. errors: tam ədəd.`;
+function wGrade_(topic, text, wc) {
+  const g = claude_(W_RUBRIC, 'Mövzu: ' + topic + '\nSöz sayı: ' + wc + '\n\nŞagirdin yazısı:\n"""\n' + text + '\n"""', 400);
+  const pick = (x, al) => { x = +x; return al.reduce((b, a) => Math.abs(a - x) < Math.abs(b - x) ? a : b, al[0]); };
+  const r = { wc, topic_ok: g.topic_ok !== false, lang_ok: g.lang_ok !== false, A: pick(g.A, [0, 0.5, 1]), B: pick(g.B, [0, 1, 2]), C: pick(g.C, [0, 0.5, 1]), D: pick(g.D, [0, 0.5, 1]), errors: Math.max(0, Math.round(+g.errors || 0)) };
+  if (!r.topic_ok || !r.lang_ok) { r.A = 0; r.B = null; r.C = null; r.D = null; r.pen = 0; r.total = 0; return r; }
+  if (r.A === 0) { r.B = null; r.C = null; r.D = null; r.pen = 0; r.total = 0; return r; } /* A=0 → 0/5 */
+  if (r.B === 0) { r.C = null; r.D = null; r.pen = 0; r.total = r.A; return r; }   /* B=0 → yalnız A */
+  r.pen = r.errors >= 6 ? 1 : r.errors >= 3 ? 0.5 : 0;
+  r.total = Math.max(0, Math.min(5, r.A + r.B + r.C + r.D - r.pen));
+  return r;
+}
+const W_SAMPLE = `You write model "opinion paragraphs" for Azerbaijani school students (A2–B1 level), exactly in the teacher's template:
+1) Topic sentence: the answer to the question in affirmative form + "because" + a reason (e.g. "it has several benefits").
+2) "Firstly," first reason + so/because + explanation (or a new sentence with "For example,").
+3) "Secondly," second reason + that's why/as + explanation, or "; for example," / "For instance," + a concrete example (Azerbaijan-related examples are welcome).
+4) "However, some people think that" + the opposite opinion + because/so + explanation.
+5) "It might be true, but" + a sentence defending your opinion.
+6) "In conclusion," + topic sentence paraphrased with synonyms.
+About 105–125 words, one paragraph, simple clear English, no lists.
+
+Two of the teacher's paragraphs as style examples:
+"Rebuilding cities and villages in Karabakh is important because thousands of families want to return to their homeland. Firstly, many people lost their homes during the war, so new houses, schools and hospitals will help them start a normal life again. Secondly, rebuilding protects our history and culture; for example, old mosques, bridges and museums show the identity of our nation. However, some people think that this money should be spent on other regions because the work is very expensive. It might be true, but Karabakh is a part of our country, and its people deserve safe homes. In conclusion, restoring Karabakh is an important duty for all of us."
+"I believe that higher education is very important in people's lives. Firstly, a university degree helps people to find a good job with a high salary; for example, doctors, engineers and lawyers cannot work without a diploma. Secondly, at university students gain deep knowledge, learn to think critically and make new friends who can help them in the future. However, some people think that higher education is not necessary because a few successful businessmen never finished university. It might be true, but such people are rare, and most employers still prefer graduates. In conclusion, higher education gives people more opportunities and a better future."
+
+Also give exactly 10 key words/phrases that appear EXACTLY (same form) in your paragraph, with Azerbaijani translations.
+"q" = the topic as a clean English question in sentence case, ending with " Why?" if it is a yes/no or opinion question (like "Is higher education important in people's lives? Why?").
+Answer ONLY with JSON: {"q":"...","p":"...","kw":[["english","azərbaycanca"], ...]}`;
+function wSample_(topic) {
+  const g = claude_(W_SAMPLE, 'Topic: ' + topic, 1500);
+  const p = String(g.p || '').trim(), q = String(g.q || topic).trim().slice(0, 200);
+  const kw = (Array.isArray(g.kw) ? g.kw : []).filter(k => Array.isArray(k) && k[0] && k[1] && p.indexOf(String(k[0])) >= 0).slice(0, 10).map(k => [String(k[0]), String(k[1])]);
+  if (wWords(p) < 60) throw new Error('sample');
+  return { q, p, kw };
+}
+/* şagird: yoxla. Kilid yalnız cədvələ yazanda tutulur — süni intellekt cavab verənə qədər başqaları gözləmir. */
+function wCheck(o) {
+  const now = Date.now(), tel = String(o.tel || ''), teacher = o.key === KEY;
+  const topic = String(o.topic || '').trim().slice(0, 200), text = String(o.text || '').trim().slice(0, 4000);
+  if (!topic) return { ok: false, error: 'notopic' };
+  if (!text) return { ok: false, error: 'notext' };
+  if (!tel && !teacher) return { ok: false, error: 'tel' };
+  const lock = LockService.getScriptLock();
+  let mode = 'teacher', ad = '', soyad = '';
+  lock.waitLock(10000);
+  try {
+    if (!teacher) {
+      const us = usersSheet(), ur = userRow(us, tel);
+      if (!ur) return { ok: false, error: 'reg' };
+      const u = us.getRange(ur, 1, 1, 15).getValues()[0];
+      if (isTrue(u[6])) return { ok: false, error: 'blok' };
+      const nm = String(u[14] || '').trim(); ad = nm ? nm.split(' ')[0] : u[1]; soyad = nm ? nm.split(' ').slice(1).join(' ') : u[2];
+      const { s, r, v } = wGet_(tel), st = wState_(v, now);
+      if (st.today >= W_DAY) return { ok: false, error: 'day', w: st };
+      if (st.paid && st.left > 0) { mode = 'paid'; v[6] = st.used + 1; }
+      else if (st.freeLeft > 0) { mode = 'free'; v[3] = (+v[3] || 0) + 1; }
+      else return { ok: false, error: 'pay', w: st };
+      const day = wDay(now); v[8] = String(v[7]) === day ? (+v[8] || 0) + 1 : 1; v[7] = "'" + day;
+      v[0] = "'" + tel; v[1] = u[1]; v[2] = u[2];
+      const row = r || s.getLastRow() + 1; s.getRange(row, 1, 1, WL.length).setValues([v]);
+    }
+  } finally { lock.releaseLock(); }
+  const refund = () => { if (teacher) return; lock.waitLock(10000); try { const { s, r, v } = wGet_(tel); if (!r) return; if (mode === 'paid') v[6] = Math.max(0, (+v[6] || 0) - 1); else v[3] = Math.max(0, (+v[3] || 0) - 1); v[8] = Math.max(0, (+v[8] || 0) - 1); s.getRange(r, 1, 1, WL.length).setValues([v]); } finally { lock.releaseLock(); } };
+  let res, sample = null;
+  try { res = wGrade_(topic, text, wWords(text)); }
+  catch (e) { refund(); return { ok: false, error: String(e.message || e) }; }
+  /* yeni mövzu: bir dəfə nümunə yaz və "Paraqraflar" siyahısına əlavə et */
+  const k = wKey(topic);
+  if (o.isNew && res.total > 0 && k) {
+    const ex = pxList().find(x => x.k === k || wKey(x.q) === k);
+    if (!ex) { try { sample = wSample_(topic); } catch (e) { console.error('sample: ' + e); } }
+  }
+  lock.waitLock(10000);
+  try {
+    if (sample) { const px = pxSheet(); if (!pxList().some(x => x.k === k || wKey(x.q) === wKey(sample.q))) { px.appendRow([new Date(now), sample.q, sample.p, JSON.stringify(sample.kw), "'" + tel, k]); px.getRange(px.getLastRow(), 1).setNumberFormat(DF); } }
+    const wr = wrSheet(), na = v => v === null ? '—' : v;
+    wr.appendRow([new Date(now), "'" + (tel || 'müəllim'), ad || (teacher ? 'Müəllim' : ''), soyad, topic, res.wc, res.A, na(res.B), na(res.C), na(res.D), res.errors, res.pen, res.total, text.slice(0, 4000)]);
+    wr.getRange(wr.getLastRow(), 1).setNumberFormat(DF);
+  } finally { lock.releaseLock(); }
+  const st = teacher ? null : wState_(wGet_(tel).v, now);
+  return { ok: true, r: res, mode, w: st, xp: (o.isNew ? pxList() : undefined) };
+}
+
 function doGet(e) {
   const lock = LockService.getScriptLock(); /* oxuma da növbə ilə: eyni anda iki sorğu cədvəli düzəndə qarışıqlıq olmasın */
   lock.waitLock(10000);
@@ -267,9 +471,11 @@ function doGet(e) {
 }
 function doGet_(e) {
   const p = e.parameter || {};
+  if (p.a === 'paras') return out({ xp: pxList() }); /* 📝 süni intellektin yazdığı yeni nümunə paraqraflar (hamı görür) */
   if (p.a === 'cfg') { const v = cfgSheet().getRange('A1').getValue(); let st = null; try { st = v ? JSON.parse(v) : null; } catch (e) {} return out({ state: st }); }
   if (p.key !== KEY) return out({ error: 'key' });
-  if (p.a === 'users') return out({ rows: usersRows(usersSheet()) });
+  if (p.a === 'users') { const wm = wMap_(Date.now()); return out({ rows: usersRows(usersSheet()).map(u => (wm[u.tel] ? Object.assign(u, { w: wm[u.tel] }) : u)) }); }
+  if (p.a === 'wres') return out({ rows: wResRows(), xp: pxList() });
   if (p.a === 'fbs') return out({ rows: fbRows() });
   if (p.a === 'res') return out({ rows: resRows() });
   if (p.a === 'plist') return out({ tels: usersRows(usersSheet()).filter(u => u.prem).map(u => u.tel) });
@@ -278,6 +484,8 @@ function doGet_(e) {
 
 /* Yaz: ping (qeydiyyat + son giriş + blok yoxlaması), pq (premium yoxlaması), block, elaqe (ödəniş), premium, cfg (müəllim) */
 function doPost(e) {
+  let o0 = {}; try { o0 = JSON.parse(e.postData.contents || '{}'); } catch (x) {}
+  if (o0.a === 'wcheck') return out(wCheck(o0)); /* 📝 öz kilidi var: süni intellekt cavabını gözləyərkən cədvəl bağlı qalmır */
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
@@ -292,6 +500,7 @@ function doPost(e) {
       return out({ ok: true, key: KEY });
     }
     if (o.a === 'ping') return out(userPing(o, now));
+    if (o.a === 'wq') return out(wStatus(o, now)); /* 📝 şagirdin yoxlama limiti */
     if (o.a === 'res') return out(resAdd(o, now)); /* 📊 nəticə: yalnız qrupa yazılmış şagirdin nəticəsi saxlanılır */
     if (o.a === 'pq') { /* şagirdin premium yoxlaması (Missions) */
       const s = usersSheet(), r = userRow(s, o.tel);
@@ -326,6 +535,8 @@ function doPost(e) {
     if (o.key !== KEY) return out({ ok: false, error: 'key' });
     if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium' || o.a === 'slug' || o.a === 'grp' || o.a === 'ren') return out(userSet(o, now));
     if (o.a === 'fbset') return out(fbSet(o, now));
+    if (o.a === 'wact') return out(wAct(o, now)); /* ✍️ müəllim: Writing-i aktiv et / söndür */
+    if (o.a === 'pxdel') return out(pxDel(o));
     if (o.a === 'cfg') { cfgSheet().getRange('A1').setNumberFormat('@').setValue(JSON.stringify(o.state || {})); return out({ ok: true }); }
     return out({ ok: false, error: 'a' });
   } finally {
