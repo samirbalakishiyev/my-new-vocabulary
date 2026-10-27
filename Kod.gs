@@ -464,6 +464,13 @@ function wCheck(o) {
   return { ok: true, r: res, mode, w: st, xp: (o.isNew ? pxList() : undefined) };
 }
 
+/* ▶ Yoxlama testi: Apps Script-də yuxarıda bu funksiyanı seçib "Run" basın — icazə istəyəcək, sonra nəticəni "Execution log"da göstərir */
+function wTest() {
+  const t = 'I believe that mobile phones are useful for students because they have several benefits. Firstly, students can find information quickly, so they can do their homework faster. Secondly, phones help students to learn languages; for example, there are many apps for learning English words. However, some people think that phones are harmful because children spend too much time on games. It might be true, but parents and teachers can control the screen time. In conclusion, I believe that mobile phones are helpful and important tools for learning.';
+  const r = wGrade_('Are mobile phones useful for students?', t, wWords(t));
+  console.log('✅ Süni intellekt işləyir. Nəticə: ' + JSON.stringify(r));
+}
+
 function doGet(e) {
   const lock = LockService.getScriptLock(); /* oxuma da növbə ilə: eyni anda iki sorğu cədvəli düzəndə qarışıqlıq olmasın */
   lock.waitLock(10000);
