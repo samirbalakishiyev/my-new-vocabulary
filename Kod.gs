@@ -348,7 +348,7 @@ function claude_(system, user, maxTok) {
   if (code !== 200) { console.error('Claude API ' + code + ': ' + body.slice(0, 500)); throw new Error(code === 401 ? 'badkey' : code === 400 && /credit/i.test(body) ? 'credit' : 'api' + code); }
   const j = JSON.parse(body), t = (j.content || []).filter(c => c.type === 'text').map(c => c.text).join('');
   const a = t.indexOf('{'), b = t.lastIndexOf('}');
-  if (a < 0 || b < a) throw new Error('json');
+  if (a < 0 || b < a) { console.error('Cavab: ' + JSON.stringify(j).slice(0, 800)); throw new Error('json'); }
   return JSON.parse(t.slice(a, b + 1));
 }
 const W_RUBRIC = `Sən ingilis dili üzrə esse/paraqraf yoxlayan təcrübəli müəllimsən. Azərbaycan məktəb şagirdinin "opinion paragraph" yazısını YALNIZ aşağıdakı rəsmi meyarlarla qiymətləndir. Ədalətli ol: kiçik səhvə görə həddindən artıq bal azaltma, əlavə bal da vermə. Xətti diqqətlə oxu, xırdalığa getmə.
@@ -383,7 +383,7 @@ Cavabı YALNIZ bu JSON formatında ver, başqa heç nə yazma:
 {"topic_ok":true,"lang_ok":true,"A":1,"B":2,"C":1,"D":0.5,"errors":3}
 A: 0, 0.5 və ya 1. B: 0, 1 və ya 2. C və D: 0, 0.5 və ya 1. errors: tam ədəd.`;
 function wGrade_(topic, text, wc) {
-  const g = claude_(W_RUBRIC, 'Mövzu: ' + topic + '\nSöz sayı: ' + wc + '\n\nŞagirdin yazısı:\n"""\n' + text + '\n"""', 400);
+  const g = claude_(W_RUBRIC, 'Mövzu: ' + topic + '\nSöz sayı: ' + wc + '\n\nŞagirdin yazısı:\n"""\n' + text + '\n"""', 3000);
   const pick = (x, al) => { x = +x; return al.reduce((b, a) => Math.abs(a - x) < Math.abs(b - x) ? a : b, al[0]); };
   const r = { wc, topic_ok: g.topic_ok !== false, lang_ok: g.lang_ok !== false, A: pick(g.A, [0, 0.5, 1]), B: pick(g.B, [0, 1, 2]), C: pick(g.C, [0, 0.5, 1]), D: pick(g.D, [0, 0.5, 1]), errors: Math.max(0, Math.round(+g.errors || 0)) };
   if (!r.topic_ok || !r.lang_ok) { r.A = 0; r.B = null; r.C = null; r.D = null; r.pen = 0; r.total = 0; return r; }
@@ -410,7 +410,7 @@ Also give exactly 10 key words/phrases that appear EXACTLY (same form) in your p
 "q" = the topic as a clean English question in sentence case, ending with " Why?" if it is a yes/no or opinion question (like "Is higher education important in people's lives? Why?").
 Answer ONLY with JSON: {"q":"...","p":"...","kw":[["english","azərbaycanca"], ...]}`;
 function wSample_(topic) {
-  const g = claude_(W_SAMPLE, 'Topic: ' + topic, 1500);
+  const g = claude_(W_SAMPLE, 'Topic: ' + topic, 4000);
   const p = String(g.p || '').trim(), q = String(g.q || topic).trim().slice(0, 200);
   const kw = (Array.isArray(g.kw) ? g.kw : []).filter(k => Array.isArray(k) && k[0] && k[1] && p.indexOf(String(k[0])) >= 0).slice(0, 10).map(k => [String(k[0]), String(k[1])]);
   if (wWords(p) < 60) throw new Error('sample');
