@@ -240,7 +240,8 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .wgch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 12px}.wgbig{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:16px 14px;border-radius:18px;border:2px solid var(--c);background:var(--s);font:inherit;color:var(--ink);text-align:left;cursor:pointer}.wgbig span{font-size:26px}.wgbig b{font-size:17px;font-weight:900;color:var(--c)}.wgbig small{font-size:12.5px;font-weight:700;color:var(--muted)}
 .wgqt{margin:4px 0 10px;padding:8px 12px;border-radius:12px;font-weight:800;font-size:13.5px;background:var(--card);border:1.5px solid var(--line)}.wgqt.ok{border-color:#1E8E4E;color:#1E6B3D;background:#E8F6EC}.wgqt.no{border-color:#D9364C;color:#9B1C2E;background:#FDECEE}
 .wgtopic{margin:4px 0 12px;padding:12px 14px;border-radius:14px;background:var(--c);color:#fff;font-weight:900;font-size:18px;line-height:1.3}
-.wgguide{padding:12px 14px;border-radius:16px;background:var(--card);border:1.5px solid var(--line);margin-bottom:12px}.wgguide h3{margin:0 0 6px;font-size:16px}.wgguide ol{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14.5px;line-height:1.45;font-weight:600}.wgr1{color:#C62828;font-style:italic}.wgg{color:#2E7D32;font-style:italic}.wgb{color:#3F67B5}.wgor{display:inline-block;background:#FFF176;padding:0 6px;border-radius:5px;font-weight:800;font-size:12.5px;margin:0 2px}.wgtip{margin:8px 0 0;font-size:13.5px;font-weight:700;color:var(--muted)}
+.wgd{margin-bottom:10px;border-radius:16px;background:var(--card);border:2px solid var(--c);overflow:hidden}.wgd>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 14px;font-weight:900;font-size:16px;color:var(--c);-webkit-tap-highlight-color:transparent}.wgd>summary::-webkit-details-marker{display:none}.wgd>summary::after{content:"▾";margin-left:auto;font-size:22px;line-height:1;transition:transform .2s}.wgd[open]>summary::after{transform:rotate(180deg)}.wgd[open]>summary{border-bottom:1.5px solid var(--line)}.wgd>.kwlist{padding:10px}
+.wgguide{padding:12px 14px}.wgguide h3{margin:0 0 6px;font-size:16px}.wgguide ol{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14.5px;line-height:1.45;font-weight:600}.wgr1{color:#C62828;font-style:italic}.wgg{color:#2E7D32;font-style:italic}.wgb{color:#3F67B5}.wgor{display:inline-block;background:#FFF176;padding:0 6px;border-radius:5px;font-weight:800;font-size:12.5px;margin:0 2px}.wgtip{margin:8px 0 0;font-size:13.5px;font-weight:700;color:var(--muted)}
 .wgin,.wgta{width:100%;box-sizing:border-box;font:inherit;font-size:16px;font-weight:600;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink)}.wgta{resize:vertical;line-height:1.5;min-height:220px}.wgin:focus,.wgta:focus{outline:none;border-color:var(--c)}
 .wgwc{margin:6px 2px 8px;font-weight:900;font-size:13.5px}.wgwc.lo{color:#D9364C}.wgwc.mid{color:#C98A00}.wgwc.ok{color:#1E8E4E}
 .wgbox{margin:10px 0;padding:14px;border-radius:16px;background:var(--card);border:2px solid var(--c)}.wgbox.err{border-color:#C98A00;background:#FFF8E1;font-weight:700}.wgbox.pay{border-color:#D9364C;background:#FDECEE}.wgbox.pay h3{margin:0 0 6px;color:#9B1C2E}.wgbox.pay p{margin:0 0 8px;font-weight:600}.wgbox.wait{font-weight:800;text-align:center}
@@ -9630,14 +9631,14 @@ const wgFind=q=>{const k=wgKey(q);if(!k)return -1;return PARA.findIndex(p=>wgKey
 const WG_PHR=[['because','çünki'],['so','buna görə də'],['as','çünki, ona görə ki'],["that's why",'məhz buna görə'],['For example,','Məsələn,'],['For instance,','Məsələn,'],['However,','Lakin,'],['some people think that','bəzi insanlar düşünür ki'],['It might be true, but','Bu doğru ola bilər, amma'],['In conclusion,','Nəticə olaraq,'],['I believe that','İnanıram ki'],['benefits / advantages','faydalar / üstünlüklər']];
 function wgGuide(){
   const R=t=>`<b class="wgr1">${t}</b>`,G=t=>`<span class="wgg">${t}</span>`,O=`<span class="wgor">və ya</span>`;
-  return `<div class="wgguide"><h3>🧭 Paraqrafı belə qur</h3><ol>
+  return `<details class="wgd"><summary>🧭 Paraqrafı belə qur</summary><div class="wgguide"><ol>
   <li>Mövzunun adı <u>təsdiq formada</u> + ${R('because')} <i class="wgb">it has several benefits / advantages.</i></li>
   <li>${R('Firstly,')} (ilk səbəb) + ${G('(so / because)')} + explanation ${O} yeni cümlə: ${R('For example,')} + explanation</li>
   <li>${R('Secondly,')} (ikinci səbəb) + ${G("(that's why / as)")} + explanation ${O} yeni cümlə: ${R('For instance,')} + explanation</li>
   <li>${R('However,')} some people think that + əks fikir + ${G('(so / because)')} + explanation ${O} yeni cümlə: ${R('For example,')} + explanation</li>
   <li>${R('It might be true,')} but + öz fikrini müdafiə edən cümlə.</li>
   <li>${R('In conclusion,')} I believe that + topic sentence-i <u>başqa sözlərlə</u> yaz + 2 sinonim sifət və ya feil ilə səbəbləri qısa göstər.</li></ol>
-  <p class="wgtip">📏 Ən azı <b>100 söz</b> yaz. 70 sözdən az olsa, bal verilmir.</p></div>`;
+  <p class="wgtip">📏 Ən azı <b>100 söz</b> yaz. 70 sözdən az olsa, bal verilmir.</p></div></details>`;
 }
 function wgQuotaHTML(){
   const w=WG.w;if(isTeacher())return `<div class="wgqt ok">👩‍🏫 Müəllim rejimi — limitsiz yoxlama</div>`;
@@ -9682,7 +9683,7 @@ function wgWrite(i,topic){
   V={wg:4};WG.i=i;WG.q=i>=0?PARA[i].q:topic;WG.res=null;WG.warn=false;WG.msg='';
   const kw=i>=0&&PARA[i].kw&&PARA[i].kw.length?PARA[i].kw:null,d=lsGet('mnv-wd',{})[wgKey(WG.q)]||'';
   let h=hdr('Paragraph Writing',i>=0?'Mövzu '+(i+1):'Öz mövzun',i>=0?'wgPick()':'wgOwn()','te')+`<div style="${colorVars('te')}"><div class="wgtopic">${esc(WG.q)}</div>${wgGuide()}`;
-  h+=`<div class="sec-title">${kw?'Key words · Açar sözlər':'Faydalı ifadələr · Useful phrases'}</div><div class="kwlist">`+(kw||WG_PHR).map(([e,a])=>`<button class="kwi" onclick="say('${esc(jsq(e))}',.85)"><b>${esc(e)}</b><span>${esc(a)}</span></button>`).join('')+`</div>`;
+  h+=`<details class="wgd"><summary>${kw?'🔑 Açar sözlər · Key words':'🔑 Faydalı ifadələr · Useful phrases'}</summary><div class="kwlist">`+(kw||WG_PHR).map(([e,a])=>`<button class="kwi" onclick="say('${esc(jsq(e))}',.85)"><b>${esc(e)}</b><span>${esc(a)}</span></button>`).join('')+`</div></details>`;
   h+=`<div class="sec-title">✍️ Paraqrafını yaz</div><textarea id="wgx" class="wgta" rows="11" spellcheck="false" autocapitalize="sentences" placeholder="Paraqrafını burada ingilis dilində yaz…" oninput="wgType()">${esc(d)}</textarea><div class="wgwc" id="wgwc"></div><div id="wgq">${wgQuotaHTML()}</div><div id="wgres"></div><button class="btn" id="wgbtn" onclick="wgCheck()">✅ Yoxla (Check)</button></div>`;
   app.innerHTML=h;window.scrollTo(0,0);wgType(true);wgQuota();
 }
