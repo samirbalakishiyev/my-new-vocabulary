@@ -250,6 +250,11 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .wgbox{margin:10px 0;padding:14px;border-radius:16px;background:var(--card);border:2px solid var(--c)}.wgbox.err{border-color:#C98A00;background:#FFF8E1;font-weight:700}.wgbox.pay{border-color:#D9364C;background:#FDECEE}.wgbox.pay h3{margin:0 0 6px;color:#9B1C2E}.wgbox.pay p{margin:0 0 8px;font-weight:600}.wgbox.wait{font-weight:800;text-align:center}
 .wgtot{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}.wgtot b{color:var(--c);font-size:30px}.wgtab{width:100%;border-collapse:collapse;font-size:14.5px}.wgtab td{padding:7px 4px;border-top:1px solid var(--line);font-weight:700}.wgtab td:last-child{text-align:right;font-weight:900;white-space:nowrap}.wgtab small{color:var(--muted)}.wgnc{color:var(--muted);font-weight:700;font-size:12.5px}.wgwarn{color:#9B1C2E;font-weight:800;margin:0 0 6px}
 .wgwa{display:block;text-align:center;text-decoration:none;background:#25D366!important;border-color:#1DA851!important;color:#fff!important}
+.wsrow{border-color:#3F67B5!important}.wsrow b,.wsrow .go{color:#2B4F99!important}
+.wsq{width:100%;box-sizing:border-box;font:inherit;font-size:17px;font-weight:700;padding:12px 14px;border:2px solid var(--c);border-radius:14px;background:var(--card);color:var(--ink);margin-bottom:10px}
+.wsg{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px 12px;margin-bottom:10px}.wsw{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:17px;margin-bottom:6px}.wsw b{color:var(--c);font-size:19px}.wsw span{font-weight:700;color:var(--muted)}.wsw .say{margin-left:auto}
+.wsl{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font:inherit;font-size:14px;font-weight:700;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:6px;cursor:pointer}.wsl small{display:block;font-weight:600;color:var(--muted);font-size:12.5px;margin-top:2px}.wsl em{margin-left:auto;font-style:normal;color:var(--c);font-weight:900;white-space:nowrap}
+.wsnone{background:var(--card);border:2px dashed var(--line);border-radius:16px;padding:18px;text-align:center;font-size:16px}
 .thin4{display:grid;gap:6px;margin-top:12px}.thin4 .hgrid{margin:0;gap:6px}
 .thin4 .resrow{margin:0;padding:4px 12px;min-height:38px;border-radius:12px;gap:8px;box-sizing:border-box}.thin4 .resrow .mic{font-size:19px}.thin4 .resrow>span:nth-child(2){display:flex;align-items:baseline;gap:7px;min-width:0;overflow:hidden;white-space:nowrap}.thin4 .resrow b{font-size:15.5px;display:inline}.thin4 .resrow small{font-size:11.5px;display:inline;overflow:hidden;text-overflow:ellipsis}.thin4 .resrow .go{font-size:20px}
 .thin4 .fbbtn{margin:0;min-height:38px}
@@ -8226,7 +8231,7 @@ function home(){
   h+=`</div>`;
   h+=`<button class="wgtile" onclick="wgHome()"><span class="mic" aria-hidden="true">📝</span><span><b>Paragraph Writing Guide</b><small>Mövzu seç · guide ilə yaz · süni intellekt yoxlasın</small></span><span class="go">›</span></button>`;
   {const nU=AUTO()?0:ST.log.filter(e=>!e.sent).length;h+=`<button class="resrow" onclick="resHome()"><span class="mic" aria-hidden="true">📊</span><span><b>Nəticələrim</b><small>${ST.log.length} nəticə${nU?` · <em>${nU} göndərilməyib</em>`:''}</small></span><span class="go">›</span></button>`;}
-  h=h.replace(/(<button class="resrow"[\s\S]*<\/button>)$/,'<div class="thin4">$1'+fbB+'<div class="grid hgrid">'+th+'</div></div>');
+  h=h.replace(/(<button class="resrow"[\s\S]*<\/button>)$/,'<div class="thin4">$1'+`<button class="resrow wsrow" onclick="wsHome()"><span class="mic" aria-hidden="true">🔎</span><span><b>Söz axtar</b><small>Söz saytda haradadır?</small></span><span class="go">›</span></button>`+fbB+'<div class="grid hgrid">'+th+'</div></div>');
   h+=RCONF?`<div class="foot"><p class="perr" style="color:var(--rd);font-weight:800;margin:0 0 8px">Bütün nəticələr, bildiyin sözlər və səhvlər silinsin?</p><div class="pbtns" style="justify-content:center"><button class="pbtn dl" style="text-decoration:none;color:var(--rd);font-size:15px" onclick="resetYes()">Bəli, sıfırla</button><button class="pbtn gh" style="text-decoration:none;font-size:15px" onclick="resetNo()">Xeyr</button></div></div>`:`<div class="foot"><button onclick="resetAll()">Bütün nəticələri sıfırla</button></div>`;
   app.innerHTML=h;window.scrollTo(0,0);fbBadge();
 }
@@ -9790,6 +9795,40 @@ async function tPxDel(j){
   const p=(TWR.xp||[])[j];if(!p)return;TWR.del='';
   try{const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'pxdel',key:lsGet('mnv-tkey',''),q:p.q})});const o=await r.json();if(!o.ok)throw 0;TWR.xp=o.xp||[];wgXP(TWR.xp);tToast('🗑 Silindi')}catch(e){tToast('Alınmadı.')}
   tWr();
+}
+/* ================= 🔎 Söz axtar: sözün saytda harada olduğunu göstərir ================= */
+const wsF=s=>String(s||'').toLocaleLowerCase('az').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ə/g,'e').replace(/ı/g,'i').replace(/ş/g,'s').replace(/ç/g,'c').replace(/ğ/g,'g').replace(/ö/g,'o').replace(/ü/g,'u').replace(/[’']/g,"'").trim();
+let WSI=null;
+function wsIndex(){
+  if(WSI)return WSI;const L=[];const add=(en,tr,where,open,extra)=>{if(en)L.push({en:String(en),tr:tr||'',where,open,extra:extra||'',k:wsF(en),kt:wsF(tr)})};
+  const tk=(s,i)=>Math.floor(i/SZ(s))+1,ok=e=>!(e&&e._id&&DEL.has(e._id));
+  for(const [l] of LV){
+    for(const [c,,cz] of CATS)(D.words[l][c]||[]).forEach((e,i)=>{if(ok(e))add(e[0],e[1]+(e[2]?' · '+e[2]:''),`Vocabulary → Words → ${lvName(l)} → ${cz} → Task ${tk('words',i)}`,`tasks('words','${l}','${c}')`)});
+    (D.syn[l]||[]).forEach((e,i)=>{if(!ok(e))return;const w=`Vocabulary → Synonym → ${lvName(l)} → Task ${tk('syn',i)}`,t=pTr('syn',e[0],e[1],e[0]);add(e[0],t,w,`tasks('syn','${l}','')`,e[0]+' = '+e[1]);add(e[1],t,w,`tasks('syn','${l}','')`,e[0]+' = '+e[1])});
+    (D.ant[l]||[]).forEach((e,i)=>{if(!ok(e))return;const w=`Vocabulary → Antonym → ${lvName(l)} → Task ${tk('ant',i)}`;add(e[0],pTr('ant',e[0],e[1],e[0]),w,`tasks('ant','${l}','')`,e[0]+' ↔ '+e[1]);add(e[1],pTr('ant',e[0],e[1],e[1]),w,`tasks('ant','${l}','')`,e[0]+' ↔ '+e[1])});
+    (D.def[l]||[]).forEach((e,i)=>{if(ok(e))add(e[0],'',`Vocabulary → Definition → ${lvName(l)} → Task ${tk('def',i)}`,`tasks('def','${l}','')`,e[1])});
+    (D.gap[l]||[]).forEach((e,i)=>{if(ok(e))add(e[1],'',`Vocabulary → Sentences → ${lvName(l)} → Task ${tk('gap',i)}`,`tasks('gap','${l}','')`,String(e[0]).replace('___','_____'))});
+  }
+  TOPS.forEach(k=>(TV[k].w||[]).forEach((e,i)=>{if(ok(e))add(e[0],e[1]+(e[2]?' · '+e[2]:''),`Vocabulary → Mövzular üzrə sözlər → ${TV[k].e} ${TV[k].n} → Task ${tk('tv',i)}`,`tasks('tv','${k}','')`)}));
+  RLV.forEach(Lv=>(READ[Lv]||[]).forEach((p,pi)=>Object.entries(p.keys||{}).forEach(([w,t])=>add(w,(t||[]).join(' · '),`Reading → ${Lv} → ${pi+1}. ${p.t}`,`readPassage('${Lv}',${pi})`))));
+  PARA.forEach((p,i)=>(p.kw||[]).forEach(([w,t])=>add(w,t,`Paragraph → Mövzu ${i+1}: ${p.q}`,`paraShow(${i})`)));
+  return WSI=L;
+}
+function wsHome(q){
+  V={ws:1};WSQ=q!=null?q:(WSQ||'');
+  app.innerHTML=hdr('Söz axtar','Sözün saytda harada olduğunu tap','home()','bl')+`<div style="${colorVars('bl')}"><input id="wsq" class="tsearch wsq" placeholder="🔎 İngiliscə söz və ya tərcümə yazın (məs: advantage)" value="${esc(WSQ)}" autocomplete="off" oninput="clearTimeout(window._wst);window._wst=setTimeout(()=>wsRun(this.value),200)"><div id="wsr"></div></div>`;
+  window.scrollTo(0,0);const i=document.getElementById('wsq');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}wsRun(WSQ);
+}
+let WSQ='';
+function wsRun(q){
+  WSQ=q;const box=document.getElementById('wsr');if(!box)return;const f=wsF(q);
+  if(f.length<2){box.innerHTML=`<p class="tnote">Ən azı 2 hərf yazın. İngiliscə söz və ya Azərbaycanca tərcümə ilə axtarmaq olar.</p>`;return}
+  const L=wsIndex(),hit=L.filter(x=>x.k.includes(f)||(f.length>=3&&x.kt.includes(f)));
+  if(!hit.length){box.innerHTML=`<div class="wsnone">😕 <b>${esc(q)}</b> — bu söz tətbiqdə yoxdur.</div>`;return}
+  const rank=x=>x.k===f?0:x.k.startsWith(f)?1:x.k.includes(f)?2:3,G=new Map();
+  hit.sort((a,b)=>rank(a)-rank(b)||a.k.length-b.k.length).forEach(x=>{if(!G.has(x.k))G.set(x.k,{en:x.en,tr:'',locs:[]});const g=G.get(x.k);if(!g.tr&&x.tr)g.tr=x.tr;if(g.locs.length<30&&!g.locs.some(y=>y.where===x.where&&y.extra===x.extra))g.locs.push(x)});
+  const gs=[...G.values()].slice(0,40);
+  box.innerHTML=`<p class="tnote">${G.size>40?'İlk 40 söz göstərilir · ':''}${G.size} söz tapıldı</p>`+gs.map(g=>`<div class="wsg"><div class="wsw"><b>${esc(g.en)}</b>${g.tr?` — <span>${esc(g.tr)}</span>`:''}<button class="say sm" aria-label="Dinlə" onclick="say('${esc(jsq(g.en))}',.85)">${SPK}</button></div>${g.locs.map(x=>`<button class="wsl" onclick="${x.open}"><span>📍 ${esc(x.where)}${x.extra?`<small>${esc(x.extra)}</small>`:''}</span><em>Aç ›</em></button>`).join('')}</div>`).join('');
 }
 boot();
 </script>
