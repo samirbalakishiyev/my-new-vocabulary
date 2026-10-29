@@ -117,7 +117,31 @@ function usersFix(s) {
   gv.forEach(r => { const m = String(r[0]).match(/^L (11|14)$/); if (m) { r[0] = 'N ' + m[1]; gch = true; } });
   if (gch) gr.setValues(gv);
 }
-function usersRows(s) {
+/* 🎂 Yaş: "Yaşlar" vərəqi (Telefon | Yaş | Tarix). Users vərəqinə toxunmur — yeni qeydiyyatda yazılan yaş buraya düşür */
+function ageSheet() {
+  const ss = SpreadsheetApp.getActive();
+  let s = ss.getSheetByName('Yaşlar');
+  if (!s) { s = ss.insertSheet('Yaşlar'); s.appendRow(['Telefon', 'Yaş', 'Tarix']); s.getRange(1, 1, 1, 3).setFontWeight('bold'); s.setFrozenRows(1); }
+  return s;
+}
+function ageSet(tel, y, now) {
+  y = +y; tel = String(tel || '');
+  if (!tel || !(y >= 4 && y <= 99)) return;
+  const s = ageSheet(), n = s.getLastRow();
+  if (n > 1) {
+    const v = s.getRange(2, 1, n - 1, 2).getValues();
+    for (let i = 0; i < v.length; i++) if (String(v[i][0]).replace(/^'/, '') === tel) { if (+v[i][1] !== y) s.getRange(i + 2, 2).setValue(y); return; }
+  }
+  s.appendRow(["'" + tel, y, new Date(now)]); s.getRange(s.getLastRow(), 3).setNumberFormat(DF);
+}
+function ageMap() {
+  const s = SpreadsheetApp.getActive().getSheetByName('Yaşlar'), m = {};
+  if (!s || s.getLastRow() < 2) return m;
+  s.getRange(2, 1, s.getLastRow() - 1, 2).getValues().forEach(r => { if (r[0] !== '') m[String(r[0]).replace(/^'/, '')] = +r[1] || ''; });
+  return m;
+}
+function usersRows(s) { const m = ageMap(); return usersRows0(s).map(u => (m[u.tel] ? Object.assign(u, { yas: m[u.tel] }) : u)); }
+function usersRows0(s) {
   usersImport(s);
   usersFix(s);
   const v = s.getDataRange().getValues(); v.shift();
@@ -131,6 +155,7 @@ function userRow(s, tel) {
   return 0;
 }
 function userPing(o, now) {
+  if (o.yas) ageSet(o.tel, o.yas, now); /* 🎂 */
   const s = usersSheet();
   const r = userRow(s, o.tel);
   if (!r) {
