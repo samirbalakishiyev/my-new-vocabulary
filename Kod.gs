@@ -6,7 +6,7 @@
 const KEY = 'BURAYA-OZ-ACARINIZI-YAZIN';
 const ADMIN_PASS = 'BURAYA-PANEL-SIFRESI'; /* 🔐 Müəllim panelinin şifrəsi — özünüz yazın, heç kimə deməyin */
 const SKEY = 'BURAYA-LUGET-SIFRESI'; /* 📚 PDF lüğətlərin şifrəsi — heç kimə verməyin */
-const SLUG_IDS = ['g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11'];
+const SLUG_IDS = ['g5', 'g6', 'g7', 'g8', 'g9', 'g10', 'g11', 'pA', 'pB', 'pC', 'pAll']; /* pA/pB/pC = A1–A2/B1–B2/C1–C2 tam lüğət (5 AZN), pAll = bütün lüğət (10 AZN) */
 /* "g5,g8" → ['g5','g8'] (köhnə TRUE = hamısı) */
 function slugList(v) {
   if (v === true || String(v).toUpperCase() === 'TRUE') return SLUG_IDS.slice();
