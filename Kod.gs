@@ -140,7 +140,41 @@ function ageMap() {
   s.getRange(2, 1, s.getLastRow() - 1, 2).getValues().forEach(r => { if (r[0] !== '') m[String(r[0]).replace(/^'/, '')] = +r[1] || ''; });
   return m;
 }
-function usersRows(s) { const m = ageMap(); return usersRows0(s).map(u => (m[u.tel] ? Object.assign(u, { yas: m[u.tel] }) : u)); }
+function usersRows(s) { const m = ageMap(), ab = abMap(); return usersRows0(s).map(u => Object.assign(u, m[u.tel] ? { yas: m[u.tel] } : {}, ab[u.tel] ? { ab: ab[u.tel] } : {})); }
+/* ⏳ Avto-blok: 31.10.2026-dan sonra qoşulan MÜƏLLİMLƏR və 25 YAŞDAN BÖYÜKLƏR 3 gün pulsuz istifadə edir.
+   💳 "Ödəniş edib" qeyd olunmayıbsa, 3 gündən sonra növbəti girişdə avtomatik bloklanır.
+   Müəllim blokunu əl ilə açsa, həmin şəxs bir daha avtomatik bloklanmır ("Avtoblok" vərəqi: avto / istisna). */
+const AB_FROM = 1793390400000, AB_DAYS = 3, AB_AGE = 25, AB_PAY_FROM = 1792436563700;
+function abSheet() {
+  const ss = SpreadsheetApp.getActive();
+  let s = ss.getSheetByName('Avtoblok');
+  if (!s) { s = ss.insertSheet('Avtoblok'); s.appendRow(['Telefon', 'Status', 'Tarix']); s.getRange(1, 1, 1, 3).setFontWeight('bold'); s.setFrozenRows(1); }
+  return s;
+}
+function abMap() {
+  const s = SpreadsheetApp.getActive().getSheetByName('Avtoblok'), m = {};
+  if (!s || s.getLastRow() < 2) return m;
+  s.getRange(2, 1, s.getLastRow() - 1, 2).getValues().forEach(r => { if (r[0] !== '') m[String(r[0]).replace(/^'/, '')] = String(r[1]); });
+  return m;
+}
+function abSet(tel, st, now) {
+  tel = String(tel || ''); if (!tel) return;
+  const s = abSheet(), n = s.getLastRow();
+  if (n > 1) {
+    const v = s.getRange(2, 1, n - 1, 1).getValues();
+    for (let i = 0; i < v.length; i++) if (String(v[i][0]).replace(/^'/, '') === tel) { s.getRange(i + 2, 2, 1, 2).setValues([[st, new Date(now)]]); s.getRange(i + 2, 3).setNumberFormat(DF); return; }
+  }
+  s.appendRow(["'" + tel, st, new Date(now)]); s.getRange(s.getLastRow(), 3).setNumberFormat(DF);
+}
+function abCheck(s, r, val, o, now) {
+  const tel = String(o.tel || ''), q = ms(val[4]);
+  if (!q || q < AB_FROM || isTrue(val[6]) || (ms(val[8]) || 0) >= AB_PAY_FROM) return false;
+  if (now - q < AB_DAYS * 864e5) return false;
+  if (!/müəllim/i.test(String(o.rol || val[3] || ''))) { const y = +(o.yas || ageMap()[tel] || 0); if (!(y > AB_AGE)) return false; }
+  if (abMap()[tel] === 'istisna') return false;
+  s.getRange(r, 7).insertCheckboxes().setValue(true); abSet(tel, 'avto', now);
+  return true;
+}
 function usersRows0(s) {
   usersImport(s);
   usersFix(s);
@@ -172,13 +206,14 @@ function userPing(o, now) {
   /* 📋 şagirdin "Nəticəni müəllimə göndər" xanasındakı ad və sinif (qrupu tapmaq üçün) */
   if (o.pn !== undefined || o.pk !== undefined) s.getRange(r, 13, 1, 2).setNumberFormat('@').setValues([[String(o.pn || val[12] || '').slice(0, 80), String(o.pk || val[13] || '').slice(0, 40)]]);
   s.getRange(r, 6).setValue(new Date(now)).setNumberFormat(DF);
-  return { ok: true, blok: isTrue(val[6]), prem: isTrue(val[9]), grp: String(val[11] || ''), nm: String(val[14] || '') };
+  const ab = abCheck(s, r, val, o, now); /* ⏳ */
+  return { ok: true, blok: ab || isTrue(val[6]), prem: isTrue(val[9]), grp: String(val[11] || ''), nm: String(val[14] || '') };
 }
 function userSet(o, now) {
   const s = usersSheet();
   const r = userRow(s, o.tel);
   if (!r) return { ok: false, error: 'tel' };
-  if (o.a === 'block') { s.getRange(r, 7).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
+  if (o.a === 'block') { s.getRange(r, 7).insertCheckboxes().setValue(!!o.v); if (!o.v) abSet(o.tel, 'istisna', now); return { ok: true }; }
   if (o.a === 'premium') { s.getRange(r, 10).insertCheckboxes().setValue(!!o.v); return { ok: true }; }
   if (o.a === 'ren') { /* ✏️ müəllimin düzəltdiyi ad və nömrə ('' = qeydiyyatdakı) — şagirdin girişi dəyişmir */
     const t = String(o.v || '').trim().replace(/\s+/g, ' ').slice(0, 80);
