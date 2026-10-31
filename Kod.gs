@@ -56,6 +56,7 @@ function colMap(hv) {
 }
 /* başqa vərəqlərdə qalmış köhnə istifadəçiləri Users-ə köçürür (təkrarlamadan) */
 function usersImport(s) {
+  const DM = delMap();
   const ss = SpreadsheetApp.getActive();
   const have = new Set(s.getLastRow() > 1 ? s.getRange(2, 1, s.getLastRow() - 1, 1).getValues().map(r => String(r[0])) : []);
   const add = [];
@@ -66,7 +67,7 @@ function usersImport(s) {
     if (idx[0] < 0 || idx[1] < 0) return;
     v.slice(1).forEach(r => {
       const tel = String(r[idx[0]] || '').replace(/\D/g, '').replace(/^994/, '').replace(/^0/, '');
-      if (!tel || have.has(tel)) return;
+      if (!tel || have.has(tel) || DM[tel]) return;
       have.add(tel);
       add.push(idx.map((i, j) => j === 0 ? "'" + tel : i < 0 ? (j === 6 || j === 9 ? false : '') : r[i]));
     });
@@ -140,7 +141,7 @@ function ageMap() {
   s.getRange(2, 1, s.getLastRow() - 1, 2).getValues().forEach(r => { if (r[0] !== '') m[String(r[0]).replace(/^'/, '')] = +r[1] || ''; });
   return m;
 }
-function usersRows(s) { const m = ageMap(), ab = abMap(); return usersRows0(s).map(u => Object.assign(u, m[u.tel] ? { yas: m[u.tel] } : {}, ab[u.tel] ? { ab: ab[u.tel] } : {})); }
+function usersRows(s) { usersPurge_(s); const m = ageMap(), ab = abMap(); return usersRows0(s).map(u => Object.assign(u, m[u.tel] ? { yas: m[u.tel] } : {}, ab[u.tel] ? { ab: ab[u.tel] } : {})); }
 /* ⏳ Avto-blok: 31.10.2026-dan sonra qoşulan MÜƏLLİMLƏR və 25 YAŞDAN BÖYÜKLƏR 3 gün pulsuz istifadə edir.
    💳 "Ödəniş edib" qeyd olunmayıbsa, 3 gündən sonra növbəti girişdə avtomatik bloklanır.
    Müəllim blokunu əl ilə açsa, həmin şəxs bir daha avtomatik bloklanmır ("Avtoblok" vərəqi: avto / istisna). */
@@ -188,7 +189,58 @@ function userRow(s, tel) {
   for (let i = 0; i < v.length; i++) if (String(v[i][0]) === String(tel)) return i + 2;
   return 0;
 }
+/* 🗑 İstifadəçini silmək (müəllim paneli → 🗑 Sil). Silinən nömrələr BÜTÜN saytlar üçün ortaq cədvələ yazılır:
+   "Silinənlər – bütün saytlar" (Google Diskinizdə). Bu siyahıdakı nömrə heç bir saytda qeydiyyatdan keçə bilməz,
+   hər saytda onun bütün sətirləri silinir. Birinə yenidən icazə vermək üçün həmin cədvəldən onun sətrini silin. */
+const DEL_ID = '1huCwvX18oEAaz9jPPGKvqjHgerei7Tqq70l70rLDlDA';
+function icazeVer() { SpreadsheetApp.openById(DEL_ID).getName(); } /* 🔑 bir dəfə: bu funksiyanı seçib ▶ İşə sal → İcazə ver */
+function delSheet() {
+  let b = null; try { b = SpreadsheetApp.openById(DEL_ID); } catch (e) { b = SpreadsheetApp.getActive(); }
+  let s = b.getSheetByName('Silinənlər');
+  if (!s) { s = b.insertSheet('Silinənlər'); s.appendRow(['Telefon', 'Silinmə tarixi', 'Harada silinib']); s.getRange(1, 1, 1, 3).setFontWeight('bold'); s.setFrozenRows(1); }
+  return s;
+}
+function delMap() {
+  const c = CacheService.getScriptCache(), k = c.get('dm');
+  if (k) { try { return JSON.parse(k); } catch (e) {} }
+  const m = {};
+  try { const s = delSheet(); if (s.getLastRow() > 1) s.getRange(2, 1, s.getLastRow() - 1, 1).getValues().forEach(r => { const t = String(r[0]).replace(/^'/, '').replace(/\D/g, ''); if (t) m[t] = 1; }); } catch (e) {}
+  try { c.put('dm', JSON.stringify(m), 60); } catch (e) {}
+  return m;
+}
+/* bu cədvəlin bütün vərəqlərindən həmin nömrənin sətirlərini silir */
+function delLocal(tel) {
+  let n = 0;
+  SpreadsheetApp.getActive().getSheets().forEach(sh => {
+    const nm = sh.getName();
+    if (nm === 'Silinənlər' || nm === 'Paraqraflar' || /yedək/i.test(nm) || sh.getLastRow() < 2 || sh.getLastColumn() < 1) return;
+    const hv = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(x => String(x).trim().toLowerCase());
+    const c = hv.findIndex(h => /^(tel|telefon|phone)/.test(h));
+    if (c < 0) return;
+    const v = sh.getRange(2, c + 1, sh.getLastRow() - 1, 1).getValues();
+    for (let i = v.length - 1; i >= 0; i--) {
+      const t = String(v[i][0]).replace(/^'/, '').replace(/\D/g, '').replace(/^994/, '').replace(/^0/, '');
+      if (t === tel) { sh.deleteRow(i + 2); n++; }
+    }
+  });
+  return n;
+}
+function userDel(o, now) {
+  const tel = String(o.tel || '').replace(/\D/g, '').replace(/^994/, '').replace(/^0/, '');
+  if (!tel) return { ok: false, error: 'tel' };
+  const n = delLocal(tel);
+  if (!delMap()[tel]) { const s = delSheet(); s.appendRow(["'" + tel, new Date(now), SpreadsheetApp.getActive().getName()]); s.getRange(s.getLastRow(), 2).setNumberFormat(DF); }
+  CacheService.getScriptCache().remove('dm');
+  return { ok: true, n };
+}
+/* müəllim paneli siyahısı: başqa saytda silinənləri bu cədvəldən də təmizləyir */
+function usersPurge_(s) {
+  const dm = delMap(); if (!Object.keys(dm).length || s.getLastRow() < 2) return;
+  const v = s.getRange(2, 1, s.getLastRow() - 1, 1).getValues(), seen = {};
+  v.forEach(r => { const t = String(r[0]).replace(/^'/, ''); if (dm[t] && !seen[t]) { seen[t] = 1; delLocal(t); } });
+}
 function userPing(o, now) {
+  { const tel = String(o.tel || ''); if (tel && delMap()[tel]) { delLocal(tel); return { ok: true, gone: true, blok: false }; } } /* 🗑 silinib: qeydiyyat yoxdur */
   if (o.yas) ageSet(o.tel, o.yas, now); /* 🎂 */
   const s = usersSheet();
   const r = userRow(s, o.tel);
@@ -602,6 +654,7 @@ function doPost(e) {
     if (o.key !== KEY) return out({ ok: false, error: 'key' });
     if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium' || o.a === 'slug' || o.a === 'grp' || o.a === 'ren') return out(userSet(o, now));
     if (o.a === 'fbset') return out(fbSet(o, now));
+    if (o.a === 'udel') return out(userDel(o, now)); /* 🗑 */
     if (o.a === 'wact') return out(wAct(o, now)); /* ✍️ müəllim: Writing-i aktiv et / söndür */
     if (o.a === 'pxdel') return out(pxDel(o));
     if (o.a === 'cfg') { cfgSheet().getRange('A1').setNumberFormat('@').setValue(JSON.stringify(o.state || {})); return out({ ok: true }); }
