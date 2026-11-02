@@ -146,6 +146,9 @@ function usersRows(s) { usersPurge_(s); const m = ageMap(), ab = abMap(); return
    💳 "Ödəniş edib" qeyd olunmayıbsa, 3 gündən sonra növbəti girişdə avtomatik bloklanır.
    Müəllim blokunu əl ilə açsa, həmin şəxs bir daha avtomatik bloklanmır ("Avtoblok" vərəqi: avto / istisna). */
 const AB_FROM = 1793390400000, AB_DAYS = 3, AB_AGE = 25, AB_PAY_FROM = 1792436563700;
+/* ⏳ 02.11.2026 20:40-dan (Bakı) sonra qoşulan HAMI (şagird və müəllim) 3 gün pulsuz istifadə edir, sonra avtomatik bloklanır.
+   Müəllim panelində 💳 "Ödədi" basılanda avtomatik blok açılır və bir daha bloklanmır. */
+const AB_ALL = 1793637600000;
 function abSheet() {
   const ss = SpreadsheetApp.getActive();
   let s = ss.getSheetByName('Avtoblok');
@@ -171,7 +174,7 @@ function abCheck(s, r, val, o, now) {
   const tel = String(o.tel || ''), q = ms(val[4]);
   if (!q || q < AB_FROM || isTrue(val[6]) || (ms(val[8]) || 0) >= AB_PAY_FROM) return false;
   if (now - q < AB_DAYS * 864e5) return false;
-  if (!/müəllim/i.test(String(o.rol || val[3] || ''))) { const y = +(o.yas || ageMap()[tel] || 0); if (!(y > AB_AGE)) return false; }
+  if (q < AB_ALL && !/müəllim/i.test(String(o.rol || val[3] || ''))) { const y = +(o.yas || ageMap()[tel] || 0); if (!(y > AB_AGE)) return false; }
   if (abMap()[tel] === 'istisna') return false;
   s.getRange(r, 7).insertCheckboxes().setValue(true); abSet(tel, 'avto', now);
   return true;
@@ -289,7 +292,10 @@ function userSet(o, now) {
     return { ok: true, slug: list };
   }
   s.getRange(r, 9).setValue(o.v ? new Date(now) : '').setNumberFormat(DF);
-  return { ok: true, t: o.v ? now : '' };
+  /* 💳 ödəniş edildi → 3 günlük avtomatik blok açılır */
+  let unb = false;
+  if (o.v && isTrue(s.getRange(r, 7).getValue()) && abMap()[String(o.tel)] === 'avto') { s.getRange(r, 7).insertCheckboxes().setValue(false); abSet(o.tel, 'ödəyib', now); unb = true; }
+  return { ok: true, t: o.v ? now : '', unb };
 }
 
 /* 📊 Şagird nəticələri: "Nəticələr" (hamısı) + "Qrup …" (hər qrup ayrıca). Açar sütunu (telefon|vaxt) təkrarı önləyir. */

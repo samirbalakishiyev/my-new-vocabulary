@@ -9395,7 +9395,7 @@ function tToast(m){let t=document.getElementById('ttoast');if(!t){t=document.cre
 const PAY_FROM=1792436563700;
 const isPaid=u=>(+u.elaqe||0)>=PAY_FROM, isPay=u=>isPaid(u)&&!u.blok, isNew=u=>!u.blok&&!isPaid(u);
 /* ⏳ avto-blok məlumatı (server qaydası: 31.10.2026-dan sonra qoşulan müəllim və 25+ yaşlılar, ödənişsiz → 3 gündən sonra blok) */
-const AB_FROM=1793390400000,abTag=u=>{if(u.blok)return u.ab==='avto'?'🤖 avtomatik bloklanıb (3 gün bitdi)':'';if(isPaid(u)||!u.qeyd||+u.qeyd<AB_FROM||u.ab==='istisna')return '';if(!/müəllim/i.test(u.rol||'')&&!(+u.yas>25))return '';const d=Math.ceil((+u.qeyd+3*864e5-Date.now())/864e5);return d>0?`⏳ pulsuz: ${d} gün qalıb`:'⏳ növbəti girişdə bloklanacaq'};
+const AB_FROM=1793390400000,abTag=u=>{if(u.blok)return u.ab==='avto'?'🤖 avtomatik bloklanıb (3 gün bitdi)':'';if(isPaid(u)||!u.qeyd||+u.qeyd<AB_FROM||u.ab==='istisna')return '';if(+u.qeyd<1793637600000&&!/müəllim/i.test(u.rol||'')&&!(+u.yas>25))return '';const d=Math.ceil((+u.qeyd+3*864e5-Date.now())/864e5);return d>0?`⏳ pulsuz: ${d} gün qalıb`:'⏳ növbəti girişdə bloklanacaq'};
 async function tUsers(reload){
   const same=!!document.getElementById('tuList'),y=window.scrollY;
   if(!TU.list||reload){if(!same)app.innerHTML=hdr('İstifadəçilər','Yüklənir…','tHome()','bl');else tToast('Yenilənir…');await Promise.all([tFetch('users'),tPremX()])}
@@ -9476,7 +9476,7 @@ async function tSet(a,tel,v){
   tUsers();
   const post=(url)=>fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,key,tel,v})}).then(r=>r.json());
   try{const o=await post(SHEET_URL);if(!o.ok)throw new Error(o.error||'x');
-    if(a==='elaqe'&&v&&o.t)u.elaqe=o.t;
+    if(a==='elaqe'&&v&&o.t)u.elaqe=o.t;if(a==='elaqe'&&o.unb){u.blok=false;u.ab='';tUsers();}
     tToast(a==='block'?(v?'🚫 Bloklandı':'✅ Blok açıldı'):a==='premium'?(v?'👑 Premium açıldı':'Premium götürüldü'):a==='slug'?(v?'📚 PDF lüğətlər açıldı':'📚 PDF lüğətlər bağlandı'):(v?'💳 Ödəniş edənlərə əlavə olundu':'Ödəniş işarəsi götürüldü'));
   }catch(e){u[F]=old;if(oldX)TU.px.add(String(tel));tUsers();const m=String(e&&e.message);
     tToast(m==='key'?'Cədvəl açarı səhvdir.':'Alınmadı. Google Cədvəlin skriptini yeniləmisiniz?')}
