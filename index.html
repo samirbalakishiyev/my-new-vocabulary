@@ -9494,20 +9494,22 @@ async function tMy(force){
   h+=`<p class="mhint" style="margin-top:12px">Şagirdi qrupa yazmaq: <b>İstifadəçilər</b> → adın yanındakı <b>👥</b> → qrup.</p>`;
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
+/* müəllim paneli: test adını aydın göstər (istiqamət + sıra) */
+const secLbl=t=>String(t||'').replace(/^Words \(AZ → EN\) · /,'Words · AZ → EN · ').replace(/^Words · (?!AZ → EN)/,'Words · EN → AZ · ');
 function tMyG(){
   const g=TM.g,L=(TU.list||[]).filter(u=>u.grp===g),tels=new Set(L.map(u=>u.tel));
   const nm=tel=>{const u=L.find(x=>x.tel===tel);return u?(u.nm||(u.ad+' '+u.soyad)).trim():tel};
   const R0=(TU.res||[]).filter(x=>tels.has(x.tel)).sort((a,b)=>(+b.at||0)-(+a.at||0));
-  const tests=[];R0.forEach(x=>{if(!tests.includes(x.sec))tests.push(x.sec)});
+  const tests=[];R0.forEach(x=>{if(!tests.includes(x.sec))tests.push(x.sec)});tests.sort((a,b)=>secLbl(a).localeCompare(secLbl(b),'en',{numeric:true}));
   if(TM.t&&!tests.includes(TM.t))TM.t='';
   let h=hdr('👥 '+g,L.length+' şagird','tMy()','tq')+`<div style="${colorVars('tq')}">`;
   h+=`<div class="pbtns" style="margin-bottom:10px;align-items:center"><button class="pbtn" style="background:var(--tq)" onclick="tMy(true).then(tMyG)">↻ Yenilə</button></div>`;
-  h+=`<select class="mysel" onchange="TM.t=this.value;tMyG()"><option value="">📋 Bütün testlər (${R0.length} nəticə)</option>${tests.map(t=>`<option value="${esc(t)}"${TM.t===t?' selected':''}>${esc(t)}</option>`).join('')}</select>`;
+  h+=`<select class="mysel" onchange="TM.t=this.value;tMyG()"><option value="">📋 Bütün testlər (${R0.length} nəticə)</option>${tests.map(t=>`<option value="${esc(t)}"${TM.t===t?' selected':''}>${esc(secLbl(t))}</option>`).join('')}</select>`;
   const pc=p=>(+p)>=80?'ok':(+p)>=50?'mid':'low';
   let rows;
   if(TM.t){rows=L.map(u=>{const r=R0.find(x=>x.tel===u.tel&&x.sec===TM.t);return [nm(u.tel),TM.t,r?r.p:null]}).sort((a,b)=>(a[2]==null)-(b[2]==null)||a[0].localeCompare(b[0],'az'))}
   else rows=R0.map(x=>[nm(x.tel),x.sec,x.p]);
-  if(rows.length)h+=`<table class="mytab"><thead><tr><th>Şagird</th><th>Test</th><th>Faiz</th></tr></thead><tbody>`+rows.map(([n,t,p])=>`<tr><td>${esc(n)}</td><td>${esc(t)}</td><td>${p==null?'<span class="myp none">işləməyib</span>':`<span class="myp ${pc(p)}">${esc(p)}%</span>`}</td></tr>`).join('')+`</tbody></table>`;
+  if(rows.length)h+=`<table class="mytab"><thead><tr><th>Şagird</th><th>Test</th><th>Faiz</th></tr></thead><tbody>`+rows.map(([n,t,p])=>`<tr><td>${esc(n)}</td><td>${esc(secLbl(t))}</td><td>${p==null?'<span class="myp none">işləməyib</span>':`<span class="myp ${pc(p)}">${esc(p)}%</span>`}</td></tr>`).join('')+`</tbody></table>`;
   else h+=`<div class="empty">${L.length?'Bu qrupun şagirdləri hələ test işləməyib. Nəticələr şagird qrupa yazılandan sonra gəlir.':'Bu qrupda hələ şagird yoxdur. İstifadəçilər → 👥 ilə şagirdi qrupa yazın.'}</div>`;
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
@@ -9532,7 +9534,7 @@ async function tResults(reload){
     const S=Object.values(M).sort((a,b)=>(a.grp+a.ad).localeCompare(b.grp+b.ad,'az'));
     h+=`<p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Şagird: ${S.length}</p><div class="tlist">`+S.map(x=>{const av=Math.round(x.s/x.n),[bg,fg]=pc(av);return `<div class="titem"><span><b>${esc(x.ad)} ${esc(x.soyad)}</b> <em class="tedit" style="color:#fff;background:#0E7C86">👥 ${esc(x.grp)}</em><br><small style="color:var(--muted);font-weight:700">${x.n} test · son: ${dOnly(x.last)}</small></span><span class="badge" style="flex:none;background:${bg};color:${fg}">orta ${av}%</span></div>`}).join('')+(S.length?'':'<div class="empty">Bu filtrdə nəticə yoxdur.</div>')+`</div>`;
   }else{
-    h+=`<p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Göstərilir: ${Math.min(rows.length,400)}${rows.length>400?' / '+rows.length+' (hamısı Excel-dədir)':''}</p><div class="tlist">`+rows.slice(0,400).map(x=>{const [bg,fg]=pc(x.p);return `<div class="titem"><span><b>${esc(x.ad)} ${esc(x.soyad)}</b> <em class="tedit" style="color:#fff;background:#0E7C86">👥 ${esc(x.grp)}</em><br><small style="color:var(--muted);font-weight:700">${esc(x.sec)} · ${dOnly(x.at)} · ${esc(x.r)}/${esc(x.n)}</small>${x.w?`<br><small style="color:var(--rd);font-weight:700">Səhvlər: ${esc(x.w)}</small>`:''}</span><span class="badge" style="flex:none;background:${bg};color:${fg}">${esc(x.p)}%</span></div>`}).join('')+(rows.length?'':`<div class="empty">${all.length?'Bu filtrdə nəticə yoxdur.':'Hələ nəticə yoxdur. Şagirdi «İstifadəçilər» bölməsində qrupa yazın — bundan sonrakı nəticələri bura avtomatik düşəcək.'}</div>`)+`</div>`;
+    h+=`<p style="margin:0 0 8px;font-weight:800;color:var(--muted)">Göstərilir: ${Math.min(rows.length,400)}${rows.length>400?' / '+rows.length+' (hamısı Excel-dədir)':''}</p><div class="tlist">`+rows.slice(0,400).map(x=>{const [bg,fg]=pc(x.p);return `<div class="titem"><span><b>${esc(x.ad)} ${esc(x.soyad)}</b> <em class="tedit" style="color:#fff;background:#0E7C86">👥 ${esc(x.grp)}</em><br><small style="color:var(--muted);font-weight:700">${esc(secLbl(x.sec))} · ${dOnly(x.at)} · ${esc(x.r)}/${esc(x.n)}</small>${x.w?`<br><small style="color:var(--rd);font-weight:700">Səhvlər: ${esc(x.w)}</small>`:''}</span><span class="badge" style="flex:none;background:${bg};color:${fg}">${esc(x.p)}%</span></div>`}).join('')+(rows.length?'':`<div class="empty">${all.length?'Bu filtrdə nəticə yoxdur.':'Hələ nəticə yoxdur. Şagirdi «İstifadəçilər» bölməsində qrupa yazın — bundan sonrakı nəticələri bura avtomatik düşəcək.'}</div>`)+`</div>`;
   }
   app.innerHTML=h+'</div>';
 }
