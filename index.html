@@ -8225,7 +8225,7 @@ function home(){
   h+=mb('📚','Vocabulary','Sözlər, testlər, kartlar',wN+' söz','tq','vocabHome()');
   h+=mb('📖','Reading','Mətnlər və suallar',RLV.reduce((u,L)=>u+(READ[L]||[]).length,0)+' mətn','in','readHome()');
   h+=mb('✍️','Paragraph','Nümunə paraqraflar',Object.keys(ST.pa||{}).length+'/'+PARA.length,'te','paraHome()');
-  h+=mb('🧩','Grammar','16 mövzu · 4509 test','247 blok','pu','grammarHome()');
+  h+=mb('🧩','Grammar','18 mövzu · 8912 test','482 blok','pu','grammarHome()');
   {const nu=Object.keys(ST.uns||{}).filter(live).length,ng=Object.keys(grMist()).length;h+=mb('❗','Səhvlərim','Səhv cavablar · Əmin olmadıqlarım',String(m+ng)+(nu?' · 🤔 '+nu:''),'rd','mistakes()');}
   h+=mb('🏆','Ümumi Sınaqlar','Siniflər üzrə sınaqlar','Tezliklə','am','examsHome()');
   h+=`</div>`;
