@@ -142,11 +142,11 @@ function ageMap() {
   return m;
 }
 function usersRows(s) { usersPurge_(s); const m = ageMap(), ab = abMap(); return usersRows0(s).map(u => Object.assign(u, m[u.tel] ? { yas: m[u.tel] } : {}, ab[u.tel] ? { ab: ab[u.tel] } : {})); }
-/* ⏳ Avto-blok: 31.10.2026-dan sonra qoşulan MÜƏLLİMLƏR və 25 YAŞDAN BÖYÜKLƏR 3 gün pulsuz istifadə edir.
-   💳 "Ödəniş edib" qeyd olunmayıbsa, 3 gündən sonra növbəti girişdə avtomatik bloklanır.
+/* ⏳ Avto-blok: 31.10.2026-dan sonra qoşulan MÜƏLLİMLƏR və 25 YAŞDAN BÖYÜKLƏR 5 gün pulsuz istifadə edir.
+   💳 "Ödəniş edib" qeyd olunmayıbsa, 5 gündən sonra növbəti girişdə avtomatik bloklanır.
    Müəllim blokunu əl ilə açsa, həmin şəxs bir daha avtomatik bloklanmır ("Avtoblok" vərəqi: avto / istisna). */
-const AB_FROM = 1793390400000, AB_DAYS = 3, AB_AGE = 25, AB_PAY_FROM = 1792436563700;
-/* ⏳ 02.11.2026 20:40-dan (Bakı) sonra qoşulan HAMI (şagird və müəllim) 3 gün pulsuz istifadə edir, sonra avtomatik bloklanır.
+const AB_FROM = 1793390400000, AB_DAYS = 5, AB_AGE = 25, AB_PAY_FROM = 1792436563700;
+/* ⏳ 02.11.2026 20:40-dan (Bakı) sonra qoşulan HAMI (şagird və müəllim) 5 gün pulsuz istifadə edir, sonra avtomatik bloklanır.
    Müəllim panelində 💳 "Ödədi" basılanda avtomatik blok açılır və bir daha bloklanmır. */
 const AB_ALL = 1793637600000;
 /* 👑 Premium: əl ilə 👑 qoyulub, və ya 02.11.2026-dan sonra qoşulub, və ya 💳 ödəniş edib → Missions task-ları açıqdır */
@@ -294,7 +294,7 @@ function userSet(o, now) {
     return { ok: true, slug: list };
   }
   s.getRange(r, 9).setValue(o.v ? new Date(now) : '').setNumberFormat(DF);
-  /* 💳 ödəniş edildi → 3 günlük avtomatik blok açılır */
+  /* 💳 ödəniş edildi → 5 günlük avtomatik blok açılır */
   let unb = false;
   if (o.v && isTrue(s.getRange(r, 7).getValue()) && abMap()[String(o.tel)] === 'avto') { s.getRange(r, 7).insertCheckboxes().setValue(false); abSet(o.tel, 'ödəyib', now); unb = true; }
   return { ok: true, t: o.v ? now : '', unb };
