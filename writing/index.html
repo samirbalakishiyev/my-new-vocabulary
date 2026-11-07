@@ -112,7 +112,13 @@ details.box .in{padding:0 16px 14px}
 .tiles{display:flex;flex-wrap:wrap;gap:8px}
 .tile{background:var(--surface);border:2px solid var(--line);color:var(--ink);font-weight:800;padding:10px 14px;border-radius:12px;font-size:18px;box-shadow:0 2px 0 var(--line)}
 .tile.blk{background:var(--soft);border-color:var(--brand);color:var(--brand)}
-.tile.used{visibility:hidden}
+.tile.used{pointer-events:none}
+.tile.yes{background:#22C55E;border-color:#16A34A;color:#fff;box-shadow:0 0 0 4px rgba(34,197,94,.35),0 0 18px rgba(34,197,94,.8);transform:scale(1.08);transition:all .15s}
+.tile.new{animation:pop .3s}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.built .pk{display:inline-block;margin:0 6px 4px 0;padding:2px 8px;border-radius:8px;background:var(--ok-bg);color:var(--ok);animation:gl .7s}
+.built .pk.pb{color:var(--brand);background:var(--soft)}
+@keyframes gl{0%{background:#22C55E;color:#fff;box-shadow:0 0 14px rgba(34,197,94,.9)}100%{}}
 .tile.no{border-color:var(--bad);background:var(--bad-bg);animation:sh .35s}
 @keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .okl{margin-top:12px;background:var(--ok-bg);color:var(--ok);padding:12px 14px;border-radius:14px;font-weight:800;font-size:18px}
@@ -193,15 +199,20 @@ function build(ti){
     ch[ci].replace(/,/g,"").trim().split(/\s+/).forEach((w,k)=>units.push({t:(ci===0&&k===0)?lc(w,true):w,blk:0}));
     const pool=units.map((u,k)=>({t:u.t,blk:u.blk,k}));
     if(ci===0&&units.length===1&&LINKERS.includes(ch[0].replace(/,/g,"").trim()))shuffle(LINKERS.filter(x=>x!==ch[0].replace(/,/g,"").trim())).slice(0,2).forEach(x=>pool.push({t:x.toLowerCase(),blk:0,k:-1}));
-    let order=shuffle(pool),n=0;while(pool.length>1&&order.map(o=>o.k).join()===pool.map(o=>o.k).join()&&n++<10)order=shuffle(pool);
+    const MAXT=6,extra=pool.filter(o=>o.k<0),queue=pool.filter(o=>o.k>=0);
     area.innerHTML=`<p class="step">Addım ${ci+1} / ${ch.length} · <b style="color:#D6262E">Qırmızı</b> hissəni ingiliscə başdan qur${ci?' — əvvəl qurduğun hissələr hazır blokdadır':''}:</p><div class="built"><span class="cur"></span></div><div class="tiles"></div>`;
-    const cur=area.querySelector('.cur'),tl=area.querySelector('.tiles');let p=0;err=false;const picked=[];
-    order.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='tile'+(o.blk?' blk':'');b.textContent=o.t;b.onclick=()=>{
+    const cur=area.querySelector('.cur'),tl=area.querySelector('.tiles');let p=0;err=false;
+    let qi=0;const first=[];while(qi<queue.length&&first.length+extra.length<MAXT)first.push(queue[qi++]);
+    let order=shuffle(first.concat(extra)),n=0;while(order.length>1&&order[0].k===0&&n++<10)order=shuffle(order);
+    const mk=o=>{const b=document.createElement('button');b.type='button';b.className='tile'+(o.blk?' blk':'');b.textContent=o.t;b.onclick=()=>{
       if(b.classList.contains('used'))return;
-      if(o.k>=0&&o.t.toLowerCase()===units[p].t.toLowerCase()){beep(true);b.classList.add('used');picked.push(units[p].t);p++;cur.textContent=picked.join(' ');
-        if(p===units.length){if(!err)clean++;cur.className='done';cur.textContent='✓ '+en;stars(cur);ci++;setTimeout(render,900)}}
+      if(o.k>=0&&o.t.toLowerCase()===units[p].t.toLowerCase()){beep(true);b.classList.add('used','yes');
+        const sp=document.createElement('span');sp.className='pk'+(units[p].blk?' pb':'');sp.textContent=units[p].t;cur.appendChild(sp);p++;
+        setTimeout(()=>{if(qi<queue.length){const nb=mk(queue[qi++]);nb.classList.add('new');b.replaceWith(nb)}else b.remove()},280);
+        if(p===units.length){if(!err)clean++;setTimeout(()=>{cur.className='done';cur.textContent='✓ '+en;stars(cur);ci++;setTimeout(render,900)},300)}}
       else{beep(false);mist++;err=true;b.classList.remove('no');void b.offsetWidth;b.classList.add('no');c.querySelector('#ms').textContent='❌ '+mist}
-    };tl.appendChild(b)});
+    };return b};
+    order.forEach(o=>tl.appendChild(mk(o)));
   }
   function end(){
     const en=S.map(sEN).join(" "),az=S.map(sAZ).join(" "),n=wcount(en),p=Math.round(clean/total*100);
