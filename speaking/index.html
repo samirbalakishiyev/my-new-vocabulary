@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Speaking · My New Vocabulary</title>
+<meta name="theme-color" content="#B5541C">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✍️</text></svg>">
+<style>
+:root{
+  --bg:#F6F1EC; --surface:#FFFFFF; --ink:#2A1A10; --muted:#7A6556; --line:#E6D8CC;
+  --brand:#B5541C; --brand-ink:#FFFFFF; --soft:#FCE9DC;
+  --ok:#15803D; --ok-bg:#DCF5E3; --bad:#C62828; --bad-bg:#FBE1E1; --warn:#B45F06; --warn-bg:#FFEBCC;
+  --blue:#2563EB; --blue-bg:#DCE8FF; --mark:#FFE27A;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17110D; --surface:#241A14; --ink:#F3E9E1; --muted:#BFA898; --line:#3D2D22;
+  --brand:#F08A4B; --brand-ink:#17110D; --soft:#3A2416;
+  --ok:#4ADE80; --ok-bg:#11331E; --bad:#FF7B7B; --bad-bg:#3C1616; --warn:#FFB45C; --warn-bg:#3B250F;
+  --blue:#7DA8FF; --blue-bg:#172B52; --mark:#6B5410; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17110D; --surface:#241A14; --ink:#F3E9E1; --muted:#BFA898; --line:#3D2D22;
+  --brand:#F08A4B; --brand-ink:#17110D; --soft:#3A2416;
+  --ok:#4ADE80; --ok-bg:#11331E; --bad:#FF7B7B; --bad-bg:#3C1616; --warn:#FFB45C; --warn-bg:#3B250F;
+  --blue:#7DA8FF; --blue-bg:#172B52; --mark:#6B5410; color-scheme:dark}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%}
+.wrap{max-width:620px;margin:0 auto;padding:16px 16px 48px}
+.screen[hidden]{display:none}
+h1{font-family:var(--serif);font-size:30px;line-height:1.15;margin:6px 0 4px}
+p{margin:0 0 12px}
+.muted{color:var(--muted)}.small{font-size:14px}
+button,input,textarea{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 10px}
+.mini{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 13px;font-size:14px;font-weight:700;color:var(--brand);text-decoration:none}
+.hero{background:linear-gradient(135deg,#C8662B,#8E3B10);color:#fff;border-radius:22px;padding:20px 18px;margin:0 0 14px}
+.hero h1{color:#fff;margin:0 0 4px}.hero p{margin:0;color:#FFE3D0;font-size:15px}
+.search{width:100%;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px;margin:0 0 12px}
+.tl{display:grid;gap:8px}
+.tp{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:11px 12px}
+.tp .n{flex:none;min-width:30px;height:30px;border-radius:9px;background:var(--soft);color:var(--brand);font-weight:800;display:grid;place-items:center;font-size:14px}
+.tp .q{font-weight:650;line-height:1.3}.tp.done{border-color:var(--ok)}.tp.done .n{background:var(--ok-bg);color:var(--ok)}
+.topic{font-family:var(--serif);font-size:22px;font-weight:700;line-height:1.25;background:var(--surface);border-left:6px solid var(--brand);border-radius:14px;padding:14px 16px;margin:0 0 12px}
+details.box{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;margin:0 0 10px;overflow:hidden}
+details.box>summary{cursor:pointer;list-style:none;padding:13px 16px;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+details.box>summary::-webkit-details-marker{display:none}
+details.box>summary::after{content:"＋";color:var(--brand);font-weight:900}details.box[open]>summary::after{content:"－"}
+details.box .in{padding:0 16px 14px}
+.steps{margin:0;padding-left:20px}.steps li{margin:0 0 8px}
+.r1{color:var(--brand);font-weight:800}.g1{color:var(--blue);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{display:inline-flex;flex-direction:column;align-items:flex-start;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:6px 10px;text-align:left}
+.chip b{font-size:15px}.chip span{font-size:12.5px;color:var(--muted)}
+.chip.used{border-color:var(--ok);background:var(--ok-bg)}.chip.unused{border-style:dashed}
+.gq{margin:0;padding-left:20px}.gq li{margin:0 0 7px}
+.ta{width:100%;min-height:260px;border:2px solid var(--line);background:var(--surface);border-radius:16px;padding:14px;line-height:1.55;resize:vertical}
+.ta:focus{border-color:var(--brand);outline:none}
+.wc{display:flex;justify-content:space-between;align-items:center;margin:6px 2px 12px;font-weight:800;font-size:15px}
+.wc .bar{flex:1;height:8px;background:var(--line);border-radius:99px;margin-left:12px;overflow:hidden}.wc .bar i{display:block;height:100%;background:var(--warn)}
+.wc.ok .bar i{background:var(--ok)}.wc.lo .bar i{background:var(--bad)}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:15px 18px;font-weight:800;background:var(--brand);color:var(--brand-ink);font-size:18px}
+.btn.ghost{background:transparent;color:var(--brand);border:2px solid var(--line);font-size:16px;padding:12px}
+.btn+.btn{margin-top:10px}
+.res{margin-top:16px}
+.sum{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 10px}
+.sum span{border-radius:999px;padding:5px 12px;font-weight:800;font-size:14px}
+.s-ok{background:var(--ok-bg);color:var(--ok)}.s-w{background:var(--warn-bg);color:var(--warn)}.s-x{background:var(--bad-bg);color:var(--bad)}
+.ck{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:11px 12px;margin:0 0 8px}
+.ck .ic{flex:none;font-size:20px;line-height:1.2}.ck b{display:block}.ck small{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.ck.ok{border-color:color-mix(in srgb,var(--ok) 45%,var(--line))}.ck.w{border-color:color-mix(in srgb,var(--warn) 55%,var(--line))}.ck.x{border-color:color-mix(in srgb,var(--bad) 55%,var(--line))}
+.ttl{font-weight:900;margin:16px 0 8px;font-size:17px}
+.mt{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px;line-height:1.75;white-space:pre-wrap;word-wrap:break-word}
+.mt mark{background:var(--bad-bg);color:inherit;border-bottom:2px solid var(--bad);border-radius:3px;padding:0 1px}
+.mt mark.sp{background:var(--warn-bg);border-bottom-color:var(--warn)}
+.mt mark sup{color:var(--bad);font-weight:900;font-size:11px;margin-left:1px}
+.mt mark.sp sup{color:var(--warn)}
+.mt .lnk{background:var(--blue-bg);border-radius:3px}
+.il{margin:8px 0 0;padding-left:0;list-style:none}.il li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;margin:0 0 6px;font-size:15px}
+.il li b{color:var(--bad)}.il li.sp b{color:var(--warn)}.il li i{color:var(--ok);font-style:normal;font-weight:700}
+.note{background:var(--soft);border-radius:14px;padding:11px 14px;font-size:14.5px;margin:12px 0}
+.sample{background:var(--surface);border:1.5px solid var(--ok);border-radius:14px;padding:14px;line-height:1.6;margin-top:10px}
+.gym{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:16px}
+.gym b{display:block}.gym small{color:var(--muted)}
+.say{border:0;background:none;padding:0 0 0 4px;font-size:15px}
+@media (max-width:380px){.topic{font-size:19px}.hero h1{font-size:26px}}
+
+/* ---------- 🎤 Speaking ---------- */
+.lv{display:flex;gap:8px;margin:0 0 14px}
+.lv button{flex:1;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-weight:900;font-size:18px;padding:10px 0;border-radius:14px}
+.lv button small{display:block;font-size:11px;font-weight:700;color:var(--muted)}
+.lv button.on{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}.lv button.on small{color:inherit;opacity:.85}
+.tp .q small{display:block;font-weight:600;color:var(--muted);font-size:13px;margin-top:2px}
+.tp .sc{margin-left:auto;flex:none;font-weight:900;font-size:13px;color:var(--ok);background:var(--ok-bg);border-radius:999px;padding:2px 9px;align-self:center}
+.tp.soon{opacity:.5;cursor:default}.tp.soon .sc{color:var(--muted);background:var(--line)}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:14px 16px;margin:0 0 12px}
+.ch{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900;font-size:15px;margin-bottom:8px}
+.nav{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);font-weight:800}
+.nav button{width:38px;height:38px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font-size:16px;font-weight:900}
+.big{font-size:21px;font-weight:800;line-height:1.4;color:var(--ink);min-height:58px}
+.big small{display:block;font-size:14.5px;font-weight:600;color:var(--muted);margin-top:4px}
+.big .say{font-size:18px}
+.kw-used{color:var(--ok)}
+.chips2{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips2 span{font-size:13px;font-weight:800;border-radius:999px;padding:3px 10px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.chips2 span.on{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.how{background:var(--soft);border-radius:14px;padding:11px 14px;font-size:15px;font-weight:700;line-height:1.5;margin:0 0 10px}
+.ta2{width:100%;min-height:170px;border:2px solid var(--brand);border-radius:16px;padding:14px;font:inherit;font-size:18px;line-height:1.6;background:var(--bg);color:var(--ink);resize:vertical}
+.ta2::placeholder{color:var(--muted);font-size:16px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0 12px;font-weight:800;font-size:14px;color:var(--muted)}
+.mic{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:9px 14px;background:#E8F0FE;color:#1A56DB;font-weight:900;font-size:15px}
+.mic.rec{background:#FDE2E2;color:#C81E1E;animation:pl 1s infinite}
+@keyframes pl{50%{box-shadow:0 0 0 6px rgba(200,30,30,.18)}}
+.row2{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row2 .btn{flex:1;min-width:130px;font-size:16px;padding:12px}
+.btn+.btn{margin-top:0}
+.score{text-align:center;padding:6px 0 10px}
+.score .md{font-size:56px;line-height:1.1}.score b{display:block;font-size:40px;color:var(--brand)}.score small{color:var(--muted);font-weight:700}
+.crit{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:15px;margin:6px 0 4px}
+.crit .v{font-weight:900}
+.crit .b{grid-column:1/-1;height:7px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:4px}.crit .b i{display:block;height:100%;background:var(--brand)}
+.ql{list-style:none;padding:0;margin:6px 0 0}.ql li{padding:7px 10px;border-radius:10px;margin:0 0 5px;font-size:15px;background:var(--bg)}
+.ql li.ok{color:var(--ok)}.ql li.no{color:var(--bad)}
+.tips{margin:8px 0 0;padding-left:20px;font-size:15px;line-height:1.55}
+.model{background:var(--surface);border:1.5px solid var(--ok);border-radius:14px;padding:14px;line-height:1.65;font-size:16.5px;margin-top:8px}
+.burst{position:fixed;pointer-events:none;font-size:26px;z-index:99;animation:up 1s forwards}
+@keyframes up{to{transform:translateY(-110px) scale(1.4);opacity:0}}
+.warn{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:9px 12px;font-weight:800;font-size:14.5px;margin:0 0 10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="screen" id="s-list">
+    <div class="topbar"><a class="mini" href="../">← My New Vocabulary</a></div>
+    <div class="hero"><h1>🎤 Speaking</h1><p>Səviyyəni seç · mövzu seç · ingiliscə danış</p></div>
+    <div class="lv" id="lv"></div>
+    <div class="tl" id="tl"></div>
+  </section>
+
+  <section class="screen" id="s-sp" hidden>
+    <div class="topbar"><button class="mini" type="button" id="back">← Mövzular</button><span class="muted small" id="tno"></span></div>
+    <div class="topic" id="topic"></div>
+    <div class="card">
+      <div class="ch"><span>❓ Guiding questions</span><span class="nav"><button type="button" id="qu" aria-label="Əvvəlki sual">▲</button><span id="qn"></span><button type="button" id="qd" aria-label="Növbəti sual">▼</button></span></div>
+      <div class="big" id="qb"></div>
+    </div>
+    <div class="card">
+      <div class="ch"><span>🔑 Key words</span><span class="nav"><button type="button" id="ku" aria-label="Əvvəlki söz">▲</button><span id="kn"></span><button type="button" id="kd" aria-label="Növbəti söz">▼</button></span></div>
+      <div class="big" id="kb"></div>
+      <div class="chips2" id="kc"></div>
+    </div>
+    <div class="card" id="talk">
+      <div class="ch"><span>🗣️ Danış</span><span id="tm" class="muted"></span></div>
+      <div class="how">👆 Aşağıdakı xanaya toxun → klaviaturada <b>🎤 mikrofona</b> bas → <b>İNGİLİSCƏ</b> danış. Danışığın avtomatik yazıya çevriləcək.<br><small class="muted">Klaviatura dili <b>English</b> olmalıdır.</small></div>
+      <div id="azw" class="warn" hidden>⚠️ Mətndə Azərbaycan hərfləri var. Klaviaturanın dilini <b>English</b> et və ingiliscə danış.</div>
+      <textarea class="ta2" id="ta" placeholder="Bura toxun və danış…" autocapitalize="sentences" spellcheck="false"></textarea>
+      <div class="bar"><span id="wc"></span><span><button class="mic" type="button" id="mic" hidden>🎤 Mikrofon</button></span></div>
+      <div class="row2"><button class="btn" type="button" id="chk">✅ Yoxla</button><button class="btn ghost" type="button" id="st">💡 Başlanğıc</button><button class="btn ghost" type="button" id="clr">🗑 Təmizlə</button></div>
+    </div>
+    <div class="card" id="res" hidden></div>
+    <div class="card"><div class="ch"><span>🎧 Model answer</span><button class="mini" type="button" id="ml">🔊 Dinlə</button></div>
+      <details><summary class="muted" style="font-weight:800;cursor:pointer">Nümunəni göstər</summary><div class="model" id="mt"></div></details></div>
+  </section>
+</div>
+<script>
+(function(){try{if(!localStorage.getItem('mnv-reg2')||JSON.parse(localStorage.getItem('mnv-blok')||'0'))location.replace('../')}catch(e){}})();
+const SP={"A1":[{"t":"About me","az":"Özüm haqqında","q":[["What is your name?","Adın nədir?",["name","i am","i'm"]],["How old are you?","Neçə yaşın var?",["years old","old"]],["Where are you from?","Haralısan?",["from","live"]],["What class are you in?","Neçənci sinifdə oxuyursan?",["class","grade","form"]],["What do you like doing?","Nə etməyi sevirsən?",["like","love","enjoy"]],["What is your favourite colour?","Sevimli rəngin hansıdır?",["colour","color","red","blue","green","yellow","black","white","pink","purple","orange"]]],"k":[["name","ad"],["years old","yaşında"],["from","-dan/-dən (haralı)"],["live","yaşamaq"],["class","sinif"],["school","məktəb"],["like","xoşlamaq"],["favourite","sevimli"],["colour","rəng"],["hobby","hobbi"],["tall","hündür"],["friendly","mehriban"]],"s":"Hello! My name is …","m":"Hello! My name is Aysel. I am eleven years old. I am from Baku and I live with my family. I am in the fifth class. I like reading books and drawing pictures. My favourite colour is blue. I am friendly and I have got many friends."},{"t":"My family","az":"Mənim ailəm","q":[["How many people are there in your family?","Ailəndə neçə nəfər var?",["people","there are","four","five","three","six"]],["What is your father's job?","Atan nə işləyir?",["father","dad","works","job"]],["What is your mother like?","Anan necədir?",["mother","mum","mom","kind"]],["Have you got brothers or sisters?","Qardaş və ya bacın var?",["brother","sister"]],["What do you do together?","Birlikdə nə edirsiniz?",["together","watch","play","go"]],["Do you love your family? Why?","Ailəni sevirsən? Niyə?",["love","because"]]],"k":[["family","ailə"],["father","ata"],["mother","ana"],["brother","qardaş"],["sister","bacı"],["grandmother","nənə"],["grandfather","baba"],["kind","mehriban"],["works","işləyir"],["together","birlikdə"],["love","sevmək"],["help","kömək etmək"]],"s":"There are … people in my family.","m":"There are five people in my family: my father, my mother, my brother, my sister and me. My father is a doctor. He works in a hospital. My mother is very kind. I have got one brother and one sister. We often watch TV and play games together. I love my family because they always help me."},{"t":"My house and my room","az":"Evim və otağım","q":[["Do you live in a house or a flat?","Evdə, yoxsa mənzildə yaşayırsan?",["house","flat","apartment"]],["How many rooms are there?","Neçə otaq var?",["rooms","room"]],["What is in your room?","Otağında nə var?",["bed","desk","table","chair","wardrobe","there is"]],["What colour is your room?","Otağın hansı rəngdədir?",["colour","color","blue","green","white","pink","yellow"]],["What do you do in your room?","Otağında nə edirsən?",["do","sleep","study","read","play"]],["Do you like your room? Why?","Otağını sevirsən? Niyə?",["like","love","because"]]],"k":[["house","ev"],["flat","mənzil"],["room","otaq"],["kitchen","mətbəx"],["bedroom","yataq otağı"],["bed","çarpayı"],["desk","yazı masası"],["chair","stul"],["wardrobe","qarderob, şkaf"],["window","pəncərə"],["big","böyük"],["small","kiçik"]],"s":"I live in a … .","m":"I live in a flat in Baku. There are four rooms in our flat: a kitchen, a living room and two bedrooms. In my room there is a bed, a desk, a chair and a big wardrobe. My room is blue and white. I sleep, study and read books in my room. I like my room because it is quiet and comfortable."},{"t":"My school","az":"Məktəbim","q":[["What is the name of your school?","Məktəbinin adı nədir?",["school","number"]],["Where is your school?","Məktəbin haradadır?",["near","in","street","next to"]],["How do you go to school?","Məktəbə necə gedirsən?",["walk","bus","car","on foot","by"]],["What is your favourite subject?","Sevimli fənnin hansıdır?",["subject","english","maths","math","music","art","science","history"]],["Who is your favourite teacher?","Sevimli müəllimin kimdir?",["teacher"]],["What do you do at break time?","Tənəffüsdə nə edirsən?",["break","play","eat","talk"]]],"k":[["school","məktəb"],["classroom","sinif otağı"],["teacher","müəllim"],["subject","fənn"],["lesson","dərs"],["break","tənəffüs"],["by bus","avtobusla"],["on foot","piyada"],["maths","riyaziyyat"],["favourite","sevimli"],["friends","dostlar"],["learn","öyrənmək"]],"s":"My school is School number … .","m":"My school is School number 20. It is near my house, so I go to school on foot. My school is big and it has a nice garden. My favourite subject is English because it is interesting. My favourite teacher is Mr. Samir. At break time I play with my friends and eat a sandwich. I like my school."},{"t":"My daily routine","az":"Gündəlik iş rejimim","q":[["What time do you get up?","Saat neçədə oyanırsan?",["get up","wake up","o'clock","at"]],["What do you have for breakfast?","Səhər yeməyində nə yeyirsən?",["breakfast","eat","drink","eggs","tea","bread","milk"]],["When do you go to school?","Məktəbə nə vaxt gedirsən?",["go to school","school"]],["What do you do after school?","Məktəbdən sonra nə edirsən?",["after school","homework","play"]],["What do you do in the evening?","Axşam nə edirsən?",["evening","watch","dinner","read"]],["What time do you go to bed?","Saat neçədə yatırsan?",["bed","sleep"]]],"k":[["get up","oyanmaq, qalxmaq"],["wash","yuyunmaq"],["have breakfast","səhər yeməyi yemək"],["go to school","məktəbə getmək"],["have lunch","nahar etmək"],["do homework","ev tapşırığı etmək"],["play","oynamaq"],["have dinner","şam yeməyi yemək"],["go to bed","yatmaq"],["usually","adətən"],["then","sonra"],["every day","hər gün"]],"s":"Every day I get up at … .","m":"Every day I get up at seven o'clock. I wash my face and then I have breakfast. I usually eat eggs and bread and drink tea. I go to school at eight. After school I have lunch and do my homework. Then I play with my friends. In the evening I have dinner with my family and watch TV. I go to bed at ten o'clock."},{"t":"Food I like","az":"Sevdiyim yeməklər","q":[["What is your favourite food?","Sevimli yeməyin nədir?",["favourite","food","pizza","plov","dolma","soup"]],["What fruit do you like?","Hansı meyvələri sevirsən?",["fruit","apple","banana","orange","grape","cherry","peach"]],["What do you drink every day?","Hər gün nə içirsən?",["drink","water","tea","milk","juice"]],["What food don't you like?","Hansı yeməyi sevmirsən?",["don't like","do not like","hate"]],["Who cooks in your family?","Ailəndə kim yemək bişirir?",["cook","mother","mum","grandmother"]],["Do you like sweets?","Şirniyyat sevirsən?",["sweet","cake","chocolate","ice cream","candy"]]],"k":[["food","yemək"],["fruit","meyvə"],["vegetables","tərəvəz"],["apple","alma"],["soup","şorba"],["chicken","toyuq"],["bread","çörək"],["juice","şirə"],["delicious","dadlı"],["cook","bişirmək"],["sweets","şirniyyat"],["healthy","sağlam"]],"s":"My favourite food is … .","m":"My favourite food is plov. My grandmother cooks it very well, and it is delicious. I like fruit too, especially apples and bananas. Every day I drink water, milk and sometimes orange juice. I don't like fish. My mother cooks in our family. I like sweets, but I don't eat a lot of chocolate because it is not healthy."},{"t":"My favourite animal","az":"Sevimli heyvanım","q":[["What is your favourite animal?","Sevimli heyvanın hansıdır?",["favourite","animal","cat","dog","horse","rabbit","lion"]],["Have you got a pet?","Ev heyvanın var?",["pet","have got","haven't"]],["What does it look like?","Necə görünür?",["big","small","colour","color","black","white","brown","eyes","tail","fur"]],["What does it eat?","Nə yeyir?",["eat","eats","meat","fish","grass","food"]],["Where does it live?","Harada yaşayır?",["live","lives","house","farm","forest","zoo"]],["Why do you like it?","Onu niyə sevirsən?",["because","like","love","funny","clever","cute"]]],"k":[["animal","heyvan"],["pet","ev heyvanı"],["cat","pişik"],["dog","it"],["rabbit","dovşan"],["tail","quyruq"],["fur","tük, xəz"],["eyes","gözlər"],["cute","şirin, sevimli"],["clever","ağıllı"],["funny","gülməli"],["look after","qayğısına qalmaq"]],"s":"My favourite animal is … .","m":"My favourite animal is a cat. I have got a pet cat and her name is Mestan. She is small and white, and she has got green eyes and a long tail. She eats fish and drinks milk. She lives in our house and sleeps on my bed. I like her because she is cute and funny. I look after her every day."},{"t":"My best friend","az":"Ən yaxın dostum","q":[["What is your best friend's name?","Ən yaxın dostunun adı nədir?",["name","best friend"]],["How old is he or she?","Neçə yaşı var?",["years old","old"]],["What does your friend look like?","Dostun necə görünür?",["tall","short","hair","eyes"]],["What is your friend like?","Dostun necə insandır?",["kind","funny","clever","friendly","good"]],["What do you do together?","Birlikdə nə edirsiniz?",["together","play","go","read","watch"]],["Why do you like your friend?","Dostunu niyə sevirsən?",["because","like","help"]]],"k":[["best friend","ən yaxın dost"],["tall","hündür"],["short","alçaq, qısa"],["hair","saç"],["eyes","gözlər"],["kind","mehriban"],["funny","zarafatcıl"],["clever","ağıllı"],["together","birlikdə"],["help","kömək etmək"],["neighbour","qonşu"],["classmate","sinif yoldaşı"]],"s":"My best friend's name is … .","m":"My best friend's name is Murad. He is twelve years old and he is my classmate. He is tall and he has got short black hair and brown eyes. Murad is very kind and funny. We play football together after school and sometimes we do our homework together. I like him because he always helps me."},{"t":"My weekend","az":"Həftə sonum","q":[["What do you do on Saturday?","Şənbə günü nə edirsən?",["saturday"]],["What do you do on Sunday?","Bazar günü nə edirsən?",["sunday"]],["Do you get up late at the weekend?","Həftə sonu gec oyanırsan?",["get up","late","sleep"]],["Where do you go with your family?","Ailənlə hara gedirsən?",["go","park","grandparents","cinema","shop","visit"]],["Do you do homework at the weekend?","Həftə sonu ev tapşırığı edirsən?",["homework"]],["What is the best part of your weekend?","Həftə sonunun ən yaxşı anı hansıdır?",["best","like","because","love"]]],"k":[["weekend","həftə sonu"],["Saturday","şənbə"],["Sunday","bazar"],["get up late","gec qalxmaq"],["park","park"],["visit","ziyarət etmək"],["grandparents","nənə və baba"],["cinema","kinoteatr"],["relax","dincəlmək"],["play","oynamaq"],["sometimes","bəzən"],["fun","əyləncə, əyləncəli"]],"s":"At the weekend I … .","m":"At the weekend I don't go to school, so I get up late. On Saturday I do my homework and then I play football in the park. On Sunday I visit my grandparents with my family. My grandmother cooks a big lunch. Sometimes we go to the cinema. The best part of my weekend is Sunday because it is fun."},{"t":"My town or village","az":"Şəhərim və ya kəndim","q":[["Where do you live?","Harada yaşayırsan?",["live","town","village","city"]],["Is it big or small?","Böyük, yoxsa kiçikdir?",["big","small"]],["What is there in your town?","Şəhərində nələr var?",["there is","there are","park","shop","school","hospital","mosque","river"]],["What is your favourite place there?","Oradakı sevimli yerin hansıdır?",["favourite","place"]],["What can people do there?","İnsanlar orada nə edə bilər?",["can","walk","swim","play","shop"]],["Do you like your town? Why?","Şəhərini sevirsən? Niyə?",["like","love","because"]]],"k":[["town","qəsəbə, şəhər"],["village","kənd"],["city","böyük şəhər"],["street","küçə"],["park","park"],["shop","mağaza"],["hospital","xəstəxana"],["river","çay"],["mountain","dağ"],["beautiful","gözəl"],["quiet","sakit"],["people","insanlar"]],"s":"I live in … .","m":"I live in Shamakhi. It is a small and beautiful town. There are many shops, two parks, a hospital and a big old mosque in my town. My favourite place is the park near my house. People can walk, play and relax there. There are mountains near the town too. I love my town because it is quiet and the people are kind."},{"t":"My clothes","az":"Paltarlarım","q":[["What do you wear to school?","Məktəbə nə geyinirsən?",["wear","uniform","school"]],["What do you wear at home?","Evdə nə geyinirsən?",["home","t-shirt","trousers","jeans"]],["What are your favourite clothes?","Sevimli paltarların hansılardır?",["favourite","clothes","jeans","dress","jacket","shirt"]],["What do you wear in winter?","Qışda nə geyinirsən?",["winter","coat","jacket","boots","hat","scarf"]],["What do you wear in summer?","Yayda nə geyinirsən?",["summer","shorts","t-shirt","sandals"]],["What colour are your shoes?","Ayaqqabıların hansı rəngdədir?",["shoes","trainers","black","white","blue","brown"]]],"k":[["clothes","paltar"],["wear","geyinmək"],["uniform","məktəbli forması"],["shirt","köynək"],["trousers","şalvar"],["jeans","cins şalvar"],["dress","don, paltar"],["jacket","gödəkcə"],["coat","palto"],["shoes","ayaqqabı"],["hat","papaq"],["comfortable","rahat"]],"s":"At school I wear … .","m":"At school I wear a school uniform: a white shirt, black trousers and black shoes. At home I wear a T-shirt and jeans because they are comfortable. My favourite clothes are my blue jeans and my red jacket. In winter I wear a warm coat, a hat and boots. In summer I wear shorts and a T-shirt. My shoes are white."},{"t":"My favourite colour and toys","az":"Sevimli rəngim və oyuncaqlarım","q":[["What is your favourite colour?","Sevimli rəngin hansıdır?",["colour","color","red","blue","green","yellow","pink","purple","orange","black","white"]],["Why do you like this colour?","Bu rəngi niyə sevirsən?",["because","like"]],["What things have you got in this colour?","Bu rəngdə hansı əşyaların var?",["have got","bag","bike","pen","t-shirt","room"]],["What is your favourite toy or game?","Sevimli oyuncağın və ya oyunun nədir?",["toy","game","ball","doll","car","lego","puzzle"]],["Who gave it to you?","Onu sənə kim verib?",["gave","present","birthday","father","mother"]],["Who do you play with?","Kiminlə oynayırsan?",["play with","friend","brother","sister"]]],"k":[["colour","rəng"],["favourite","sevimli"],["toy","oyuncaq"],["game","oyun"],["ball","top"],["doll","gəlincik"],["puzzle","tapmaca, pazl"],["present","hədiyyə"],["bike","velosiped"],["bright","parlaq"],["old","köhnə"],["new","yeni"]],"s":"My favourite colour is … .","m":"My favourite colour is green because it is the colour of nature. I have got a green bag, a green bike and a green T-shirt. My favourite toy is a big puzzle with a map of Azerbaijan. My father gave it to me for my birthday. I play with it with my little brother. We also play football with a red ball."},{"t":"My birthday","az":"Ad günüm","q":[["When is your birthday?","Ad günün nə vaxtdır?",["birthday","january","february","march","april","may","june","july","august","september","october","november","december"]],["How old will you be?","Neçə yaşın olacaq?",["years old","will be"]],["What do you do on your birthday?","Ad günündə nə edirsən?",["party","cake","friends","celebrate"]],["Who comes to your party?","Ad gününə kim gəlir?",["come","friends","family","grandparents","cousins"]],["What presents do you get?","Hansı hədiyyələri alırsan?",["present","presents","gift","get"]],["What was your best present?","Ən yaxşı hədiyyən nə olub?",["best","was"]]],"k":[["birthday","ad günü"],["party","qonaqlıq"],["cake","tort"],["candles","şamlar"],["present","hədiyyə"],["balloons","şarlar"],["celebrate","qeyd etmək"],["invite","dəvət etmək"],["guests","qonaqlar"],["happy","xoşbəxt"],["sing","oxumaq"],["month","ay"]],"s":"My birthday is in … .","m":"My birthday is in May. This year I will be twelve years old. On my birthday we have a party at home. My mother makes a big chocolate cake with candles. My friends and my cousins come to my party. We sing songs, play games and eat cake. I get many presents. My best present was a new bike. I am very happy on my birthday."},{"t":"My classroom","az":"Sinif otağım","q":[["Where is your classroom?","Sinif otağın haradadır?",["floor","first","second","third","classroom"]],["Is it big or small?","Böyükdür, yoxsa kiçik?",["big","small"]],["What is there in your classroom?","Sinifdə nələr var?",["there is","there are","desks","board","chairs","computer","map"]],["How many students are there in your class?","Sinfində neçə şagird var?",["students","pupils","there are"]],["Where do you sit?","Harada oturursan?",["sit","next to","near","front","back"]],["Do you like your classroom? Why?","Sinif otağını sevirsən? Niyə?",["like","because"]]],"k":[["classroom","sinif otağı"],["board","lövhə"],["desk","parta"],["chair","stul"],["window","pəncərə"],["map","xəritə"],["students","şagirdlər"],["floor","mərtəbə"],["sit","oturmaq"],["next to","yanında"],["clean","təmiz"],["bright","işıqlı"]],"s":"My classroom is on the … floor.","m":"My classroom is on the second floor. It is big, clean and bright. There are fifteen desks, thirty chairs, a white board and a map of the world in our classroom. There is also a computer on the teacher's desk. There are twenty-eight students in my class. I sit next to my friend Nigar near the window. I like my classroom because it is nice and bright."},{"t":"My favourite season","az":"Sevimli fəslim","q":[["What is your favourite season?","Sevimli fəslin hansıdır?",["season","spring","summer","autumn","winter"]],["What is the weather like then?","O zaman hava necə olur?",["weather","hot","cold","warm","sunny","rainy","snowy"]],["What do you wear in this season?","Bu fəsildə nə geyinirsən?",["wear","coat","t-shirt","jacket","shorts"]],["What do you do in this season?","Bu fəsildə nə edirsən?",["swim","play","go","ski","snowman"]],["What holidays are in this season?","Bu fəsildə hansı bayramlar var?",["holiday","novruz","new year","summer holiday"]],["Why do you like it?","Onu niyə sevirsən?",["because","like","love"]]],"k":[["season","fəsil"],["spring","yaz"],["summer","yay"],["autumn","payız"],["winter","qış"],["weather","hava"],["sunny","günəşli"],["rainy","yağışlı"],["snow","qar"],["warm","isti, ilıq"],["holiday","bayram, tətil"],["flowers","güllər"]],"s":"My favourite season is … .","m":"My favourite season is spring. In spring the weather is warm and sunny, but sometimes it is rainy. I wear a light jacket and jeans. The trees are green and there are many flowers. In spring we celebrate Novruz. We make semeni and jump over the fire. I like spring because it is beautiful and I can play outside."}],"A2":[{"t":"My last holiday"},{"t":"Hobbies and free time"},{"t":"Shopping and clothes"},{"t":"Weather and seasons"},{"t":"Sports in my life"},{"t":"A birthday party"},{"t":"My favourite film or book"},{"t":"A healthy lifestyle"},{"t":"My dream job"},{"t":"A trip to the city"},{"t":"My favourite food and a recipe"},{"t":"Music in my life"},{"t":"A day at the seaside"},{"t":"My neighbourhood"},{"t":"Using my phone"}],"B1":[{"t":"Technology in my life"},{"t":"Social media"},{"t":"Environmental problems"},{"t":"A person I admire"},{"t":"Learning English"},{"t":"My future plans"},{"t":"Friendship"},{"t":"A place I visited in Azerbaijan"},{"t":"Pocket money"},{"t":"Fast food vs healthy food"},{"t":"My favourite holiday (Novruz)"},{"t":"Books vs films"},{"t":"A difficult day I remember"},{"t":"Homework: good or bad?"},{"t":"Living without the internet"}],"B2":[{"t":"Online vs traditional learning"},{"t":"City life vs countryside life"},{"t":"The influence of celebrities"},{"t":"Artificial intelligence and future jobs"},{"t":"Should school uniforms be compulsory?"},{"t":"Tourism in Azerbaijan"},{"t":"Exam stress"},{"t":"Volunteering"},{"t":"Climate change"},{"t":"Rebuilding Karabakh"},{"t":"Should children have smartphones?"},{"t":"Working from home"},{"t":"Fast fashion"},{"t":"The importance of reading"},{"t":"Space exploration: worth the money?"}]};
+const PFX='mnv';
+const LV=['A1','A2','B1','B2'],TGT={A1:40,A2:60,B1:90,B2:120},TMIN={A1:1,A2:1.5,B1:2,B2:2.5};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $=id=>document.getElementById(id);
+const LS={get(){try{return JSON.parse(localStorage.getItem(PFX+'-speak')||'{}')}catch(e){return{}}},set(o){try{localStorage.setItem(PFX+'-speak',JSON.stringify(o))}catch(e){}}};
+let lvl=(()=>{try{return localStorage.getItem(PFX+'-speak-lv')||'A1'}catch(e){return'A1'}})(),cur=null,qi=0,ki=0,t0=0,tick=null;
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='en-GB';u.rate=.9;const v=speechSynthesis.getVoices().find(v=>/^en(-|_)GB/i.test(v.lang))||speechSynthesis.getVoices().find(v=>/^en/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(e){}}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.hidden=s.id!==id);scrollTo(0,0)}
+function list(){
+  $('lv').innerHTML=LV.map(l=>`<button type="button" data-l="${l}" class="${l===lvl?'on':''}">${l}<small>${(SP[l]||[]).filter(t=>t.q).length} mövzu</small></button>`).join('');
+  $('lv').querySelectorAll('button').forEach(b=>b.onclick=()=>{lvl=b.dataset.l;try{localStorage.setItem(PFX+'-speak-lv',lvl)}catch(e){}list()});
+  const sc=LS.get();
+  $('tl').innerHTML=(SP[lvl]||[]).map((t,i)=>{const r=t.q,s=sc[lvl+i];return `<button type="button" class="tp${r?'':' soon'}" data-i="${i}" ${r?'':'disabled'}><span class="n">${i+1}</span><span class="q">${esc(t.t)}<small>${esc(t.az||'')}</small></span>${r?(s!=null?`<span class="sc">⭐ ${s}</span>`:''):'<span class="sc">⏳ tezliklə</span>'}</button>`}).join('');
+  $('tl').querySelectorAll('.tp:not(.soon)').forEach(b=>b.onclick=()=>open(+b.dataset.i));
+  show('s-list');
+}
+function open(i){cur={l:lvl,i,t:SP[lvl][i]};qi=0;ki=0;t0=0;clearInterval(tick);
+  $('tno').textContent=lvl+' · '+(i+1)+' / '+SP[lvl].length;$('topic').textContent='🎤 '+cur.t.t;
+  $('ta').value='';$('res').hidden=true;$('mt').textContent=cur.t.m;$('azw').hidden=true;
+  drawQ();drawK();upd();show('s-sp');
+}
+function drawQ(){const q=cur.t.q[qi];$('qn').textContent=(qi+1)+' / '+cur.t.q.length;
+  $('qb').innerHTML=`${esc(q[0])} <button class="say" type="button" aria-label="Dinlə">🔊</button><small>${esc(q[1])}</small>`;$('qb').querySelector('.say').onclick=()=>say(q[0])}
+function drawK(){const k=cur.t.k[ki],u=used(k[0]);$('kn').textContent=(ki+1)+' / '+cur.t.k.length;
+  $('kb').innerHTML=`<span class="${u?'kw-used':''}">${u?'✓ ':''}${esc(k[0])}</span> <button class="say" type="button" aria-label="Dinlə">🔊</button><small>${esc(k[1])}</small>`;$('kb').querySelector('.say').onclick=()=>say(k[0]);
+  $('kc').innerHTML=cur.t.k.map(x=>`<span class="${used(x[0])?'on':''}">${esc(x[0])}</span>`).join('')}
+const step=(v,d,n)=>(v+d+n)%n;
+$('qu').onclick=()=>{qi=step(qi,-1,cur.t.q.length);drawQ()};$('qd').onclick=()=>{qi=step(qi,1,cur.t.q.length);drawQ()};
+$('ku').onclick=()=>{ki=step(ki,-1,cur.t.k.length);drawK()};$('kd').onclick=()=>{ki=step(ki,1,cur.t.k.length);drawK()};
+$('back').onclick=()=>{clearInterval(tick);stopRec();list()};
+const norm=s=>' '+s.toLowerCase().replace(/[’`]/g,"'").replace(/[^a-z0-9' ]+/g,' ').replace(/\s+/g,' ').trim()+' ';
+const words=s=>norm(s).trim().split(' ').filter(Boolean);
+function has(text,key){const k=norm(key).trim();if(!k)return false;if(k.includes(' ')&&!/^(i |for example|in my opinion|after that|that is why|years old|next to|on foot|by bus)/.test(k)){const ws=k.split(' ').filter(x=>x.length>2||x==='go');if(ws.length>1&&ws.every(x=>has(text,x)))return true}const re=new RegExp('(^| )'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&').replace(/ /g,' ')+"(s|es|ed|d|ing|'s)?(?= )");return re.test(text)}
+function used(k){return has(norm($('ta').value),k)}
+function upd(){const w=words($('ta').value).length,T=TGT[cur.l];$('wc').innerHTML=`Sözlər: <b style="color:${w>=T?'var(--ok)':'var(--ink)'}">${w}</b> / hədəf ${T}`;
+  $('azw').hidden=!/[əğışöçüƏĞIŞÖÇÜ]/.test($('ta').value.replace(/I/g,''));drawK()}
+function timer(){const s=Math.floor((Date.now()-t0)/1000),m=Math.floor(s/60);$('tm').textContent=`⏱ ${m}:${String(s%60).padStart(2,'0')} · hədəf ${TMIN[cur.l]} dəq`}
+$('ta').addEventListener('input',()=>{if(!t0){t0=Date.now();tick=setInterval(timer,1000);timer()}upd()});
+$('clr').onclick=()=>{$('ta').value='';$('res').hidden=true;t0=0;clearInterval(tick);$('tm').textContent='';upd()};
+$('st').onclick=()=>{const ta=$('ta');if(!ta.value.trim())ta.value=cur.t.s.replace(/…\s*\.?$/,'').replace(/\s*…\s*/,' ').trim()+' ';ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);upd()};
+$('ml').onclick=()=>say(cur.t.m);
+/* 🎤 brauzerin öz səs tanıması (Chrome) */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,recOn=false;
+if(SR){$('mic').hidden=false;$('mic').onclick=()=>recOn?stopRec():startRec()}
+function startRec(){try{rec=new SR();rec.lang='en-US';rec.continuous=true;rec.interimResults=false;
+  rec.onresult=e=>{let add='';for(let i=e.resultIndex;i<e.results.length;i++)if(e.results[i].isFinal)add+=e.results[i][0].transcript;if(add){const ta=$('ta');ta.value=(ta.value.trim()?ta.value.trim()+' ':'')+add.trim().replace(/^./,c=>c.toUpperCase())+'. ';ta.dispatchEvent(new Event('input'))}};
+  rec.onend=()=>{if(recOn)try{rec.start()}catch(e){stopRec()}};rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed')stopRec()};
+  rec.start();recOn=true;$('mic').classList.add('rec');$('mic').textContent='⏹ Dayandır'}catch(e){stopRec()}}
+function stopRec(){recOn=false;try{rec&&rec.stop()}catch(e){}if($('mic')){$('mic').classList.remove('rec');$('mic').textContent='🎤 Mikrofon'}}
+const LINK=['and','but','because','so','then','also','first','after that','finally','usually','sometimes','however','when','or','for example','in my opinion','i think','too','especially','although','that is why'];
+function check(){stopRec();const raw=$('ta').value,txt=norm(raw),W=words(raw),w=W.length,T=TGT[cur.l],t=cur.t;
+  if(w<5){$('res').hidden=false;$('res').innerHTML='<div class="warn">Çox az danışdın. Suallara baxıb ən azı bir neçə cümlə de.</div>';return}
+  const vol=Math.min(25,25*w/T);
+  const qa=t.q.map(q=>q[2].some(k=>has(txt,k))),qs=30*qa.filter(Boolean).length/t.q.length;
+  const ku=t.k.filter(k=>has(txt,k[0])),ks=Math.min(25,25*ku.length/Math.ceil(t.k.length/2));
+  const lk=LINK.filter(k=>has(txt,k)),uniq=new Set(W).size/w,ls=Math.min(12,lk.length*3)+Math.min(8,Math.max(0,(uniq-.3)*16));
+  const tot=Math.round(vol+qs+ks+ls),md=tot>=85?'🥇':tot>=70?'🥈':tot>=50?'🥉':'💪';
+  const sc=LS.get(),key=cur.l+cur.i;if(sc[key]==null||tot>sc[key]){sc[key]=tot;LS.set(sc)}
+  const tips=[];if(w<T)tips.push(`Daha çox danış: hədəf ən azı <b>${T}</b> söz (sən ${w} söz dedin).`);
+  const miss=t.q.map((q,j)=>qa[j]?null:j+1).filter(Boolean);if(miss.length)tips.push(`Bu suallara cavab vermədin: <b>${miss.join(', ')}</b>.`);
+  if(ku.length<Math.ceil(t.k.length/2))tips.push('Daha çox açar söz işlət — yaşıl olmayan sözlərə bax.');
+  if(lk.length<3)tips.push('Cümlələri birləşdir: <b>and, but, because, then, also</b>.');
+  if(uniq<.5&&w>20)tips.push('Eyni sözləri çox təkrarlama — fərqli sözlər işlət.');
+  if(!tips.length)tips.push('Əla! Növbəti mövzuya keç və ya daha uzun danışmağa çalış.');
+  const row=(n,v,m)=>`<span>${n}</span><span class="v">${Math.round(v)} / ${m}</span><div class="b"><i style="width:${Math.round(100*v/m)}%"></i></div>`;
+  $('res').hidden=false;$('res').innerHTML=`<div class="score"><div class="md">${md}</div><b>${tot}</b><small>100 baldan · ${w} söz</small></div>
+  <div class="crit">${row('📏 Həcm',vol,25)}${row('❓ Suallara cavab',qs,30)}${row('🔑 Açar sözlər',ks,25)}${row('🔗 Bağlayıcılar və söz zənginliyi',ls,20)}</div>
+  <p class="ttl">❓ Suallar</p><ul class="ql">${t.q.map((q,j)=>`<li class="${qa[j]?'ok':'no'}">${qa[j]?'✓':'✗'} ${j+1}. ${esc(q[0])}</li>`).join('')}</ul>
+  <p class="ttl">🔑 Açar sözlər (${ku.length} / ${t.k.length})</p><div class="chips2">${t.k.map(k=>`<span class="${ku.includes(k)?'on':''}">${esc(k[0])}</span>`).join('')}</div>
+  ${lk.length?`<p class="ttl">🔗 İşlətdiyin bağlayıcılar</p><div class="chips2">${lk.map(k=>`<span class="on">${esc(k)}</span>`).join('')}</div>`:''}
+  <p class="ttl">💡 Məsləhət</p><ul class="tips">${tips.map(x=>`<li>${x}</li>`).join('')}</ul>
+  <div class="row2"><button class="btn ghost" type="button" id="again">🔁 Yenidən cəhd et</button><button class="btn ghost" type="button" id="nx">Növbəti mövzu ›</button></div>`;
+  $('again').onclick=()=>{$('clr').click();$('ta').focus()};
+  $('nx').onclick=()=>{const n=cur.i+1;n<SP[cur.l].length&&SP[cur.l][n].q?open(n):list()};
+  $('res').scrollIntoView({behavior:'smooth',block:'start'});
+  if(tot>=70){const r=$('res').getBoundingClientRect();['⭐','✨','🎉'].forEach((x,i)=>{const b=document.createElement('div');b.className='burst';b.textContent=x;b.style.left=(innerWidth/2-30+i*22)+'px';b.style.top='120px';document.body.appendChild(b);setTimeout(()=>b.remove(),1000)})}
+}
+$('chk').onclick=check;
+try{speechSynthesis.getVoices()}catch(e){}
+list();
+</script>
+</body>
+</html>
