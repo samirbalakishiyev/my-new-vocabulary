@@ -477,26 +477,14 @@ const ICON_GO=svg('<path d="M9 6l6 6-6 6"/>').replace('stroke-width="2.2"','stro
 const top_=document.getElementById('top'),app=document.getElementById('app');
 /* müəllim baxışı: müəllim panelinə daxil olmuş cihazda bütün tasklar açıqdır */
 function unlocked(){return sbTeacher()}
-/* ---------- 👑 Premium: Task 1 pulsuz, Task 2+ premium (yalnız bu saytın cədvəli; o biri saytın premiumu sayılmır) ---------- */
-const SB_URLS=['https://script.google.com/macros/s/AKfycby-l8bfI4EZElFAOMaEOvYCJgJXMUX85Y2oI73CaSkS0oPZFpKkkKOHV_pNtYdk818/exec']; /* premium hər saytda AYRICA verilir */
-const SB_WA='https://wa.me/994557958625?text='+encodeURIComponent("Salam, Samir müəllim! Mr. Samir's Missions premium tasklarını açmaq istəyirəm.");
+/* ---------- Bütün tasklar hamı üçün pulsuzdur; tasklar ardıcıl açılır ---------- */
 function sbJ(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}}
 function sbReg(){return sbJ('mnv-reg2')||null}
 function sbTeacher(){return !!sbJ('mnv-tkey')}
-let SB_PREM=sbTeacher()||ls('sb-prem-mnv')==='1';
-function sbPrem(){return SB_PREM}
-function sbLk(id){return id>1&&!SB_PREM}
-async function sbCheck(){
- if(sbTeacher()){SB_PREM=true;return}
- const r=sbReg();if(!r||!r.tel)return;
- const res=await Promise.all(SB_URLS.map(u=>fetch(u,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'pq',tel:r.tel})}).then(x=>x.json()).catch(()=>null)));
- const ok=res.filter(x=>x&&x.ok);if(!ok.length)return;
- const p=ok.some(x=>x.prem);ls('sb-prem-mnv',p?'1':'0');
- if(p!==SB_PREM){SB_PREM=p;if(document.getElementById('mqlv'))msHub()}
-}
-function sbModal(){
+function sbLk(id){return false}
+function sbModal(id){
  const o=document.createElement('div');o.className='sb-ov';
- o.innerHTML=`<div class="sb-md" role="dialog" aria-modal="true"><div class="sb-cr">👑</div><h3>Premium task</h3><p>Bu tasklar premiumdur. Bütün taskların açılması üçün ödəniş olunmalıdır. Ödəniş üçün Samir müəllimə müraciət edin.</p><a class="sb-wa" href="${SB_WA}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp: 055 795 86 25</a><button type="button" class="sb-x">Bağla</button></div>`;
+ o.innerHTML=`<div class="sb-md" role="dialog" aria-modal="true"><div class="sb-cr">🔒</div><h3>Task ${id} hələ bağlıdır</h3><p>Əvvəlcə Task ${id-1}-i bitir. Hər task bitəndə növbəti task açılır.</p><button class="sb-x" type="button">Bağla</button></div>`;
  const close=()=>o.remove();o.onclick=e=>{if(e.target===o)close()};o.querySelector('.sb-x').onclick=close;
  document.body.appendChild(o);
 }
@@ -517,7 +505,7 @@ function sbModal(){
 @media (max-width:440px){.bar .hbtn{font-size:0;gap:0;padding:6px 9px}.bar .hbtn svg{width:18px;height:18px}}
 .sb-back{white-space:nowrap;flex:none;display:inline-flex;align-items:center;gap:4px;color:#fff;text-decoration:none;border:2px solid rgba(255,255,255,.7);border-radius:99px;padding:5px 12px;font-weight:900;font-size:14px}
 `;document.head.appendChild(st)})();
-sbCheck();
+
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sbCheck()});
 
 function setTop(){top_.innerHTML=`<div class="bar"><div class="wrap bar-in"><a class="sb-back" href="../">‹ Sayt</a><span class="logo">MR. SAMIR'S <b>M</b></span><button class="hbtn" type="button" id="hb">${ICON_HOME}Missiyalar</button></div></div>`;document.getElementById('hb').onclick=()=>msHub();window.scrollTo(0,0)}
@@ -1122,10 +1110,9 @@ function msHub(){
   <div class="ms-xpbar"><i style="width:${st/MQ_LEVEL*100}%"></i></div>
   <div class="row" style="justify-content:space-between"><span style="font-size:13px;font-weight:700;color:#C9D7F2">${st>=MQ_LEVEL?'Level 1 tamamlandı!':`Level 2 üçün ${MQ_LEVEL-st} ulduz qalıb`}</span><button class="ms-lnk" type="button" id="msren">Adı dəyiş</button></div>
  </div>
- ${sbPrem()?'':`<div class="sb-ban"><span>👑 Task 1 pulsuzdur. Task 2–${MQ_TASKS.length} premiumdur — açmaq üçün Samir müəllimə yazın.</span><a href="${SB_WA}" target="_blank" rel="noopener">WhatsApp</a></div>`}
  <div class="ms-zone"><h3>Level 1</h3><span>Hər task bir missiyadır · bitirdiyin hər task = 1 ⭐</span></div>
  <div class="mq-lv" id="mqlv">${Array.from({length:MQ_LEVEL},(_,i)=>{const id=i+1,T=MQ_TASKS.find(x=>x.id===id),d=T&&mqT(id).done,op=T&&(d||mqOpenTask(id));
-  return `<button class="mq-t ${d?'done':''} ${T&&sbLk(id)?'pl':''} ${nextId&&nextId.id===id&&op?'cur':''}" type="button" data-id="${id}" ${op||(T&&sbLk(id))?'':'disabled'} aria-label="Task ${id}"><span class="k">Task</span><span class="n">${id}</span><span class="e">${d?'⭐':!T?'·':sbLk(id)?'👑':op?T.ic:'🔒'}</span></button>`}).join('')}</div>
+  return `<button class="mq-t ${d?'done':''} ${T&&sbLk(id)?'pl':''} ${nextId&&nextId.id===id&&op?'cur':''}" type="button" data-id="${id}" ${T?'':'disabled'} aria-label="Task ${id}"><span class="k">Task</span><span class="n">${id}</span><span class="e">${d?'⭐':!T?'·':op?T.ic:'🔒'}</span></button>`}).join('')}</div>
  <p class="lead" style="margin-top:8px">Tasklar ardıcıl açılır. Yeni tasklar tezliklə əlavə olunacaq (indi: ${MQ_TASKS.length} / ${MQ_LEVEL}).</p>
  <div class="mq-l2 ${st>=MQ_LEVEL?'open':''}"><span style="font-size:30px">${st>=MQ_LEVEL?'🔓':'🔒'}</span><span><b>Level 2</b>${st>=MQ_LEVEL?'Açıldı! Yeni missiyalar tezliklə.':`Level 1-in ${MQ_LEVEL} taskını bitir — Level 2 açılacaq.`}</span></div>`;
  app.querySelectorAll('.mq-t').forEach(b=>b.onclick=()=>mqTask(+b.dataset.id));
@@ -1141,7 +1128,7 @@ function mqName(){
 
 /* ---------- task: story + stage map ---------- */
 function mqTask(id){
- if(sbLk(id)){sbModal();return}
+ if(!mqOpenTask(id)){sbModal(id);return}
  const T=MQ_TASKS.find(x=>x.id===id),S=mqT(id);msTop();
  if(!S.seen){
   app.innerHTML=msBackBtn('Level 1')+`<div class="ms-dos"><span class="k">Task ${id} · ${msE(T.az)}</span><h2>${T.ic} ${msE(T.t)}</h2><p style="margin:0;color:#E2EAF8;font-weight:700;line-height:1.55">${T.story}</p><span class="ms-pill" style="justify-self:start">🎯 Məqsəd: <b>${msE(T.goal)}</b></span></div>

@@ -8221,7 +8221,7 @@ function home(){
   const fbB=`<button class="fbbtn" onclick="fbHome()">✍️ Rəy və təklifləriniz <span>— yazın, oxuyuruq</span></button>`;let th='';
   const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0);
   th+=`<a class="tile wide" href="links/" style="${colorVars('bl')};background:var(--bl-s);border-color:var(--bl);text-decoration:none"><div><h2>🔗 Faydalı linklər</h2><p>YouTube videoları və kanallar</p></div><span class="badge" style="margin-left:auto">YouTube</span></a>`;
-  th+=`<a class="tile wide" href="missions/" style="background:linear-gradient(135deg,#FFE680,#FFC22E);border-color:#C99A10;color:#3B2A00;text-decoration:none"><div><h2 style="color:#3B2A00">👑 Mr. Samir's Missions</h2><p style="color:#5C4300">A2–B1 · Task 1 pulsuz</p></div><span class="badge" style="margin-left:auto;background:#3B2A00;color:#FFD54A">PREMIUM</span></a>`;
+  th+=`<a class="tile wide" href="missions/" style="background:linear-gradient(135deg,#FFE680,#FFC22E);border-color:#C99A10;color:#3B2A00;text-decoration:none"><div><h2 style="color:#3B2A00">🕵️ Mr. Samir's Missions</h2><p style="color:#5C4300">A2–B1 · tasklar ardıcıl açılır</p></div></a>`;
   h+=`<div class="mgrid">`;
   const wN=LV.reduce((u,[l])=>u+CATS.reduce((v,[c])=>v+liveCount('words',l,c),0),0);
   const mb=(ic,t,sub,badge,c,js)=>`<button class="mtile" style="${colorVars(c)}" onclick="${js}"><span class="mic" aria-hidden="true">${ic}</span><span class="mt">${t}</span><span class="ms">${sub}</span><span class="mb">${badge}</span></button>`;
