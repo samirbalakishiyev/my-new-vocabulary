@@ -363,6 +363,11 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .kw{font:inherit;font-weight:900;color:var(--c);background:var(--s);border-radius:6px;padding:0 4px;border-bottom:2px solid var(--c);line-height:1.4}
 .kw.on{background:var(--c);color:#fff}
 .kwlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:6px}
+.kwtg{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin:14px 0 10px;border:1.5px solid var(--line,#ddd);background:var(--card,#fff);color:inherit;border-radius:14px;padding:11px 14px;font:inherit;font-weight:900;font-size:17px;cursor:pointer}
+.kwtg span{flex:none;font-size:14px;font-weight:900;background:var(--c,#4F46E5);color:#fff;border-radius:999px;padding:5px 12px}
+.kwtg.on span{opacity:.75}
+.kwone{margin:10px 0 0;padding:10px 14px;border-radius:12px;background:var(--card,#fff);border:1.5px dashed var(--line,#ccc);font-size:16px}
+.kwone small{opacity:.7}
 .kwi{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:9px 11px;display:grid;gap:1px}
 .kwi b{color:var(--c);font-weight:900}.kwi span{font-size:14px;font-weight:700}.kwi small{font-size:13px;color:var(--muted);font-weight:600}
 .kwi.on{border-color:var(--c);background:var(--s)}
@@ -8674,11 +8679,16 @@ function readPassage(L,i,keep){
   const P=READ[L][i],marks=rMarks(P.text),r=ST.rd[rKey(L,i)];
   let h=hdr(P.t,'Reading '+L+' · Mətn '+(i+1),`readList('${L}')`,'in')+`<div style="${colorVars('in')}"><div class="rmeta"><span class="chip">${esc(P.topic)}</span><span class="chip">${rWords(P.text)} söz</span>${r?`<span class="chip">Nəticə: ${r.ok}/${r.n}</span>`:''}<button class="say" aria-label="Mətni dinlə" onclick="rSay()">${SPK}</button></div>`;
   h+=`<p class="rtext">${rText(P.text,true)}</p>`;
-  h+=`<div class="sec-title">Vacib sözlər</div><div class="kwlist">`+marks.map((w,k)=>{const tr=P.keys[w]||['',''];return `<button class="kwi${k===RP.sel?' on':''}" onclick="rKw(${k})"><b>${esc(w)}</b><span>${esc(tr[0])}</span><small>${esc(tr[1])}</small></button>`}).join('')+`</div>`;
+  const kwO=rKwOpen();
+  if(!kwO&&RP.sel>=0&&marks[RP.sel]){const w=marks[RP.sel],tr=P.keys[w]||['',''];h+=`<div class="kwone"><b>${esc(w)}</b> — ${esc(tr[0])}${tr[1]?` <small>/ ${esc(tr[1])}</small>`:''}</div>`}
+  h+=`<button type="button" class="kwtg${kwO?' on':''}" aria-expanded="${kwO}" onclick="rKwTog()">🔑 Vacib sözlər (${marks.length})<span>${kwO?'Gizlət ▴':'Göstər ▾'}</span></button>`;
+  if(kwO)h+=`<div class="kwlist">`+marks.map((w,k)=>{const tr=P.keys[w]||['',''];return `<button class="kwi${k===RP.sel?' on':''}" onclick="rKw(${k})"><b>${esc(w)}</b><span>${esc(tr[0])}</span><small>${esc(tr[1])}</small></button>`}).join('')+`</div>`;
   h+=`<button class="btn" onclick="readQuiz()">${r?'Suallara yenidən cavab ver':'Suallara keç'} (${P.qs.length} sual)</button></div>`;
   app.innerHTML=h;if(!keep)window.scrollTo(0,0);
 }
 function rKw(k){const P=READ[RP.L][RP.i],w=rMarks(P.text)[k];RP.sel=RP.sel===k?-1:k;if(RP.sel>=0&&w)say(w,.8);const y=window.scrollY;readPassage(RP.L,RP.i,true);window.scrollTo(0,y)}
+function rKwOpen(){try{return localStorage.getItem('mnv-kwopen')==='1'}catch(e){return false}}
+function rKwTog(){const o=!rKwOpen();try{localStorage.setItem('mnv-kwopen',o?'1':'0')}catch(e){}const y=window.scrollY;readPassage(RP.L,RP.i,true);window.scrollTo(0,y)}
 function rSay(){const P=READ[RP.L][RP.i];say(P.text,.9)}
 function readQuiz(){const {L,i}=RP;const ids=D.rq[L].filter(e=>RQP[e._id].pi===i).map(e=>e._id);V={};run(ids,{mode:'read',l:L,pi:i,s:'rq',back:`readPassage('${L}',${i})`})}
 
