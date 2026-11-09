@@ -141,7 +141,33 @@ function ageMap() {
   s.getRange(2, 1, s.getLastRow() - 1, 2).getValues().forEach(r => { if (r[0] !== '') m[String(r[0]).replace(/^'/, '')] = +r[1] || ''; });
   return m;
 }
-function usersRows(s) { usersPurge_(s); const m = ageMap(), ab = abMap(); return usersRows0(s).map(u => Object.assign(u, m[u.tel] ? { yas: m[u.tel] } : {}, ab[u.tel] ? { ab: ab[u.tel] } : {})); }
+function usersRows(s) { usersPurge_(s); const m = ageMap(), ab = abMap(), tg = tagMap(); return usersRows0(s).map(u => Object.assign(u, m[u.tel] ? { yas: m[u.tel] } : {}, ab[u.tel] ? { ab: ab[u.tel] } : {}, tg[u.tel] ? { tg: tg[u.tel] } : {})); }
+/* 🏷️ Müəllim etiketi (məs: CK = "Ceyhun müəllimin şagirdlərinə özəl…"): ayrıca "Etiketlər" vərəqi (Users vərəqinə toxunmur).
+   Müəllim panelində CK düyməsi ilə qoyulur/götürülür; şagirdin tətbiqində yuxarıda yazı kimi görünür. */
+function tagSheet() {
+  const ss = SpreadsheetApp.getActive();
+  let s = ss.getSheetByName('Etiketlər');
+  if (!s) { s = ss.insertSheet('Etiketlər'); s.appendRow(['Telefon', 'Etiket', 'Tarix']); s.getRange(1, 1, 1, 3).setFontWeight('bold'); s.setFrozenRows(1); }
+  return s;
+}
+function tagMap() {
+  const s = SpreadsheetApp.getActive().getSheetByName('Etiketlər'), m = {};
+  if (!s || s.getLastRow() < 2) return m;
+  s.getRange(2, 1, s.getLastRow() - 1, 2).getValues().forEach(r => { if (r[0] !== '' && r[1] !== '') m[String(r[0]).replace(/^'/, '')] = String(r[1]); });
+  return m;
+}
+function tagSet(o, now) {
+  const tel = String(o.tel || ''), v = String(o.v || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 6).toUpperCase();
+  if (!tel) return { ok: false, error: 'tel' };
+  const s = tagSheet(), n = s.getLastRow();
+  if (n > 1) {
+    const t = s.getRange(2, 1, n - 1, 1).getValues();
+    for (let i = 0; i < t.length; i++) if (String(t[i][0]).replace(/^'/, '') === tel) { s.getRange(i + 2, 2, 1, 2).setValues([[v, new Date(now)]]); s.getRange(i + 2, 3).setNumberFormat(DF); return { ok: true, tg: v }; }
+  }
+  if (v) { s.appendRow(["'" + tel, v, new Date(now)]); s.getRange(s.getLastRow(), 3).setNumberFormat(DF); }
+  return { ok: true, tg: v };
+}
+
 /* ⏳ Avto-blok: 31.10.2026-dan sonra qoşulan MÜƏLLİMLƏR və 25 YAŞDAN BÖYÜKLƏR 5 gün pulsuz istifadə edir.
    💳 "Ödəniş edib" qeyd olunmayıbsa, 5 gündən sonra növbəti girişdə avtomatik bloklanır.
    Müəllim blokunu əl ilə açsa, həmin şəxs bir daha avtomatik bloklanmır ("Avtoblok" vərəqi: avto / istisna). */
@@ -256,7 +282,7 @@ function userPing(o, now) {
     s.getRange(lr, 5, 1, 2).setNumberFormat(DF);
     s.getRange(lr, 7).insertCheckboxes();
     s.getRange(lr, 10).insertCheckboxes();
-    return { ok: true, blok: false, prem: false, grp: '', nm: '' };
+    return { ok: true, blok: false, tg: tagMap()[String(o.tel || '')] || '', prem: false, grp: '', nm: '' };
   }
   const val = s.getRange(r, 1, 1, 15).getValues()[0];
   s.getRange(r, 2, 1, 3).setValues([[o.ad || val[1], o.soyad || val[2], o.rol || val[3]]]);
@@ -264,7 +290,7 @@ function userPing(o, now) {
   if (o.pn !== undefined || o.pk !== undefined) s.getRange(r, 13, 1, 2).setNumberFormat('@').setValues([[String(o.pn || val[12] || '').slice(0, 80), String(o.pk || val[13] || '').slice(0, 40)]]);
   s.getRange(r, 6).setValue(new Date(now)).setNumberFormat(DF);
   const ab = abCheck(s, r, val, o, now); /* ⏳ */
-  return { ok: true, blok: ab || isTrue(val[6]), prem: premOf(val), grp: String(val[11] || ''), nm: String(val[14] || '') };
+  return { ok: true, blok: ab || isTrue(val[6]), tg: tagMap()[String(o.tel || '')] || '', prem: premOf(val), grp: String(val[11] || ''), nm: String(val[14] || '') };
 }
 function userSet(o, now) {
   const s = usersSheet();
@@ -660,6 +686,7 @@ function doPost(e) {
       return out({ ok: true, keys: slugKeys(slugList(s.getRange(r, 11).getValue())) });
     }
     if (o.key !== KEY) return out({ ok: false, error: 'key' });
+    if (o.a === 'tag') return out(tagSet(o, now)); /* 🏷️ müəllim etiketi (CK) */
     if (o.a === 'block' || o.a === 'elaqe' || o.a === 'premium' || o.a === 'slug' || o.a === 'grp' || o.a === 'ren') return out(userSet(o, now));
     if (o.a === 'fbset') return out(fbSet(o, now));
     if (o.a === 'udel') return out(userDel(o, now)); /* 🗑 */
