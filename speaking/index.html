@@ -108,6 +108,15 @@ details.box .in{padding:0 16px 14px}
 .big small{display:block;font-size:14.5px;font-weight:600;color:var(--muted);margin-top:4px}
 .big .say{font-size:18px}
 .kw-used{color:var(--ok)}
+.tgl{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;border:0;background:none;padding:0;color:var(--ink);font:inherit;font-weight:900;font-size:16px;text-align:left;cursor:pointer}
+.tgl small{font-weight:700;color:var(--muted);font-size:13px}
+.tgl .ar{flex:none;background:var(--brand);color:var(--brand-ink);border-radius:999px;padding:8px 13px;font-size:14px}
+.tgl.on .ar{background:var(--soft);color:var(--brand)}
+.all{margin:12px 0 0;padding-left:22px}.all li{margin:0 0 10px;font-size:18px;line-height:1.4}
+.all li b{font-weight:800}.all li small{display:block;font-size:14px;color:var(--muted);font-weight:600}
+.all.kw{list-style:none;padding-left:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}.all.kw li{font-size:16px;margin:0;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:7px 10px}
+.all.kw li.on{border-color:var(--ok);background:var(--ok-bg)}.all.kw li.on b{color:var(--ok)}
+@media (max-width:360px){.all.kw{grid-template-columns:1fr}}
 .chips2{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .chips2 span{font-size:13px;font-weight:800;border-radius:999px;padding:3px 10px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
 .chips2 span.on{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
@@ -147,13 +156,13 @@ details.box .in{padding:0 16px 14px}
     <div class="topbar"><button class="mini" type="button" id="back">← Mövzular</button><span class="muted small" id="tno"></span></div>
     <div class="topic" id="topic"></div>
     <div class="card">
-      <div class="ch"><span>❓ Guiding questions</span><span class="nav"><button type="button" id="qu" aria-label="Əvvəlki sual">▲</button><span id="qn"></span><button type="button" id="qd" aria-label="Növbəti sual">▼</button></span></div>
-      <div class="big" id="qb"></div>
+      <button type="button" class="tgl" id="qt"><span>❓ Guiding questions <small id="qn"></small></span><span class="ar" id="qa">📋 Sualları göstər ▾</span></button>
+      <ol class="all" id="qb" hidden></ol>
     </div>
     <div class="card">
-      <div class="ch"><span>🔑 Key words</span><span class="nav"><button type="button" id="ku" aria-label="Əvvəlki söz">▲</button><span id="kn"></span><button type="button" id="kd" aria-label="Növbəti söz">▼</button></span></div>
-      <div class="big" id="kb"></div>
-      <div class="chips2" id="kc"></div>
+      <button type="button" class="tgl" id="kt"><span>🔑 Key words <small id="kn"></small></span><span class="ar" id="ka">Açar sözləri göstər ▾</span></button>
+      <ul class="all kw" id="kb" hidden></ul>
+
     </div>
     <div class="card" id="talk">
       <div class="ch"><span>🗣️ Danış</span><span id="tm" class="muted"></span></div>
@@ -187,19 +196,19 @@ function list(){
   $('tl').querySelectorAll('.tp:not(.soon)').forEach(b=>b.onclick=()=>open(+b.dataset.i));
   show('s-list');
 }
-function open(i){cur={l:lvl,i,t:SP[lvl][i]};qi=0;ki=0;t0=0;clearInterval(tick);
+function open(i){cur={l:lvl,i,t:SP[lvl][i]};t0=0;clearInterval(tick);
   $('tno').textContent=lvl+' · '+(i+1)+' / '+SP[lvl].length;$('topic').textContent='🎤 '+cur.t.t;
   $('ta').value='';$('res').hidden=true;$('mt').textContent=cur.t.m;$('azw').hidden=true;
   drawQ();drawK();upd();show('s-sp');
 }
-function drawQ(){const q=cur.t.q[qi];$('qn').textContent=(qi+1)+' / '+cur.t.q.length;
-  $('qb').innerHTML=`${esc(q[0])} <button class="say" type="button" aria-label="Dinlə">🔊</button><small>${esc(q[1])}</small>`;$('qb').querySelector('.say').onclick=()=>say(q[0])}
-function drawK(){const k=cur.t.k[ki],u=used(k[0]);$('kn').textContent=(ki+1)+' / '+cur.t.k.length;
-  $('kb').innerHTML=`<span class="${u?'kw-used':''}">${u?'✓ ':''}${esc(k[0])}</span> <button class="say" type="button" aria-label="Dinlə">🔊</button><small>${esc(k[1])}</small>`;$('kb').querySelector('.say').onclick=()=>say(k[0]);
-  $('kc').innerHTML=cur.t.k.map(x=>`<span class="${used(x[0])?'on':''}">${esc(x[0])}</span>`).join('')}
-const step=(v,d,n)=>(v+d+n)%n;
-$('qu').onclick=()=>{qi=step(qi,-1,cur.t.q.length);drawQ()};$('qd').onclick=()=>{qi=step(qi,1,cur.t.q.length);drawQ()};
-$('ku').onclick=()=>{ki=step(ki,-1,cur.t.k.length);drawK()};$('kd').onclick=()=>{ki=step(ki,1,cur.t.k.length);drawK()};
+function drawQ(){const t=cur.t;$('qn').textContent='('+t.q.length+')';$('qb').innerHTML=t.q.map((q,j)=>`<li><b>${esc(q[0])}</b> <button class="say" type="button" data-s="${j}" aria-label="Dinlə">🔊</button><small>${esc(q[1])}</small></li>`).join('');$('qb').querySelectorAll('.say').forEach(b=>b.onclick=()=>say(t.q[+b.dataset.s][0]));tg('q',null)}
+
+function drawK(){const t=cur.t,n=t.k.filter(k=>used(k[0])).length;$('kn').textContent='('+n+' / '+t.k.length+' işlədildi)';$('kb').innerHTML=t.k.map((k,j)=>{const u=used(k[0]);return `<li class="${u?'on':''}"><b>${u?'✓ ':''}${esc(k[0])}</b> <button class="say" type="button" data-s="${j}" aria-label="Dinlə">🔊</button><small>${esc(k[1])}</small></li>`}).join('');$('kb').querySelectorAll('.say').forEach(b=>b.onclick=()=>say(t.k[+b.dataset.s][0]));tg('k',null)}
+
+const OPEN={q:false,k:false};try{Object.assign(OPEN,JSON.parse(localStorage.getItem(PFX+'-speak-open')||'{}'))}catch(e){}
+function tg(x,v){if(v!=null){OPEN[x]=v;try{localStorage.setItem(PFX+'-speak-open',JSON.stringify(OPEN))}catch(e){}}const o=OPEN[x];$(x+'b').hidden=!o;$(x+'a').textContent=x==='q'?(o?'Sualları gizlət ▴':'📋 Sualları göstər ▾'):(o?'Açar sözləri gizlət ▴':'Açar sözləri göstər ▾');$(x+'t').classList.toggle('on',o)}
+$('qt').onclick=()=>tg('q',!OPEN.q);
+$('kt').onclick=()=>tg('k',!OPEN.k);
 $('back').onclick=()=>{clearInterval(tick);stopRec();list()};
 const norm=s=>' '+s.toLowerCase().replace(/[’`]/g,"'").replace(/[^a-z0-9' ]+/g,' ').replace(/\s+/g,' ').trim()+' ';
 const words=s=>norm(s).trim().split(' ').filter(Boolean);
