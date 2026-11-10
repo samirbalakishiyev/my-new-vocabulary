@@ -423,7 +423,18 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 @media (min-width:640px){.vgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .vtile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;min-height:92px;padding:12px;border-radius:16px;background:var(--s);border:2px solid transparent;color:var(--ink);font:inherit;cursor:pointer;min-width:0}
 .vtile:hover{border-color:var(--c)}
-.vtile.vkey{border:3px solid #7F0000;box-shadow:0 2px 0 #7F000033}.vtile.vkey:hover{border-color:#5A0000}.vtile:disabled{opacity:.6;cursor:default}
+.vtile{border:2px solid color-mix(in srgb,var(--c) 45%,transparent)}
+.vtile.vkey{min-height:118px;border-width:3px;box-shadow:0 6px 16px -10px var(--kb)}
+.vtile.vkey .vt{font-size:19px}
+.vtile.vlearn{--kb:#B85400;background:linear-gradient(140deg,#FFF1DE,#FFD8A8);border-color:#C25E00}
+.vtile.vlearn .vt,.vtile.vlearn .vb{color:#A04A00}
+.vtile.vexam{--kb:#0B6E66;background:linear-gradient(140deg,#E0F7F4,#B4ECE5);border-color:#0F766E}
+.vtile.vexam .vt,.vtile.vexam .vb{color:#0B5F59}
+.vkey:hover{filter:brightness(.97)}
+.goexam{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px;padding:14px 16px;border-radius:16px;border:3px solid #B42318;background:linear-gradient(135deg,#FF8A4C,#F0443A);color:#fff;font:inherit;font-weight:900;font-size:18px;cursor:pointer;box-shadow:0 8px 18px -10px #B42318;animation:gex 1.6s ease-in-out infinite}
+.goexam small{display:block;font-weight:700;font-size:13px;opacity:.9}
+@keyframes gex{50%{box-shadow:0 0 0 6px rgba(240,68,58,.22),0 8px 18px -10px #B42318}}
+@media (prefers-reduced-motion:reduce){.goexam{animation:none}}.vtile.vtile:disabled{opacity:.6;cursor:default}
 .vtile .vt{font-size:16.5px;font-weight:900;color:var(--c);line-height:1.15}
 .vtile .vs{font-size:12.5px;font-weight:700;color:var(--muted);line-height:1.3}
 .vtile .vb{margin-top:auto;padding-top:4px;font-size:12.5px;font-weight:900;color:var(--c)}
@@ -8255,8 +8266,8 @@ function vocabHome(){
   V={vh:1};const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0);
   const vb=(t,sub,badge,c,js,dis)=>`<button class="vtile" style="${colorVars(c)}" ${dis?'disabled':`onclick="${js}"`}><span class="vt">${t}</span><span class="vs">${sub}</span><span class="vb">${badge}</span></button>`;
   let h=hdr('Vocabulary','Bölməni seçin','home()','tq')+`<div class="vgrid">`;
-  h+=vb('📘 Sözləri öyrən','Siyahı üzrə · kartlar üzrə',lk+'/'+lt,'bl','learnMenu()').replace('class="vtile"','class="vtile vkey"');
-  h+=vb('📝 Sözlər imtahanı','Nitq hissələri · sinonim · antonim · definition',lt+' söz','tq','examHome()').replace('class="vtile"','class="vtile vkey"');
+  h+=vb('📘 Sözləri öyrən','Siyahı üzrə · kartlar üzrə',lk+'/'+lt,'or','learnMenu()').replace('class="vtile"','class="vtile vkey vlearn"');
+  h+=vb('📝 Sözlər imtahanı','Nitq hissələri · sinonim · antonim · definition',lt+' söz','tq','examHome()').replace('class="vtile"','class="vtile vkey vexam"');
   h+=vb('Make Up Sentences','Cümlə qur',count('mk')+' cümlə','pu',"levels('mk')");
   h+=vb('Sentences','Boşluğu doldur',count('gap')+' sual','bl',"levels('gap')");
   h+=vb('Topic Vocabulary','Mövzular üzrə sözlər',TOPS.length+' mövzu','am','topicHome()');
@@ -8654,7 +8665,7 @@ function lShow(){
   const title=(s==='words'?CATS.find(x=>x[0]===c)[1]:o.n)+' · Task '+(t+1);
   let h=hdr(title,lvName(l)+' · öyrən',`lTasks('${s}','${l}','${c}')`,o.c)+`<div style="${colorVars(o.c)}">`;
   h+=`<div class="bar"><i style="width:${k/q.length*100}%;background:var(--bl)"></i></div><div class="qmeta"><span>Öyrənildi: ${k} / ${q.length}</span><span>${all?'Hamısı öyrənildi':'Qalıb: '+(q.length-k)}</span></div>`;
-  if(all)h+=`<div class="ldone"><b>Əla! Bu taskdakı bütün sözləri öyrəndin.</b><button class="btn" style="background:var(--bl)" onclick="lExam()">${exName(s)} – Task ${t+1}-ə keç</button></div>`;
+  if(all)h+=`<div class="ldone"><b>Əla! Bu taskdakı bütün sözləri öyrəndin.</b><button class="goexam" type="button" onclick="lExam()"><span>📝 Bu sözlərin imtahanına keç ›<small>${s==='words'?CATS.find(x=>x[0]===c)[1]:VN[s][0]} · ${lvName(l)} · Task ${t+1}</small></span></button></div>`;
   h+=`<div class="qcard lcard${learned?' lon':''}">${learned?'<span class="lbadge">Öyrəndim ✓</span>':''}${lCard(id)}</div>`;
   h+=`<div class="lbtns">${learned?`<button class="btn ghost" onclick="lUnlearn()">Yenidən öyrən</button><button class="btn" onclick="lNext()">Növbəti</button>`:`<button class="btn ghost" onclick="lNext()">Sonra</button><button class="btn lyes" onclick="lLearn()">Öyrəndim</button>`}</div>`;
   h+=`<div class="sec-title">Bu taskın sözləri</div><div class="lboxes">`+q.map((x,i)=>`<button class="lbx${ST.learned[x]?' on':''}${i===0?' cur':''}" onclick="lPick('${esc(jsq(x))}')">${esc(lLabel(x))}</button>`).join('')+`</div></div>`;
