@@ -7988,7 +7988,7 @@ The man / whose / car / was stolen / reported / it / to the police.|Maşını o�
 const LV=[['A','A1–A2','Başlanğıc'],['B','B1–B2','Orta'],['C','C1–C2','Yüksək']];
 const CATS=[['noun','Nouns','İsimlər'],['verb','Verbs','Fellər'],['adj','Adjectives','Sifətlər'],['adv','Adverbs','Zərflər'],['prep','Prepositions','Önlüklər'],['col','Collocations','Söz birləşmələri'],['phr','Phrasal verbs','Frazal fellər'],['idi','Idioms','İdiomlar']];
 const SECS={
-  words:{n:'Words',az:'Sözlər',c:'tq',hint:'Bu sözün tərcüməsini seçin',unit:'söz',size:20},
+  words:{n:'Nitq hissələri üzrə',az:'Sözlər',c:'tq',hint:'Bu sözün tərcüməsini seçin',unit:'söz',size:20},
   syn:{n:'Synonyms',az:'Sinonimlər',c:'gr',hint:'Sinonimini seçin',unit:'söz',size:20},
   ant:{n:'Antonyms',az:'Antonimlər',c:'pk',hint:'Antonimini seçin',unit:'söz',size:20},
   def:{n:'Definitions',az:'Təriflər',c:'or',hint:'Tərifə uyğun sözü seçin',unit:'söz',size:20},
@@ -7997,7 +7997,8 @@ const SECS={
   rq:{n:'Reading',az:'Mətn oxu',c:'in',hint:'Mətnə görə düzgün cavabı seçin',unit:'sual',size:5},
   tv:{n:'Topic Vocabulary',az:'Mövzular üzrə sözlər',c:'am',hint:'Bu sözün tərcüməsini seçin',unit:'söz',size:20}
 };
-const exName=s=>s==='mk'?SECS[s].n:SECS[s].n+' Exam';
+const exName=s=>s==='mk'?SECS[s].n:s==='words'?'Nitq hissələri üzrə · imtahan':SECS[s].n+' Exam';
+const VN={words:['Nitq hissələri üzrə','İsimlər, fellər, sifətlər… · tərcümə'],syn:['Sinonim','Synonyms · sinonimlər'],ant:['Antonim','Antonyms · antonimlər'],def:['Definition','Definitions · təriflər']};
 const LET='ABCDE';
 const SZ=s=>SECS[s].size;
 
@@ -8254,14 +8255,9 @@ function vocabHome(){
   V={vh:1};const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0);
   const vb=(t,sub,badge,c,js,dis)=>`<button class="vtile" style="${colorVars(c)}" ${dis?'disabled':`onclick="${js}"`}><span class="vt">${t}</span><span class="vs">${sub}</span><span class="vb">${badge}</span></button>`;
   let h=hdr('Vocabulary','Bölməni seçin','home()','tq')+`<div class="vgrid">`;
-  {const fk=Object.keys(ST.fc||{}).filter(id=>live(id)&&LSECS.includes(IDX[id].s)&&ST.fc[id].b>=1).length;
-   h+=vb('📘 Sözləri öyrən','Bax, öyrən, imtahan ver',lk+'/'+lt,'bl','learnHome()').replace('class="vtile"','class="vtile vkey"');
-   h+=vb('🃏 Sözləri kartlarla öyrən','Flashcards · tasklar üzrə',fk+'/'+lt,'in','fcHome()').replace('class="vtile"','class="vtile vkey"');}
-  h+=vb('Synonym','Sinonimlər',count('syn')+' söz','gr',"levels('syn')");
-  h+=vb('Antonym','Antonimlər',count('ant')+' söz','pk',"levels('ant')");
-  h+=vb('Definition','Təriflər',count('def')+' söz','or',"levels('def')");
+  h+=vb('📘 Sözləri öyrən','Siyahı üzrə · kartlar üzrə',lk+'/'+lt,'bl','learnMenu()').replace('class="vtile"','class="vtile vkey"');
+  h+=vb('📝 Sözlər imtahanı','Nitq hissələri · sinonim · antonim · definition',lt+' söz','tq','examHome()').replace('class="vtile"','class="vtile vkey"');
   h+=vb('Make Up Sentences','Cümlə qur',count('mk')+' cümlə','pu',"levels('mk')");
-  h+=vb('Words Exam','Sözlərin tərcüməsi',count('words')+' söz','tq',"levels('words')");
   h+=vb('Sentences','Boşluğu doldur',count('gap')+' sual','bl',"levels('gap')");
   h+=vb('Topic Vocabulary','Mövzular üzrə sözlər',TOPS.length+' mövzu','am','topicHome()');
   h+=vb('📕 PDF Lüğət','Yüklə · məktəb lüğətləri','PDF','or','pdfHome()');
@@ -8277,8 +8273,8 @@ const fcCount=(s,l,c)=>{let ids=[];if(l==null){for(const [L] of LV)ids=ids.conca
 function fcLvIds(s,l){if(s!=='words')return taskIdsAll(s,l,'');let o=[];for(const [c] of CATS)o=o.concat(taskIdsAll(s,l,c));return o}
 function taskIdsAll(s,l,c){return pool(s,l,c).map(e=>ID(s,l,c,e)).filter(id=>!DEL.has(id))}
 function fcHome(){
-  V={};if(!ST.fc)ST.fc={};let h=hdr('Sözləri kartlarla öyrən','Bölməni seçin','vocabHome()','in')+`<p class="tnote">Karta bax, toxun — arxasında tərcümə və nümunə var. Bildinsə «✓ Bildim», bilmədinsə «↻ Təkrar etməliyəm» bas. Hamısını bildiyin task mavi olur.</p><div class="list">`;
-  for(const s of LSECS){const o=SECS[s];h+=`<button class="row" style="${colorVars(o.c)}" onclick="fcLevels('${s}')"><div><div class="t" style="color:var(--c)">${o.n}</div><div class="s">${esc(o.az)}</div></div><span class="badge">${fcCount(s)}/${count(s)}</span></button>`}
+  V={};if(!ST.fc)ST.fc={};let h=hdr('Kartlar üzrə öyrən','Bölməni seçin','learnMenu()','in')+`<p class="tnote">Karta bax, toxun — arxasında tərcümə və nümunə var. Bildinsə «✓ Bildim», bilmədinsə «↻ Təkrar etməliyəm» bas. Hamısını bildiyin task mavi olur.</p><div class="list">`;
+  for(const s of LSECS){const o=SECS[s];h+=`<button class="row" style="${colorVars(o.c)}" onclick="fcLevels('${s}')"><div><div class="t" style="color:var(--c)">${VN[s][0]}</div><div class="s">${esc(VN[s][1])}</div></div><span class="badge">${fcCount(s)}/${count(s)}</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
 function fcLevels(s){
@@ -8287,7 +8283,7 @@ function fcLevels(s){
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
 function fcCats(l){
-  V={};let h=hdr('Words '+lvName(l)+' · kartlar','Nitq hissəsini seçin',"fcLevels('words')",'tq')+`<div class="list" style="${colorVars('tq')}">`;
+  V={};let h=hdr('Nitq hissələri · '+lvName(l)+' · kartlar','Nitq hissəsini seçin',"fcLevels('words')",'tq')+`<div class="list" style="${colorVars('tq')}">`;
   for(const [c,n,az] of CATS)h+=`<button class="row" onclick="fcTasks('words','${l}','${c}')"><div><div class="t">${n}</div><div class="s">${az} · ${nTasks('words',l,c)} task</div></div><span class="badge">${fcCount('words',l,c)}/${liveCount('words',l,c)}</span></button>`;
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
@@ -8389,7 +8385,7 @@ function examSoon(n){
 }
 function levels(s){
   V={s};const o=SECS[s];
-  let h=hdr(exName(s),o.az+' · səviyyəni seçin',VSECS.includes(s)?'vocabHome()':'home()',o.c)+`<div class="list" style="${colorVars(o.c)}">`;
+  let h=hdr(exName(s),o.az+' · səviyyəni seçin',LSECS.includes(s)?'examHome()':VSECS.includes(s)?'vocabHome()':'home()',o.c)+`<div class="list" style="${colorVars(o.c)}">`;
   for(const [l,name,az] of LV){
     h+=`<button class="row" onclick="${s==='words'?`cats('${l}')`:`tasks('${s}','${l}','')`}"><div><div class="lvl">${name}</div><div class="s">${az}</div></div><span class="badge">${levelCount(s,l)} ${o.unit}</span></button>`;
   }
@@ -8397,7 +8393,7 @@ function levels(s){
 }
 function cats(l){
   V={s:'words',l};
-  let h=hdr('Words '+lvName(l),'Nitq hissəsini seçin',"levels('words')",'tq')+`<div class="list" style="${colorVars('tq')}">`;
+  let h=hdr('Nitq hissələri · '+lvName(l),'Nitq hissəsini seçin',"levels('words')",'tq')+`<div class="list" style="${colorVars('tq')}">`;
   for(const [c,n,az] of CATS){
     const ids=pool('words',l,c).map(e=>ID('words',l,c,e)).filter(id=>!DEL.has(id)),kn=ids.filter(id=>ST.known[id]).length;
     h+=`<button class="row" onclick="tasks('words','${l}','${c}')"><div><div class="t">${n}</div><div class="s">${az} · ${nTasks('words',l,c)} task</div></div><span class="badge">${kn}/${ids.length}</span></button>`;
@@ -8600,9 +8596,21 @@ const LSECS=['words','syn','ant','def'];
 const WTR={};for(const l in D.words)for(const c in D.words[l])D.words[l][c].forEach(e=>{const k=e[0].toLowerCase();if(!WTR[k])WTR[k]=e[1]});
 const lCount=(s,l,c)=>Object.keys(ST.learned).filter(id=>live(id)&&IDX[id].s===s&&(l==null||IDX[id].l===l)&&(c==null||IDX[id].c===c)).length;
 let LQ={};
+function learnMenu(){
+  V={};const lk=Object.keys(ST.learned).filter(id=>live(id)&&LSECS.includes(IDX[id].s)).length,lt=LSECS.reduce((u,x)=>u+count(x),0),fk=Object.keys(ST.fc||{}).filter(id=>live(id)&&LSECS.includes(IDX[id].s)&&ST.fc[id].b>=1).length;
+  let h=hdr('Sözləri öyrən','Necə öyrənmək istəyirsən?','vocabHome()','bl')+`<div class="list">`;
+  h+=`<button class="row" style="${colorVars('bl')}" onclick="learnHome()"><div><div class="t" style="color:var(--c)">📋 Siyahı üzrə öyrən</div><div class="s">Sözə bax, öyrən, «Öyrəndim» bas</div></div><span class="badge">${lk}/${lt}</span></button>`;
+  h+=`<button class="row" style="${colorVars('in')}" onclick="fcHome()"><div><div class="t" style="color:var(--c)">🃏 Kartlar üzrə öyrən</div><div class="s">Karta toxun, arxasında tərcümə</div></div><span class="badge">${fk}/${lt}</span></button>`;
+  app.innerHTML=h+'</div>';window.scrollTo(0,0);
+}
+function examHome(){
+  V={};let h=hdr('Sözlər imtahanı','Bölməni seçin','vocabHome()','tq')+`<div class="list">`;
+  for(const s of LSECS){const o=SECS[s];h+=`<button class="row" style="${colorVars(o.c)}" onclick="levels('${s}')"><div><div class="t" style="color:var(--c)">${VN[s][0]}</div><div class="s">${esc(VN[s][1])}</div></div><span class="badge">${count(s)} söz</span></button>`}
+  app.innerHTML=h+'</div>';window.scrollTo(0,0);
+}
 function learnHome(){
-  V={};let h=hdr('Sözləri öyrən','Bölməni seçin','vocabHome()','bl')+`<p class="tnote">Hər taskda imtahandakı eyni sözlər var. Sözə bax, öyrəndinsə "Öyrəndim" bas. Hamısı mavi olanda imtahana keç.</p><div class="list">`;
-  for(const s of LSECS){const o=SECS[s];h+=`<button class="row" style="${colorVars(o.c)}" onclick="lLevels('${s}')"><div><div class="t" style="color:var(--c)">${o.n}</div><div class="s">${esc(o.az)}</div></div><span class="badge">${lCount(s)}/${count(s)}</span></button>`}
+  V={};let h=hdr('Siyahı üzrə öyrən','Bölməni seçin','learnMenu()','bl')+`<p class="tnote">Hər taskda imtahandakı eyni sözlər var. Sözə bax, öyrəndinsə "Öyrəndim" bas. Hamısı mavi olanda imtahana keç.</p><div class="list">`;
+  for(const s of LSECS){const o=SECS[s];h+=`<button class="row" style="${colorVars(o.c)}" onclick="lLevels('${s}')"><div><div class="t" style="color:var(--c)">${VN[s][0]}</div><div class="s">${esc(VN[s][1])}</div></div><span class="badge">${lCount(s)}/${count(s)}</span></button>`}
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
 function lLevels(s){
@@ -8611,7 +8619,7 @@ function lLevels(s){
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
 function lCats(l){
-  V={};let h=hdr('Words '+lvName(l)+' · öyrən','Nitq hissəsini seçin',"lLevels('words')",'tq')+`<div class="list" style="${colorVars('tq')}">`;
+  V={};let h=hdr('Nitq hissələri · '+lvName(l)+' · öyrən','Nitq hissəsini seçin',"lLevels('words')",'tq')+`<div class="list" style="${colorVars('tq')}">`;
   for(const [c,n,az] of CATS)h+=`<button class="row" onclick="lTasks('words','${l}','${c}')"><div><div class="t">${n}</div><div class="s">${az} · ${nTasks('words',l,c)} task</div></div><span class="badge">${lCount('words',l,c)}/${liveCount('words',l,c)}</span></button>`;
   app.innerHTML=h+'</div>';window.scrollTo(0,0);
 }
