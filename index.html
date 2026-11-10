@@ -425,7 +425,13 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .vtile:hover{border-color:var(--c)}
 .vtile{border:2px solid color-mix(in srgb,var(--c) 45%,transparent)}
 .vtile.vkey{min-height:118px;border-width:3px;box-shadow:0 6px 16px -10px var(--kb)}
-.vtile.vkey .vt{font-size:19px}
+.vtile .vt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.vtile.vkey .vt{font-size:clamp(13px,3.75vw,19px);letter-spacing:-.2px}
+.vtile.vkey{padding:12px 10px}
+.vtile.vother{background:#EEF1FB;border:2px solid #5563D6;box-shadow:0 4px 12px -10px #33409E}
+.vtile.vother .vt,.vtile.vother .vb{color:#33409E}
+.vtile.vother .vt{font-size:clamp(13px,3.7vw,16.5px)}
+.vtile.vother .vs{color:#5b6390}
 .vtile.vlearn{--kb:#B85400;background:linear-gradient(140deg,#FFF1DE,#FFD8A8);border-color:#C25E00}
 .vtile.vlearn .vt,.vtile.vlearn .vb{color:#A04A00}
 .vtile.vexam{--kb:#0B6E66;background:linear-gradient(140deg,#E0F7F4,#B4ECE5);border-color:#0F766E}
@@ -8268,10 +8274,11 @@ function vocabHome(){
   let h=hdr('Vocabulary','Bölməni seçin','home()','tq')+`<div class="vgrid">`;
   h+=vb('📘 Sözləri öyrən','Siyahı üzrə · kartlar üzrə',lk+'/'+lt,'or','learnMenu()').replace('class="vtile"','class="vtile vkey vlearn"');
   h+=vb('📝 Sözlər imtahanı','Nitq hissələri · sinonim · antonim · definition',lt+' söz','tq','examHome()').replace('class="vtile"','class="vtile vkey vexam"');
-  h+=vb('Make Up Sentences','Cümlə qur',count('mk')+' cümlə','pu',"levels('mk')");
-  h+=vb('Sentences','Boşluğu doldur',count('gap')+' sual','bl',"levels('gap')");
-  h+=vb('Topic Vocabulary','Mövzular üzrə sözlər',TOPS.length+' mövzu','am','topicHome()');
-  h+=vb('📕 PDF Lüğət','Yüklə · məktəb lüğətləri','PDF','or','pdfHome()');
+  const vo=x=>x.replace('class="vtile"','class="vtile vother"');
+  h+=vo(vb('Make Up Sentences','Cümlə qur',count('mk')+' cümlə','pu',"levels('mk')"));
+  h+=vo(vb('Fill in the Gaps','Boşluğu doldur',count('gap')+' sual','bl',"levels('gap')"));
+  h+=vo(vb('Topic Vocabulary','Mövzular üzrə sözlər',TOPS.length+' mövzu','am','topicHome()'));
+  h+=vo(vb('PDF Dictionary','PDF lüğət · yüklə',"PDF",'or','pdfHome()'));
   app.innerHTML=h+`</div>`;window.scrollTo(0,0);
 }
 const VSECS=['words','syn','ant','def','gap','mk'];
