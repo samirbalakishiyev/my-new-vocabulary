@@ -250,7 +250,21 @@ button:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
 .wgbox{margin:10px 0;padding:14px;border-radius:16px;background:var(--card);border:2px solid var(--c)}.wgbox.err{border-color:#C98A00;background:#FFF8E1;font-weight:700}.wgbox.pay{border-color:#D9364C;background:#FDECEE}.wgbox.pay h3{margin:0 0 6px;color:#9B1C2E}.wgbox.pay p{margin:0 0 8px;font-weight:600}.wgbox.wait{font-weight:800;text-align:center}
 .wgtot{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}.wgtot b{color:var(--c);font-size:30px}.wgtab{width:100%;border-collapse:collapse;font-size:14.5px}.wgtab td{padding:7px 4px;border-top:1px solid var(--line);font-weight:700}.wgtab td:last-child{text-align:right;font-weight:900;white-space:nowrap}.wgtab small{color:var(--muted)}.wgnc{color:var(--muted);font-weight:700;font-size:12.5px}.wgwarn{color:#9B1C2E;font-weight:800;margin:0 0 6px}
 .wgwa{display:block;text-align:center;text-decoration:none;background:#25D366!important;border-color:#1DA851!important;color:#fff!important}
-.wsrow{border-color:#3F67B5!important}.wsrow b,.wsrow .go{color:#2B4F99!important}
+.wsrow{border-color:#3F67B5!important}
+/* 🎨 ana ekran: hər blokun öz açıq rəngi + kənar xətti */
+.mgrid .mtile{border:2px solid var(--kb,transparent)}
+.mtile.k-tq{background:#DFF6F1;--kb:#1C9F95}
+.mtile.k-in{background:#E7EAFF;--kb:#5563D6}
+.mtile.k-te{background:#E2F1FC;--kb:#2E86C1}
+.mtile.k-pu{background:#F2E9FC;--kb:#8A5CC7}
+.mtile.k-rd{background:#FDE8E7;--kb:#D9574E}
+.mtile.k-am{background:#FFF5D9;--kb:#C99A10}
+.wgtile.spk{border-color:#2E8B57;background:linear-gradient(135deg,#ECF9EF,#CDEFD8);color:#174D2E;box-shadow:0 10px 22px -16px #2E8B57}
+.wgtile.spk .go{color:#2E8B57}
+.wgtile.spk b{color:#1E6B3F}.wgtile.spk small{color:#3F6B50}
+.resrow[data-r=res]{background:#EAF7EE}
+.resrow.wsrow{background:#F3EEFC;border-color:#7A5BC9!important}
+.resrow.wsrow b,.resrow.wsrow .go{color:#5B3FA8}.wsrow b,.wsrow .go{color:#2B4F99!important}
 .wsq{width:100%;box-sizing:border-box;font:inherit;font-size:17px;font-weight:700;padding:12px 14px;border:2px solid var(--c);border-radius:14px;background:var(--card);color:var(--ink);margin-bottom:10px}
 .wsg{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:10px 12px;margin-bottom:10px}.wsw{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:17px;margin-bottom:6px}.wsw b{color:var(--c);font-size:19px}.wsw span{font-weight:700;color:var(--muted)}.wsw .say{margin-left:auto}
 .wsl{display:flex;align-items:center;gap:8px;width:100%;text-align:left;font:inherit;font-size:14px;font-weight:700;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:8px 10px;margin-top:6px;cursor:pointer}.wsl small{display:block;font-weight:600;color:var(--muted);font-size:12.5px;margin-top:2px}.wsl em{margin-left:auto;font-style:normal;color:var(--c);font-weight:900;white-space:nowrap}
@@ -8252,7 +8266,7 @@ function home(){
   th+=`<a class="tile wide" href="missions/" style="background:linear-gradient(135deg,#FFE680,#FFC22E);border-color:#C99A10;color:#3B2A00;text-decoration:none"><div><h2 style="color:#3B2A00">👑 Mr. Samir's Missions</h2><p style="color:#5C4300">A2–B1 · tasklar ardıcıl açılır</p></div></a>`;
   h+=`<div class="mgrid">`;
   const wN=LV.reduce((u,[l])=>u+CATS.reduce((v,[c])=>v+liveCount('words',l,c),0),0);
-  const mb=(ic,t,sub,badge,c,js)=>`<button class="mtile" style="${colorVars(c)}" onclick="${js}"><span class="mic" aria-hidden="true">${ic}</span><span class="mt">${t}</span><span class="ms">${sub}</span><span class="mb">${badge}</span></button>`;
+  const mb=(ic,t,sub,badge,c,js)=>`<button class="mtile k-${c}" style="${colorVars(c)}" onclick="${js}"><span class="mic" aria-hidden="true">${ic}</span><span class="mt">${t}</span><span class="ms">${sub}</span><span class="mb">${badge}</span></button>`;
   h+=mb('📚','Vocabulary','Sözlər, testlər, kartlar',wN+' söz','tq','vocabHome()');
   h+=mb('📖','Reading','Mətnlər və suallar',RLV.reduce((u,L)=>u+(READ[L]||[]).length,0)+' mətn','in','readHome()');
   h+=mb('✍️','Paragraph','Nümunə paraqraflar',Object.keys(ST.pa||{}).length+'/'+PARA.length,'te','paraHome()');
@@ -8261,8 +8275,8 @@ function home(){
   h+=mb('🏆','Ümumi Sınaqlar','Siniflər üzrə sınaqlar','Tezliklə','am','examsHome()');
   h+=`</div>`;
   h+=`<button class="wgtile" onclick="wgHome()"><span class="mic" aria-hidden="true">📝</span><span><b>Paragraph Writing Guide</b><small>Mövzu seç · açar sözlər və suallarla yaz · pulsuz avtomatik yoxlama</small></span><span class="go">›</span></button>`;
-  h+=`<button class="wgtile" onclick="location.href='speaking/?v=3'"><span class="mic" aria-hidden="true">🎤</span><span><b>Speaking</b><small>A1–B2 · mövzu seç · ingiliscə danış · avtomatik yoxlama</small></span><span class="go">›</span></button>`;
-  {const nU=AUTO()?0:ST.log.filter(e=>!e.sent).length;h+=`<button class="resrow" onclick="resHome()"><span class="mic" aria-hidden="true">📊</span><span><b>Nəticələrim</b><small>${ST.log.length} nəticə${nU?` · <em>${nU} göndərilməyib</em>`:''}</small></span><span class="go">›</span></button>`;}
+  h+=`<button class="wgtile spk" onclick="location.href='speaking/?v=3'"><span class="mic" aria-hidden="true">🎤</span><span><b>Speaking</b><small>A1–B2 · mövzu seç · ingiliscə danış · avtomatik yoxlama</small></span><span class="go">›</span></button>`;
+  {const nU=AUTO()?0:ST.log.filter(e=>!e.sent).length;h+=`<button class="resrow" data-r="res" onclick="resHome()"><span class="mic" aria-hidden="true">📊</span><span><b>Nəticələrim</b><small>${ST.log.length} nəticə${nU?` · <em>${nU} göndərilməyib</em>`:''}</small></span><span class="go">›</span></button>`;}
   h=h.replace(/(<button class="resrow"[\s\S]*<\/button>)$/,'<div class="thin4">$1'+`<button class="resrow wsrow" onclick="wsHome()"><span class="mic" aria-hidden="true">🔎</span><span><b>Söz axtar</b><small>Söz saytda haradadır?</small></span><span class="go">›</span></button>`+fbB+'<div class="grid hgrid">'+th+'</div></div>');
   h+=RCONF?`<div class="foot"><p class="perr" style="color:var(--rd);font-weight:800;margin:0 0 8px">Bütün nəticələr, bildiyin sözlər və səhvlər silinsin?</p><div class="pbtns" style="justify-content:center"><button class="pbtn dl" style="text-decoration:none;color:var(--rd);font-size:15px" onclick="resetYes()">Bəli, sıfırla</button><button class="pbtn gh" style="text-decoration:none;font-size:15px" onclick="resetNo()">Xeyr</button></div></div>`:`<div class="foot"><button onclick="resetAll()">Bütün nəticələri sıfırla</button></div>`;
   app.innerHTML=h;window.scrollTo(0,0);fbBadge();
