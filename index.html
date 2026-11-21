@@ -9405,9 +9405,9 @@ async function tFb(reload){
   if(!TFB.rows||reload){app.innerHTML=hdr('Rəy və təkliflər','Yüklənir…','tHome()','bl');TFB.err='';
     const key=lsGet('mnv-tkey','');
     if(!key)TFB.err='Əvvəlcə daxil olun.';
-    else try{const r=await fetch(SHEET_URL+'?a=fbs&key='+encodeURIComponent(key)+'&_='+Date.now());const o=await r.json();
+    else try{const o=await sheetGet('?a=fbs&key='+encodeURIComponent(key));
       if(o.error)TFB.err=o.error==='key'?'Cədvəl açarı səhvdir.':o.error==='a'?'Google Cədvəlin skriptini yeniləyin (yeni Kod.gs).':'Xəta: '+o.error;else TFB.rows=o.rows||[]}
-    catch(e){TFB.err='Yükləmək alınmadı. İnterneti yoxlayın.'}}
+    catch(e){TFB.err=navigator.onLine===false?'İnternet yoxdur. Bağlantını yoxlayın.':BUSY}}
   const A=(TFB.rows||[]).slice().sort((a,b)=>(+b.at||0)-(+a.at||0)),F=TFB.f||'',st=f=>f.st||'Yeni';
   const L=A.filter(f=>F==='Arxiv'?st(f)==='Arxiv':F?st(f)===F:st(f)!=='Arxiv');
   const y=window.scrollY,same=!!document.getElementById('tfbList');
@@ -9437,13 +9437,16 @@ function tKey(){
   let h=hdr('Cədvəl açarı','Bir dəfə daxil edin','tHome()','bl')+`<form class="tlogin" style="${colorVars('bl')}" onsubmit="event.preventDefault();lsSet('mnv-tkey',document.getElementById('tk').value.trim());TU={list:null,res:null,q:'',f:'Yeni',r:'',err:'',load:false,msg:'',px:new Set(),pxOk:false};TMSG='Açar yadda saxlandı.';tHome()"><input id="tk" type="password" autocomplete="off" placeholder="Açar" value="${esc(lsGet('mnv-tkey',''))}" style="letter-spacing:.05em"><button class="btn" type="submit">Yadda saxla</button></form><p class="tnote" style="margin-top:12px">Açar Google Cədvəlin skriptindədir (KEY). Şagirdlərə verməyin.</p>`;
   app.innerHTML=h;window.scrollTo(0,0);
 }
+/* 🔁 müəllim paneli: cədvəl məşğul olanda (Google skripti eyni anda bir sorğu işləyir) 3 dəfəyə qədər yenidən cəhd */
+async function sheetGet(q){let last;for(let i=0;i<3;i++){try{const r=await fetch(SHEET_URL+q+'&_='+Date.now());const o=await r.json();return o}catch(e){last=e;if(i<2)await new Promise(ok=>setTimeout(ok,i?4000:1500))}}throw last}
+const BUSY='Cədvəl hazırda məşğuldur (çox şagird eyni anda işləyir). Bir az sonra «Yenilə» düyməsinə basın.';
 async function tFetch(kind){
   const key=lsGet('mnv-tkey','');TU.err='';
   if(!SHEET_URL){TU.err='Google Cədvəl hələ qoşulmayıb.';return}
   if(!key){TU.err='Əvvəlcə "Cədvəl açarı"nı daxil edin.';return}
-  try{const r=await fetch(SHEET_URL+'?a='+kind+'&key='+encodeURIComponent(key)+'&_='+Date.now());const o=await r.json();
+  try{const o=await sheetGet('?a='+kind+'&key='+encodeURIComponent(key));
     if(o.error)TU.err=o.error==='key'?'Cədvəl açarı səhvdir.':'Xəta: '+o.error;else{TU[kind==='users'?'list':'res']=o.rows||[];(o.rows||[]).forEach(x=>{if(/^L (11|14)$/.test(x.grp||''))x.grp='N'+x.grp.slice(1)})}
-  }catch(e){TU.err='Məlumatı yükləmək alınmadı. İnterneti yoxlayın.'}
+  }catch(e){TU.err=navigator.onLine===false?'İnternet yoxdur. Bağlantını yoxlayın.':BUSY}
 }
 const dOnly=t=>{if(!t)return '';const d=new Date(+t||t);return isNaN(d)?String(t):fmtD(+d)};
 /* premium in the other site's sheet (same phone = same student); works when both scripts use the same KEY */
