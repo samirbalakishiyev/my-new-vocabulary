@@ -9564,8 +9564,8 @@ async function tSet(a,tel,v){
   tUsers();
   const post=(url)=>fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a,key,tel,v})}).then(r=>r.json());
   try{const o=await post(SHEET_URL);if(!o.ok)throw new Error(o.error||'x');
-    if(a==='elaqe'&&v&&o.t)u.elaqe=o.t;if(a==='elaqe'&&o.unb){u.blok=false;u.ab='';tUsers();}
-    tToast(a==='block'?(v?'🚫 Bloklandı':'✅ Blok açıldı'):a==='premium'?(v?'👑 Premium açıldı':'Premium götürüldü'):a==='slug'?(v?'📚 PDF lüğətlər açıldı':'📚 PDF lüğətlər bağlandı'):(v?'💳 Ödəniş edənlərə əlavə olundu':'Ödəniş işarəsi götürüldü'));
+    if(a==='elaqe'&&v&&o.t)u.elaqe=o.t;if(a==='elaqe'&&o.unb){u.blok=false;u.ab='';tUsers();}if(a==='elaqe'&&v&&!o.unb&&u.blok){/* 💳 ödəniş = blokdan çıxar (hər blok növü üçün) */try{const b=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({a:'block',key,tel,v:false})}).then(r=>r.json());if(b&&b.ok){u.blok=false;u.ab='';o.unb=true;tUsers();}}catch(e){}}
+    tToast(a==='block'?(v?'🚫 Bloklandı':'✅ Blok açıldı'):a==='premium'?(v?'👑 Premium açıldı':'Premium götürüldü'):a==='slug'?(v?'📚 PDF lüğətlər açıldı':'📚 PDF lüğətlər bağlandı'):(v?(o.unb?'💳 Ödəniş qeyd olundu · ✅ blok açıldı':'💳 Ödəniş edənlərə əlavə olundu'):'Ödəniş işarəsi götürüldü'));
   }catch(e){u[F]=old;if(oldX)TU.px.add(String(tel));tUsers();const m=String(e&&e.message);
     tToast(m==='key'?'Cədvəl açarı səhvdir.':'Alınmadı. Google Cədvəlin skriptini yeniləmisiniz?')}
 }
