@@ -9115,6 +9115,66 @@ const SAMIR_TEL='557958625';
 const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 let REG=lsGet('mnv-reg2',null);
+
+/* ☁️ İRƏLİLƏYİŞ SİNXRONU — şagirdin işlədikləri telefon nömrəsinə bağlı Google Cədvəldə ("İrəliləyiş" vərəqi) saxlanır.
+   Eyni nömrə ilə başqa telefonda / kompüterdə açanda hamısı geri gəlir. Heç nə silinmir: iki cihazın işi birləşdirilir. */
+const PSYNC=(()=>{
+  const META='mnv-ps',INC=/^(?:myvocab-v2|myvocab-prof|mnv-paV2|mnv-speak|mnv-speak-lv|mnv-pwlab|gr_done|gr_mist|e9-msq|e9-msn)$/,EXC=/(?:^|[-_])(?:tkey|reg2?|blok|gone|ps|cfg|q|sendq|dev|tdev)$/i;
+  const url=()=>SHEET_URL,tel=()=>{try{return REG&&REG.tel?String(REG.tel):''}catch(e){return ''}};
+  const ok=k=>!!k&&k!==META&&INC.test(k)&&!EXC.test(k);
+  const H=s=>{let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)+'.'+s.length};
+  const mGet=()=>{try{const m=JSON.parse(localStorage.getItem(META)||'null');if(m&&typeof m==='object')return {o:String(m.o||''),s:m.s||{},h:m.h||{},lu:+m.lu||0}}catch(e){}return {o:'',s:{},h:{},lu:0}};
+  const mSet=m=>{try{localStorage.setItem(META,JSON.stringify(m))}catch(e){}};
+  const own=(m,t)=>{if(m.o!==t){m.o=t;m.s={};m.h={}}return m}; /* yeni nömrə: bu cihazdakı iş onun hesabı ilə birləşir, heç nə silinmir */
+  const isO=x=>x&&typeof x==='object'&&!Array.isArray(x);
+  function deep(a,b){
+    if(a===undefined||a===null)return b;if(b===undefined||b===null)return a;
+    if(Array.isArray(a)&&Array.isArray(b)){const seen=new Set(a.map(x=>JSON.stringify(x))),o=a.slice();b.forEach(x=>{const k=JSON.stringify(x);if(!seen.has(k)){seen.add(k);o.push(x)}});return o}
+    if(isO(a)&&isO(b)){const o=Object.assign({},b,a);for(const k in a)if(k in b)o[k]=deep(a[k],b[k]);return o}
+    if(typeof a==='number'&&typeof b==='number')return Math.max(a,b);
+    if(typeof a==='boolean'&&typeof b==='boolean')return a||b;
+    return a}
+  const mergeRaw=(a,b)=>{try{return JSON.stringify(deep(JSON.parse(a),JSON.parse(b)))}catch(e){return a}};
+  async function post(o,keep){const r=await fetch(url(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o),keepalive:!!keep});return r.json()}
+  let busy=false,started=false,hid=0;
+  async function pull(reload){
+    const t=tel();if(!t||!url()||busy)return;busy=true;let ch=0;
+    try{
+      const o=await post({a:'pget',tel:t});if(!o||!o.ok||!isO(o.d))return;
+      const m=own(mGet(),t);
+      for(const k in o.d){
+        if(!ok(k))continue;const sv=o.d[k];if(!sv||typeof sv.v!=='string')continue;
+        const L=localStorage.getItem(k),st=+sv.t||0,seen=m.s[k];
+        if(L===null){localStorage.setItem(k,sv.v);m.h[k]=H(sv.v);m.s[k]=st;ch++;continue}
+        if(L===sv.v){m.h[k]=H(L);m.s[k]=st;continue}
+        const dirty=m.h[k]!==H(L);
+        if(seen===undefined||(st>seen&&dirty)){const mv=mergeRaw(L,sv.v);if(mv!==L){localStorage.setItem(k,mv);ch++}m.s[k]=st}  /* hər iki tərəfdə iş var: birləşdir (sonra serverə gedir) */
+        else if(st>seen){localStorage.setItem(k,sv.v);m.h[k]=H(sv.v);m.s[k]=st;ch++}                                     /* başqa cihazda irəliləyib */
+      }
+      mSet(m);
+    }catch(e){return}finally{busy=false}
+    if(ch&&reload){let a=[];try{a=JSON.parse(sessionStorage.getItem('ps-rl')||'[]').filter(x=>Date.now()-x<600000)}catch(e){}
+      if(a.length<3){a.push(Date.now());try{sessionStorage.setItem('ps-rl',JSON.stringify(a))}catch(e){}location.reload();return}}
+    push(false);
+  }
+  async function push(keep){
+    const t=tel();if(!t||!url()||busy)return;
+    const m=own(mGet(),t),d={},sent={};let n=0,size=0;
+    try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(!ok(k))continue;const v=localStorage.getItem(k);if(v===null||v.length>1500000)continue;const h=H(v);if(m.h[k]===h)continue;d[k]={v,b:m.s[k]||0};sent[k]=h;n++;size+=v.length}}catch(e){}
+    if(!n)return;busy=true;
+    try{const o=await post({a:'pset',tel:t,d},keep&&size<60000);
+      if(o&&o.ok&&isO(o.t)){const m2=own(mGet(),t);for(const k in sent){const r=o.t[k];if(r===undefined)continue;m2.h[k]=sent[k];if(r>0)m2.s[k]=r}m2.lu=Date.now();mSet(m2)}
+    }catch(e){}finally{busy=false}
+  }
+  function start(){
+    if(started||!tel()||!url())return;started=true;
+    setTimeout(()=>pull(true),700);
+    setInterval(()=>{if(document.visibilityState==='visible'&&Date.now()-mGet().lu>90000)push(false)},60000);
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'){hid=Date.now();push(true)}else if(hid&&Date.now()-hid>120000){hid=0;pull(true)}});
+    window.addEventListener('pagehide',()=>push(true));
+  }
+  return {start,pull,push,deep};
+})();
 const isStandalone=()=>{try{return window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true}catch(e){return false}};
 const devName=()=>{const u=navigator.userAgent||'';return /iPhone|iPad|iPod/.test(u)?'iPhone/iPad':/Android/.test(u)?'Android':'Kompüter'};
 
@@ -9238,7 +9298,7 @@ function regSubmit(){
   REG={ad,soyad,yas,tel,rol:RG.rol,at:Date.now()};
   lsSet('mnv-reg2',REG);
   if(!PR.n){PR.n=ad+' '+soyad;psave()}
-  home();syncPing();
+  home();syncPing();PSYNC.start();
 }
 
 /* ---------- add-to-home-screen tip on the home page ---------- */
@@ -9643,6 +9703,7 @@ function boot(){
   if(lsGet('mnv-gone',0)){goneScreen();return}
   if(!REG){regScreen();cfgPull();return}
   if(String(REG.tel)===SAMIR_TEL&&!lsGet('mnv-tkey','')){telFix();cfgPull();return} /* şagird səhvən müəllimin nömrəsini yazıb */
+  PSYNC.start(); /* ☁️ irəliləyiş nömrəyə bağlı */
   if(lsGet('mnv-blok',0)){blockScreen();syncPing();return}
   lsSet('mnv-visits',lsGet('mnv-visits',0)+1);
   home();LASTPING=Date.now();syncPing();cfgPull();setTimeout(fbSync,1500);

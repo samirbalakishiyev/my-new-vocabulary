@@ -638,7 +638,8 @@ function doGet_(e) {
 /* Yaz: ping (qeydiyyat + son giriş + blok yoxlaması), pq (premium yoxlaması), block, elaqe (ödəniş), premium, cfg (müəllim) */
 function doPost(e) {
   let o0 = {}; try { o0 = JSON.parse(e.postData.contents || '{}'); } catch (x) {}
-  if (o0.a === 'wcheck') return out(wCheck(o0)); /* 📝 öz kilidi var: süni intellekt cavabını gözləyərkən cədvəl bağlı qalmır */
+  if (o0.a === 'wcheck') return out(wCheck(o0));
+  if (o0.a === 'pget' || o0.a === 'pset') return out(psHandle(o0)); /* ☁️ irəliləyiş: öz kilidi var */ /* 📝 öz kilidi var: süni intellekt cavabını gözləyərkən cədvəl bağlı qalmır */
   const lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
@@ -698,3 +699,78 @@ function doPost(e) {
     lock.releaseLock();
   }
 }
+
+/* ☁️ İRƏLİLƏYİŞ — şagirdin işlədiyi materiallar telefon nömrəsinə bağlı "İrəliləyiş" vərəqində saxlanır.
+   Şagird başqa telefonda / kompüterdə eyni nömrə ilə açanda hamısı geri gəlir. Bu vərəqi əl ilə dəyişməyin.
+   Hər açar ayrıca saxlanır: {v: dəyər, t: serverə yazılma vaxtı}. Bir cihaz köhnə versiya üzərində yazırsa,
+   heç nə itməsin deyə iki versiya birləşdirilir. */
+const PS_NAME = 'İrəliləyiş', PS_CH = 45000, PS_MAXK = 300, PS_MAXV = 1500000;
+function psSheet_() {
+  const ss = SpreadsheetApp.getActive();
+  let s = ss.getSheetByName(PS_NAME);
+  if (!s) {
+    s = ss.insertSheet(PS_NAME);
+    s.getRange(1, 1, 1, 4).setValues([['Nömrə', 'Yenilənib', 'Ölçü (KB)', 'Məlumat (avtomatik — dəyişməyin)']]).setFontWeight('bold');
+    s.setFrozenRows(1); s.setColumnWidth(1, 110); s.setColumnWidth(2, 140);
+  }
+  return s;
+}
+function psRow_(s, tel) {
+  if (s.getLastRow() < 2) return 0;
+  const c = s.getRange(2, 1, s.getLastRow() - 1, 1).createTextFinder(tel).matchEntireCell(true).findNext();
+  return c ? c.getRow() : 0;
+}
+function psLoad_(s, r) {
+  if (!r) return {};
+  const w = s.getLastColumn(); if (w < 4) return {};
+  const b64 = s.getRange(r, 4, 1, w - 3).getValues()[0].map(x => String(x || '').replace(/^~/, '')).join('');
+  if (!b64) return {};
+  try { return JSON.parse(Utilities.ungzip(Utilities.newBlob(Utilities.base64Decode(b64), 'application/x-gzip')).getDataAsString('UTF-8')) || {}; }
+  catch (e) { console.error('ps load: ' + e); return null; }
+}
+function psSave_(s, r, tel, map) {
+  const json = JSON.stringify(map);
+  const b64 = Utilities.base64Encode(Utilities.gzip(Utilities.newBlob(json, 'application/json', 'p.json')).getBytes());
+  const ch = []; for (let i = 0; i < b64.length; i += PS_CH) ch.push('~' + b64.slice(i, i + PS_CH));
+  const row = ["'" + tel, new Date(), Math.round(json.length / 1024)].concat(ch);
+  const put = r => {
+    const old = Math.max(s.getLastColumn() - 3, 0);
+    if (old > ch.length) s.getRange(r, 4 + ch.length, 1, old - ch.length).clearContent();
+    s.getRange(r, 1, 1, row.length).setValues([row]);
+    s.getRange(r, 2).setNumberFormat('dd.MM.yyyy HH:mm');
+  };
+  if (r) return put(r);
+  const lock = LockService.getScriptLock(); lock.waitLock(15000); /* yeni sətir: iki şagird eyni sətrə yazmasın */
+  try { put(psRow_(s, tel) || s.getLastRow() + 1); SpreadsheetApp.flush(); } finally { lock.releaseLock(); }
+}
+const psIsO_ = x => x && typeof x === 'object' && !Array.isArray(x);
+function psDeep_(a, b) { /* a üstündür; heç nə itmir: siyahılar birləşir, rəqəmlərdən böyüyü, true qalır */
+  if (a === undefined || a === null) return b;
+  if (b === undefined || b === null) return a;
+  if (Array.isArray(a) && Array.isArray(b)) { const seen = new Set(a.map(x => JSON.stringify(x))), o = a.slice(); b.forEach(x => { const k = JSON.stringify(x); if (!seen.has(k)) { seen.add(k); o.push(x); } }); return o; }
+  if (psIsO_(a) && psIsO_(b)) { const o = Object.assign({}, b, a); for (const k in a) if (k in b) o[k] = psDeep_(a[k], b[k]); return o; }
+  if (typeof a === 'number' && typeof b === 'number') return Math.max(a, b);
+  if (typeof a === 'boolean' && typeof b === 'boolean') return a || b;
+  return a;
+}
+function psMergeRaw_(a, b) { try { return JSON.stringify(psDeep_(JSON.parse(a), JSON.parse(b))); } catch (e) { return a; } }
+function psHandle(o) {
+  const tel = String(o.tel || '').replace(/\D/g, '');
+  if (tel.length !== 9 || !psUserOK_(tel)) return { ok: false, error: 'user' };
+  const s = psSheet_(), r = psRow_(s, tel), map = psLoad_(s, r);
+  if (map === null) return { ok: false, error: 'read' };
+  if (o.a === 'pget') return { ok: true, d: map };
+  /* pset: d = {açar: {v: dəyər, b: cihazın son gördüyü vaxt}} */
+  const d = psIsO_(o.d) ? o.d : {}, now = Date.now(), res = {};
+  Object.keys(d).slice(0, PS_MAXK).forEach(k => {
+    const x = d[k]; if (!x || typeof x.v !== 'string' || x.v.length > PS_MAXV) return;
+    const cur = map[k];
+    if (!cur || !cur.t || (+x.b || 0) >= cur.t) { map[k] = { v: x.v, t: now }; res[k] = now; }
+    else if (cur.v === x.v) { res[k] = cur.t; }
+    else { map[k] = { v: psMergeRaw_(x.v, cur.v), t: now }; res[k] = -1; } /* başqa cihaz yeniləyib: birləşdirildi */
+  });
+  if (Object.keys(res).length) psSave_(s, r, tel, map);
+  return { ok: true, t: res };
+}
+
+function psUserOK_(tel) { if (delMap()[tel]) return false; return !!userRow(usersSheet(), tel); }
